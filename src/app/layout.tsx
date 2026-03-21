@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import { DM_Sans } from 'next/font/google';
-import './globals.css';
 import { AppToaster } from '@/components/ui';
+import { AuthProvider } from '@/components/shared';
+import './globals.css';
 
 const dmSans = DM_Sans({
     subsets: ['latin'],
@@ -23,8 +24,16 @@ export default function RootLayout({
     return (
         <html lang="en" className={dmSans.variable}>
             <body className="font-sans antialiased">
-                <AppToaster />
-                {children}
+                {/*
+          AuthProvider restores tokens from sessionStorage into the
+          Zustand store on every page load/refresh.
+          Must wrap everything so tokens are available before any
+          child component fires an authenticated API call.
+        */}
+                <AuthProvider>
+                    <AppToaster />
+                    {children}
+                </AuthProvider>
             </body>
         </html>
     );
