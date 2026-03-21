@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
-import { Button, Input, Card } from '@/components/ui';
+import { Button, Input, Card, toast } from '@/components/ui';
 import { CitizenPreview } from './CitizenPreview';
 import { PasswordStrength } from './PasswordStrength';
 import { citizenLookupApi, type CitizenData } from '@/api/auth/citizen-lookup.api';
@@ -109,19 +109,28 @@ export function RegistrationForm() {
 
     const watchPassword = step2.watch('password', '');
 
-    // ── API hooks
+    // In the lookupCitizen useApi call — add successMessage:
     const { execute: lookupCitizen, loading: lookupLoading, error: lookupError } =
         useApi(citizenLookupApi, {
+            showErrorToast: true,
             onSuccess: (res) => {
                 setCitizenData(res.data);
                 setDocumentNumber(step1.getValues('documentNumber'));
+                toast.success('Identity found', {
+                    description: `Welcome, ${res.data.postNames} ${res.data.surName}`,
+                });
                 setStep(1);
             },
         });
 
+    // In the register useApi call:
     const { execute: register, loading: registerLoading, error: registerError } =
         useApi(registerApi, {
+            showErrorToast: true,
             onSuccess: (res) => {
+                toast.success('Account created!', {
+                    description: 'Check your email for a verification link.',
+                });
                 setPlatformId(res.data.platformId);
                 setStep(2);
             },
