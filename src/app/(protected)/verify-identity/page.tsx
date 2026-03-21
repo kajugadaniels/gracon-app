@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { VerificationForm } from '@/components/verify-identity';
+import { VerificationForm } from '@/components/pages/verification';
 
 export const metadata: Metadata = {
     title: 'Verify Identity — ID Verify',
