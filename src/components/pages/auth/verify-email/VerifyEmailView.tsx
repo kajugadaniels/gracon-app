@@ -59,14 +59,14 @@ export function VerifyEmailView() {
     // ── Loading state
     if (state === 'loading') {
         return (
-            <Card strength="strong" style={{ width: '100%', maxWidth: 420 }}>
+            <Card strength="strong" style={{ width: '100%', maxWidth: 400 }}>
                 <div
                     className="animate-fade-in"
                     style={{
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
-                        gap: 20,
+                        gap: 18,
                         padding: '12px 0',
                         textAlign: 'center',
                     }}
@@ -74,10 +74,10 @@ export function VerifyEmailView() {
                     {/* Spinner */}
                     <div
                         style={{
-                            width: 48,
-                            height: 48,
+                            width: 44,
+                            height: 44,
                             borderRadius: '50%',
-                            border: '3px solid rgba(255,255,255,0.10)',
+                            border: '3px solid rgba(91,35,255,0.14)',
                             borderTopColor: 'var(--color-primary)',
                             animation: 'btn-spin 0.8s linear infinite',
                         }}
@@ -85,15 +85,15 @@ export function VerifyEmailView() {
                     <div>
                         <h2
                             style={{
-                                fontSize: 20,
+                                fontSize: 16,
                                 fontWeight: 600,
                                 color: 'var(--color-text-primary)',
-                                marginBottom: 6,
+                                marginBottom: 5,
                             }}
                         >
                             Verifying your email
                         </h2>
-                        <p style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>
+                        <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', margin: 0 }}>
                             Please wait a moment...
                         </p>
                     </div>
@@ -105,29 +105,29 @@ export function VerifyEmailView() {
     // ── Success state
     if (state === 'success' || state === 'already_verified') {
         return (
-            <Card strength="strong" style={{ width: '100%', maxWidth: 420 }}>
+            <Card strength="strong" style={{ width: '100%', maxWidth: 400 }}>
                 <div
                     className="animate-fade-up"
                     style={{
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
-                        gap: 20,
+                        gap: 18,
                         textAlign: 'center',
                     }}
                 >
                     <div
-                        className="glow-success"
+                        className="glow-success animate-scale-in"
                         style={{
-                            width: 68,
-                            height: 68,
+                            width: 60,
+                            height: 60,
                             borderRadius: '50%',
                             background: 'var(--color-success-subtle)',
                             border: '2px solid var(--color-success-border)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            fontSize: 30,
+                            fontSize: 24,
                             color: 'var(--color-success)',
                         }}
                     >
@@ -137,18 +137,16 @@ export function VerifyEmailView() {
                     <div>
                         <h1
                             style={{
-                                fontSize: 24,
+                                fontSize: 18,
                                 fontWeight: 700,
                                 color: 'var(--color-text-primary)',
-                                marginBottom: 8,
+                                marginBottom: 6,
                                 letterSpacing: '-0.02em',
                             }}
                         >
-                            {state === 'already_verified'
-                                ? 'Already verified'
-                                : 'Email verified!'}
+                            {state === 'already_verified' ? 'Already verified' : 'Email verified!'}
                         </h1>
-                        <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>
+                        <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', lineHeight: 1.6, margin: 0 }}>
                             {state === 'already_verified'
                                 ? 'Your email is already verified. You can log in.'
                                 : 'Your account is now active. Complete your identity verification to access your dashboard.'}
@@ -165,28 +163,29 @@ export function VerifyEmailView() {
 
     // ── Error state
     return (
-        <Card strength="strong" style={{ width: '100%', maxWidth: 420 }}>
+        <Card strength="strong" style={{ width: '100%', maxWidth: 400 }}>
             <div
                 className="animate-fade-up"
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    gap: 20,
+                    gap: 18,
                     textAlign: 'center',
                 }}
             >
                 <div
+                    className="animate-scale-in"
                     style={{
-                        width: 68,
-                        height: 68,
+                        width: 60,
+                        height: 60,
                         borderRadius: '50%',
                         background: 'var(--color-error-subtle)',
                         border: '2px solid var(--color-error-border)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        fontSize: 30,
+                        fontSize: 24,
                         color: 'var(--color-error)',
                     }}
                 >
@@ -196,21 +195,21 @@ export function VerifyEmailView() {
                 <div>
                     <h1
                         style={{
-                            fontSize: 24,
+                            fontSize: 18,
                             fontWeight: 700,
                             color: 'var(--color-text-primary)',
-                            marginBottom: 8,
+                            marginBottom: 6,
                             letterSpacing: '-0.02em',
                         }}
                     >
                         Verification failed
                     </h1>
-                    <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>
+                    <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', lineHeight: 1.6, margin: 0 }}>
                         {message}
                     </p>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%' }}>
                     {!resendDone ? (
                         <Button
                             variant="ghost"
@@ -224,10 +223,12 @@ export function VerifyEmailView() {
                         </Button>
                     ) : (
                         <p
+                            className="animate-fade-in"
                             style={{
                                 fontSize: 13,
                                 color: 'var(--color-success)',
                                 textAlign: 'center',
+                                margin: 0,
                             }}
                         >
                             A new verification email has been sent if your account exists.
