@@ -14,26 +14,23 @@ export function ProfileCard() {
     return (
         <Card
             strength="strong"
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 20,
-            }}
+            className="animate-fade-up"
+            style={{ display: 'flex', flexDirection: 'column', gap: 18 }}
         >
             {/* Avatar + name row */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                 {/* Avatar */}
                 <div
                     style={{
-                        width: 64,
-                        height: 64,
+                        width: 56,
+                        height: 56,
                         borderRadius: '50%',
                         background: 'var(--color-primary-subtle)',
                         border: '2px solid var(--color-border-primary)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        fontSize: 22,
+                        fontSize: 18,
                         fontWeight: 700,
                         color: 'var(--color-primary)',
                         flexShrink: 0,
@@ -59,10 +56,10 @@ export function ProfileCard() {
                 <div style={{ flex: 1, minWidth: 0 }}>
                     <div
                         style={{
-                            fontSize: 20,
+                            fontSize: 16,
                             fontWeight: 700,
                             color: 'var(--color-text-primary)',
-                            marginBottom: 4,
+                            marginBottom: 5,
                             letterSpacing: '-0.01em',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
@@ -83,36 +80,37 @@ export function ProfileCard() {
 
             {/* Details grid */}
             <div
+                className="stagger"
                 style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-                    gap: 16,
-                    paddingTop: 16,
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+                    gap: 14,
+                    paddingTop: 14,
                     borderTop: '1px solid var(--color-border)',
                 }}
             >
                 {[
-                    { label: 'Email', value: user.email },
-                    { label: 'Phone', value: user.phoneNumber ?? '—' },
-                    { label: 'Sex', value: user.sex },
-                    { label: 'Member since', value: new Date(user.createdAt).toLocaleDateString() },
+                    { label: 'Email',         value: user.email },
+                    { label: 'Phone',         value: user.phoneNumber ?? '—' },
+                    { label: 'Sex',           value: user.sex },
+                    { label: 'Member since',  value: new Date(user.createdAt).toLocaleDateString() },
                 ].map(({ label, value }) => (
-                    <div key={label}>
+                    <div key={label} className="animate-fade-up">
                         <div
                             style={{
                                 fontSize: 11,
-                                fontWeight: 500,
+                                fontWeight: 600,
                                 color: 'var(--color-text-muted)',
                                 textTransform: 'uppercase',
                                 letterSpacing: '0.06em',
-                                marginBottom: 4,
+                                marginBottom: 3,
                             }}
                         >
                             {label}
                         </div>
                         <div
                             style={{
-                                fontSize: 14,
+                                fontSize: 13,
                                 fontWeight: 500,
                                 color: 'var(--color-text-primary)',
                                 overflow: 'hidden',

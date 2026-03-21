@@ -23,12 +23,13 @@ export function PlatformIdCard({ platformId }: PlatformIdCardProps) {
 
     return (
         <Card
+            className="animate-fade-up"
             style={{
                 background: 'var(--color-primary-subtle)',
                 border: '1px solid var(--color-border-primary)',
             }}
         >
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {/* Header */}
                 <div
                     style={{
@@ -57,8 +58,10 @@ export function PlatformIdCard({ platformId }: PlatformIdCardProps) {
                             cursor: 'pointer',
                             fontSize: 12,
                             fontWeight: 500,
-                            color: 'var(--color-text-secondary)',
+                            color: 'var(--color-primary)',
                             padding: '2px 6px',
+                            borderRadius: 6,
+                            transition: 'background 150ms ease',
                         }}
                     >
                         {revealed ? 'Hide' : 'Reveal'}
@@ -69,12 +72,12 @@ export function PlatformIdCard({ platformId }: PlatformIdCardProps) {
                 <div
                     style={{
                         fontFamily: 'var(--font-mono, monospace)',
-                        fontSize: 22,
+                        fontSize: 18,
                         fontWeight: 700,
                         color: 'var(--color-text-primary)',
-                        letterSpacing: '0.12em',
+                        letterSpacing: '0.10em',
                         filter: revealed ? 'none' : 'blur(8px)',
-                        transition: 'filter 300ms ease',
+                        transition: 'filter 280ms ease',
                         userSelect: revealed ? 'text' : 'none',
                     }}
                 >
@@ -92,8 +95,9 @@ export function PlatformIdCard({ platformId }: PlatformIdCardProps) {
                 {revealed && (
                     <button
                         onClick={handleCopy}
+                        className="animate-fade-in"
                         style={{
-                            background: copied ? 'var(--color-success-subtle)' : 'rgba(255,255,255,0.06)',
+                            background: copied ? 'var(--color-success-subtle)' : 'rgba(91,35,255,0.08)',
                             border: `1px solid ${copied ? 'var(--color-success-border)' : 'var(--color-border)'}`,
                             borderRadius: 'var(--radius-sm)',
                             padding: '6px 14px',
@@ -102,7 +106,7 @@ export function PlatformIdCard({ platformId }: PlatformIdCardProps) {
                             fontWeight: 500,
                             color: copied ? 'var(--color-success)' : 'var(--color-text-secondary)',
                             alignSelf: 'flex-start',
-                            transition: 'all 200ms ease',
+                            transition: 'all 180ms ease',
                         }}
                     >
                         {copied ? '✓ Copied' : 'Copy to clipboard'}

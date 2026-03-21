@@ -30,13 +30,13 @@ export function VerificationStatus() {
             <Card>
                 <div
                     style={{
-                        height: 60,
-                        background: 'rgba(255,255,255,0.04)',
+                        height: 52,
                         borderRadius: 8,
-                        animation: 'shimmer 1.4s ease-in-out infinite',
+                        background: 'rgba(91,35,255,0.05)',
                         backgroundSize: '200% 100%',
                         backgroundImage:
-                            'linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%)',
+                            'linear-gradient(90deg, rgba(91,35,255,0.04) 25%, rgba(91,35,255,0.10) 50%, rgba(91,35,255,0.04) 75%)',
+                        animation: 'shimmer 1.4s ease-in-out infinite',
                     }}
                 />
             </Card>
@@ -45,20 +45,20 @@ export function VerificationStatus() {
 
     if (isVerified) {
         return (
-            <Card>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <Card className="animate-fade-up">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                     <div
                         className="glow-success"
                         style={{
-                            width: 44,
-                            height: 44,
+                            width: 40,
+                            height: 40,
                             borderRadius: '50%',
                             background: 'var(--color-success-subtle)',
                             border: '2px solid var(--color-success-border)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            fontSize: 20,
+                            fontSize: 17,
                             color: 'var(--color-success)',
                             flexShrink: 0,
                         }}
@@ -68,19 +68,21 @@ export function VerificationStatus() {
                     <div>
                         <div
                             style={{
-                                fontSize: 15,
+                                fontSize: 14,
                                 fontWeight: 600,
                                 color: 'var(--color-text-primary)',
-                                marginBottom: 3,
+                                marginBottom: 2,
                             }}
                         >
                             Identity verified
                         </div>
-                        <div style={{ fontSize: 13, color: 'var(--color-text-muted)' }}>
+                        <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>
                             Your National ID has been verified successfully
                         </div>
                     </div>
-                    <StatusBadge status="verified" pulse label="Verified" />
+                    <div style={{ marginLeft: 'auto' }}>
+                        <StatusBadge status="verified" pulse label="Verified" />
+                    </div>
                 </div>
             </Card>
         );
@@ -88,30 +90,25 @@ export function VerificationStatus() {
 
     return (
         <Card
+            className="animate-fade-up"
             style={{
-                border: '1px solid var(--color-warning-subtle)',
-                background: 'rgba(245,158,11,0.04)',
+                border: '1px solid rgba(217,119,6,0.22)',
+                background: 'rgba(217,119,6,0.04)',
             }}
         >
-            <div
-                style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 16,
-                }}
-            >
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
                     <div
                         style={{
-                            width: 40,
-                            height: 40,
+                            width: 36,
+                            height: 36,
                             borderRadius: '50%',
                             background: 'var(--color-warning-subtle)',
-                            border: '1px solid rgba(245,158,11,0.30)',
+                            border: '1px solid rgba(217,119,6,0.28)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            fontSize: 18,
+                            fontSize: 16,
                             flexShrink: 0,
                         }}
                     >
@@ -120,27 +117,24 @@ export function VerificationStatus() {
                     <div>
                         <div
                             style={{
-                                fontSize: 15,
+                                fontSize: 14,
                                 fontWeight: 600,
                                 color: 'var(--color-text-primary)',
-                                marginBottom: 4,
+                                marginBottom: 3,
                             }}
                         >
                             Identity verification required
                         </div>
                         <div
                             style={{
-                                fontSize: 13,
+                                fontSize: 12,
                                 color: 'var(--color-text-secondary)',
                                 lineHeight: 1.5,
                             }}
                         >
-                            You need to verify your identity before you can access all
-                            features.{' '}
+                            You need to verify your identity before you can access all features.{' '}
                             {attemptsRemaining !== null && (
-                                <span>
-                                    {attemptsRemaining} attempt(s) remaining today.
-                                </span>
+                                <span>{attemptsRemaining} attempt(s) remaining today.</span>
                             )}
                         </div>
                     </div>
@@ -157,13 +151,12 @@ export function VerificationStatus() {
                 ) : (
                     <p
                         style={{
-                            fontSize: 13,
+                            fontSize: 12,
                             color: 'var(--color-error)',
                             margin: 0,
                         }}
                     >
-                        Maximum attempts reached for today. Please try again tomorrow
-                        or contact support.
+                        Maximum attempts reached for today. Please try again tomorrow or contact support.
                     </p>
                 )}
             </div>
