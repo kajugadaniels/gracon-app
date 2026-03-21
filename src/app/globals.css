@@ -110,8 +110,8 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  padding: 9px 22px;
+  gap: 8px;
+  padding: 11px 28px;
   background: var(--color-primary);
   color: #ffffff;
   font-family: var(--font-sans);
@@ -160,8 +160,8 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  padding: 8px 20px;
+  gap: 8px;
+  padding: 10px 24px;
   background: rgba(91, 35, 255, 0.06);
   color: var(--color-text-primary);
   font-family: var(--font-sans);
