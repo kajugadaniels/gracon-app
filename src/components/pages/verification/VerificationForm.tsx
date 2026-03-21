@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
-import { Button, Input, Card, StatusBadge } from '@/components/ui';
+import { Button, Input, Card, StatusBadge, toast } from '@/components/ui';
 import { DocumentUpload } from './DocumentUpload';
 import { ScoreRing } from './ScoreRing';
 import { submitVerificationApi, type VerificationResult } from '@/api/verification/submit-verification.api';
@@ -91,24 +91,30 @@ export function VerificationForm() {
         formState: { errors },
     } = useForm<FormFields>({ resolver: zodResolver(schema) });
 
+    // In the submit useApi call:
     const { execute: submit, loading, error: apiError } = useApi(
         submitVerificationApi,
         {
+            showErrorToast: true,
             onSuccess: (res) => {
                 const result = res.data ?? res;
                 setResult(result);
 
                 if (result.passed) {
-                    // Update user store — fully verified now
                     if (user) setUser({ ...user, isIdVerified: true });
-
-                    // Upgrade tokens — replace limited token with full token
                     if (result.upgradedTokens) {
                         setTokens(
                             result.upgradedTokens.accessToken,
                             result.upgradedTokens.refreshToken,
                         );
                     }
+                    toast.success('Identity verified!', {
+                        description: `Score: ${Math.round(result.compositeScore)}% — You can now log in.`,
+                    });
+                } else {
+                    toast.error('Verification failed', {
+                        description: result.failReason ?? 'Please try again with clearer photos.',
+                    });
                 }
             },
         },
