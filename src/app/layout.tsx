@@ -23,7 +23,7 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en" className={dmSans.variable}>
-            <body className="font-sans antialiased">
+            <body className="font-sans antialiased" suppressHydrationWarning>
                 {/*
           AuthProvider restores tokens from sessionStorage into the
           Zustand store on every page load/refresh.
