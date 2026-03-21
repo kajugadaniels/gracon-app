@@ -1,6 +1,7 @@
 // Layout for authenticated pages — dashboard, verify-identity
 // Includes navbar — all children are wrapped with it
-import { Navbar } from '@/components/shared';
+
+import { Navbar } from "@/components/shared";
 
 export default function ProtectedLayout({
     children,

@@ -1,5 +1,3 @@
-import { string } from "zod";
-
 // Displays verification status — used on dashboard and step indicators
 type BadgeStatus = 'verified' | 'pending' | 'failed' | 'unverified';
 
@@ -10,10 +8,10 @@ interface StatusBadgeProps {
     pulse?: boolean;
 }
 
-const statusConfig: Record
-BadgeStatus,
-    { color: string, bg: string; border: string; defaultLabel: string; icon: string }
-    > = {
+const statusConfig: Record<
+    BadgeStatus,
+    { color: string; bg: string; border: string; defaultLabel: string; icon: string }
+> = {
     verified: {
         color: 'var(--color-success)',
             bg: 'var(--color-success-subtle)',
