@@ -5,3 +5,4 @@ export { Input }       from './Input';
 export { Card }        from './Card';
 export { StatusBadge } from './StatusBadge';
 export { AppToaster, toast } from './Toast';
+export { PremiumLoader }    from './Loader';
