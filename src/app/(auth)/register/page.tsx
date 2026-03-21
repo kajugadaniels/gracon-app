@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { RegistrationForm } from '@/components/register';
+import { RegistrationForm } from '@/components/pages/auth/register';
 
 export const metadata: Metadata = {
     title: 'Create Account — ID Verify',
