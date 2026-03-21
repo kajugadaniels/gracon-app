@@ -10,7 +10,7 @@ export default function ProtectedLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const { isHydrated, isLoggedIn } = useAuthStore();
+    const { isHydrated, accessToken, user } = useAuthStore();
     const router = useRouter();
     const [ready, setReady] = useState(false);
 
@@ -18,14 +18,14 @@ export default function ProtectedLayout({
         // Wait for store to hydrate before checking auth state
         if (!isHydrated) return;
 
-        if (!isLoggedIn()) {
+        if (!accessToken || !user) {
             // No valid session — send to login
             router.replace('/login');
             return;
         }
 
         setReady(true);
-    }, [isHydrated, isLoggedIn, router]);
+    }, [isHydrated, accessToken, user, router]);
 
     // Show nothing while hydrating — prevents flash of protected content
     if (!ready) {
