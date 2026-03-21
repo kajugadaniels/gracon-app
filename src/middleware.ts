@@ -1,35 +1,39 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// Routes that require the user to be logged in
-const PROTECTED_ROUTES = ['/dashboard', '/verify-identity'];
+// ── Route definitions ──────────────────────────────────────────
+// AUTH_ROUTES: accessible only when NOT logged in
+// All other non-static routes require authentication
+const AUTH_ROUTES = [
+    '/login',
+    '/register',
+    '/verify-email',
+];
 
-// Routes only accessible when NOT logged in
-const AUTH_ROUTES = ['/login', '/register'];
-
-// We store a "session indicator" cookie (no sensitive data)
-// The actual token is in the Zustand store (in-memory)
-// This cookie is just a boolean flag so middleware can make decisions
+// Session indicator cookie — just a boolean flag, no sensitive data
+// Real tokens live in Zustand store (in-memory) — XSS safe
 const SESSION_COOKIE = 'session_active';
 
 export function middleware(req: NextRequest) {
     const { pathname } = req.nextUrl;
     const hasSession = req.cookies.has(SESSION_COOKIE);
 
-    // Redirect logged-in users away from auth pages
-    if (AUTH_ROUTES.some((route) => pathname.startsWith(route))) {
-        if (hasSession) {
-            return NextResponse.redirect(new URL('/dashboard', req.url));
-        }
+    const isAuthRoute = AUTH_ROUTES.some(
+        (route) => pathname === route || pathname.startsWith(`${route}/`),
+    );
+
+    // ── Logged-in user tries to access auth pages ─────────────────
+    // Redirect them to dashboard — they don't need to login again
+    if (isAuthRoute && hasSession) {
+        return NextResponse.redirect(new URL('/dashboard', req.url));
     }
 
-    // Redirect unauthenticated users away from protected pages
-    if (PROTECTED_ROUTES.some((route) => pathname.startsWith(route))) {
-        if (!hasSession) {
-            const loginUrl = new URL('/login', req.url);
-            loginUrl.searchParams.set('next', pathname);
-            return NextResponse.redirect(loginUrl);
-        }
+    // ── Unauthenticated user tries to access protected pages ───────
+    // Redirect to login, preserve intended destination in ?next param
+    if (!isAuthRoute && !hasSession) {
+        const loginUrl = new URL('/login', req.url);
+        loginUrl.searchParams.set('next', pathname);
+        return NextResponse.redirect(loginUrl);
     }
 
     return NextResponse.next();
@@ -37,7 +41,13 @@ export function middleware(req: NextRequest) {
 
 export const config = {
     matcher: [
-        // Match all routes except Next.js internals and static files
-        '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|webp)).*)',
+        /*
+         * Match all paths EXCEPT:
+         * - _next/static  (Next.js static assets)
+         * - _next/image   (Next.js image optimization)
+         * - favicon.ico
+         * - Public image files
+         */
+        '/((?!_next/static|_next/image|favicon\\.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)).*)',
     ],
 };
