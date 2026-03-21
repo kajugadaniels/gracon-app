@@ -128,16 +128,17 @@ export function ForgotPasswordForm() {
                     </Button>
 
 
-                    href="/login"
-                    style={{
-                        fontSize: 13,
-                        color: 'var(--color-primary)',
-                        fontWeight: 500,
-                        textDecoration: 'none',
-                    }}
-          >
-                    Back to login
-                </a>
+                    <a
+                        href="/login"
+                        style={{
+                            fontSize: 13,
+                            color: 'var(--color-primary)',
+                            fontWeight: 500,
+                            textDecoration: 'none',
+                        }}
+                    >
+                        Back to login
+                    </a>
             </div>
       </Card >
     );
