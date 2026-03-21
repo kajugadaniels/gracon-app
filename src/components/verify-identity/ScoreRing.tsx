@@ -1,0 +1,88 @@
+'use client';
+
+// Circular progress ring displaying the composite verification score
+interface ScoreRingProps {
+    score: number; // 0-100
+    size?: number;
+    passed: boolean;
+}
+
+export function ScoreRing({ score, size = 140, passed }: ScoreRingProps) {
+    const radius = (size - 16) / 2;
+    const circumference = 2 * Math.PI * radius;
+    const progress = (score / 100) * circumference;
+
+    const color = passed
+        ? 'var(--color-success)'
+        : score >= 60
+            ? 'var(--color-warning)'
+            : 'var(--color-error)';
+
+    return (
+        <div
+            style={{
+                position: 'relative',
+                width: size,
+                height: size,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+            }}
+        >
+            {/* SVG ring */}
+            <svg
+                width={size}
+                height={size}
+                style={{ position: 'absolute', transform: 'rotate(-90deg)' }}
+            >
+                {/* Background track */}
+                <circle
+                    cx={size / 2}
+                    cy={size / 2}
+                    r={radius}
+                    fill="none"
+                    stroke="rgba(255,255,255,0.08)"
+                    strokeWidth={8}
+                />
+                {/* Progress arc */}
+                <circle
+                    cx={size / 2}
+                    cy={size / 2}
+                    r={radius}
+                    fill="none"
+                    stroke={color}
+                    strokeWidth={8}
+                    strokeLinecap="round"
+                    strokeDasharray={circumference}
+                    strokeDashoffset={circumference - progress}
+                    style={{ transition: 'stroke-dashoffset 800ms cubic-bezier(0.34, 1.56, 0.64, 1)' }}
+                />
+            </svg>
+
+            {/* Center label */}
+            <div style={{ textAlign: 'center', zIndex: 1 }}>
+                <div
+                    style={{
+                        fontSize: size > 100 ? 28 : 22,
+                        fontWeight: 700,
+                        color,
+                        lineHeight: 1,
+                    }}
+                >
+                    {Math.round(score)}%
+                </div>
+                <div
+                    style={{
+                        fontSize: 11,
+                        color: 'var(--color-text-muted)',
+                        marginTop: 4,
+                        fontWeight: 500,
+                    }}
+                >
+                    {passed ? 'Passed' : 'Score'}
+                </div>
+            </div>
+        </div>
+    );
+}
