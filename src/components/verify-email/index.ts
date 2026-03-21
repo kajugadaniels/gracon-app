@@ -1,1 +1,0 @@
-export { VerifyEmailView } from './VerifyEmailView';
