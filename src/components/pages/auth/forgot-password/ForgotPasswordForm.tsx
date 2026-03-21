@@ -209,7 +209,6 @@ export function ForgotPasswordForm() {
                     type="submit"
                     fullWidth
                     loading={loading}
-                    loadingVariant="spinner"
                     loadingText="Sending reset link..."
                 >
                     Send reset link
