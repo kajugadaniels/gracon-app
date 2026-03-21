@@ -11,6 +11,11 @@ export interface VerificationResult {
     failReason: string | null;
     attemptsUsed: number;
     attemptsRemaining: number;
+    idInfo?: {
+        fullName: string;
+        dateOfBirth: string; // ISO string
+        documentNumber: string;
+    };
     // Present when passed=true — upgraded full tokens
     upgradedTokens?: {
         accessToken: string;
