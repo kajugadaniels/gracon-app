@@ -8,6 +8,8 @@ const AUTH_ROUTES = [
     '/login',
     '/register',
     '/verify-email',
+    '/forgot-password',
+    '/reset-password',
 ];
 
 // Session indicator cookie — just a boolean flag, no sensitive data
