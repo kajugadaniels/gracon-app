@@ -21,6 +21,9 @@ export interface UserProfile {
 export interface LoginResponse {
     success: boolean;
     message: string;
+    // "limited" = user must complete ID verification before accessing dashboard
+    // "full"    = user is fully verified, can access everything
+    tokenType: 'full' | 'limited';
     data: {
         accessToken: string;
         refreshToken: string;
@@ -28,7 +31,5 @@ export interface LoginResponse {
     };
 }
 
-// Authenticates user — all 5 gates must pass on the backend
-// Returns access token (15min) + refresh token (30 days) + safe user profile
 export const loginApi = (payload: LoginPayload) =>
     apiClient.post<LoginResponse>('/auth/login', payload);
