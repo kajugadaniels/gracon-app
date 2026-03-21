@@ -148,16 +148,17 @@ export function LoginForm() {
 
                     <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
 
-                        href="/forgot-password"
-                        style={{
-                            fontSize: 12,
-                            color: 'var(--color-text-muted)',
-                            textDecoration: 'none',
-                            fontWeight: 500,
-                        }}
-  >
-                        Forgot password?
-                    </a>
+                        <a
+                            href="/forgot-password"
+                            style={{
+                                fontSize: 12,
+                                color: 'var(--color-text-muted)',
+                                textDecoration: 'none',
+                                fontWeight: 500,
+                            }}
+                        >
+                            Forgot password?
+                        </a>
             </div>
 
             <Button
