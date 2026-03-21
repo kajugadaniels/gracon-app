@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { Button } from '@/components/ui';
+import { PremiumLoader } from '@/components/ui/Loader';
 import { useCamera, type CameraFacing, type QualityResult } from './hooks/useCamera';
 
 interface CameraCaptureProps {
@@ -426,16 +427,7 @@ export function CameraCapture({
                             gap: 12,
                         }}
                     >
-                        <div
-                            style={{
-                                width: 36,
-                                height: 36,
-                                border: '3px solid rgba(255,255,255,0.12)',
-                                borderTopColor: 'var(--color-primary)',
-                                borderRadius: '50%',
-                                animation: 'btn-spin 0.75s linear infinite',
-                            }}
-                        />
+                        <PremiumLoader size={36} color="primary" />
                         <span
                             style={{
                                 fontSize: 13,
