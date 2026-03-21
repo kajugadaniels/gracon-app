@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Card, Button } from '@/components/ui';
+import { PremiumLoader } from '@/components/ui/Loader';
 import { verifyEmailApi } from '@/api/auth/verify-email.api';
 import { resendVerificationApi } from '@/api/auth/resend-verification.api';
 
@@ -71,17 +72,8 @@ export function VerifyEmailView() {
                         textAlign: 'center',
                     }}
                 >
-                    {/* Spinner */}
-                    <div
-                        style={{
-                            width: 44,
-                            height: 44,
-                            borderRadius: '50%',
-                            border: '3px solid rgba(91,35,255,0.14)',
-                            borderTopColor: 'var(--color-primary)',
-                            animation: 'btn-spin 0.8s linear infinite',
-                        }}
-                    />
+                    {/* Loader */}
+                    <PremiumLoader size={44} color="primary" />
                     <div>
                         <h2
                             style={{
