@@ -9,106 +9,78 @@ export function AppToaster() {
             position="top-right"
             gap={10}
             toastOptions={{
-                // Base styles applied to every toast
                 style: {
-                    background: 'rgba(18, 18, 36, 0.92)',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(255,255,255,0.10)',
-                    borderRadius: 12,
-                    color: 'var(--color-text-primary)',
+                    background: 'rgba(10, 8, 28, 0.88)',
+                    backdropFilter: 'blur(32px)',
+                    WebkitBackdropFilter: 'blur(32px)',
+                    border: '1px solid rgba(255,255,255,0.07)',
+                    borderRadius: 16,
+                    color: '#f0eeff',
                     fontFamily: 'var(--font-sans)',
                     fontSize: 14,
                     fontWeight: 400,
-                    padding: '14px 16px',
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.45)',
+                    padding: '16px 18px',
+                    boxShadow: '0 24px 60px rgba(0,0,0,0.55), 0 6px 20px rgba(0,0,0,0.28)',
                     minWidth: 320,
                     maxWidth: 420,
+                    overflow: 'hidden',
+                    position: 'relative',
                 },
             }}
         />
     );
 }
 
-// ── Icon components ───────────────────────────────────────────
+// ── Icons ─────────────────────────────────────────────────────
 
-function HappyFace() {
+function CheckIcon() {
     return (
-        <svg
-            width="20" height="20" viewBox="0 0 24 24"
-            fill="none"
-            style={{ flexShrink: 0 }}
-        >
-            <circle cx="12" cy="12" r="10" stroke="var(--color-success)" strokeWidth="1.5" />
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
             <path
-                d="M8 13.5C8.5 15.5 11 17 12 17C13 17 15.5 15.5 16 13.5"
-                stroke="var(--color-success)" strokeWidth="1.5"
+                d="M4.5 12.5l5 5L19.5 7"
+                stroke="#34d399"
+                strokeWidth="2.5"
                 strokeLinecap="round"
+                strokeLinejoin="round"
             />
-            <circle cx="9" cy="10" r="1" fill="var(--color-success)" />
-            <circle cx="15" cy="10" r="1" fill="var(--color-success)" />
         </svg>
     );
 }
 
-function SadFace() {
+function XIcon() {
     return (
-        <svg
-            width="20" height="20" viewBox="0 0 24 24"
-            fill="none"
-            style={{ flexShrink: 0 }}
-        >
-            <circle cx="12" cy="12" r="10" stroke="var(--color-error)" strokeWidth="1.5" />
-            <path
-                d="M8 16C8.5 14 11 12.5 12 12.5C13 12.5 15.5 14 16 16"
-                stroke="var(--color-error)" strokeWidth="1.5"
-                strokeLinecap="round"
-            />
-            <circle cx="9" cy="10" r="1" fill="var(--color-error)" />
-            <circle cx="15" cy="10" r="1" fill="var(--color-error)" />
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+            <path d="M6 6l12 12M18 6L6 18" stroke="#f87171" strokeWidth="2.5" strokeLinecap="round" />
         </svg>
     );
 }
 
-function InfoFace() {
+function InfoIcon() {
     return (
-        <svg
-            width="20" height="20" viewBox="0 0 24 24"
-            fill="none"
-            style={{ flexShrink: 0 }}
-        >
-            <circle cx="12" cy="12" r="10" stroke="#60a5fa" strokeWidth="1.5" />
-            <path
-                d="M9.5 12C10 11 11 10.5 12 10.5C13 10.5 14 11 14.5 12"
-                stroke="#60a5fa" strokeWidth="1.5"
-                strokeLinecap="round"
-            />
-            <circle cx="9" cy="9.5" r="1" fill="#60a5fa" />
-            <circle cx="15" cy="9.5" r="1" fill="#60a5fa" />
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+            <circle cx="12" cy="7.5" r="1.3" fill="#93c5fd" />
+            <path d="M12 11.5v5.5" stroke="#93c5fd" strokeWidth="2.5" strokeLinecap="round" />
         </svg>
     );
 }
 
-function WarningFace() {
+function WarningIcon() {
     return (
-        <svg
-            width="20" height="20" viewBox="0 0 24 24"
-            fill="none"
-            style={{ flexShrink: 0 }}
-        >
-            <circle cx="12" cy="12" r="10" stroke="var(--color-warning)" strokeWidth="1.5" />
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
             <path
-                d="M9 13C9.5 12 11 11 12 11C13 11 14.5 12 15 13"
-                stroke="var(--color-warning)" strokeWidth="1.5"
-                strokeLinecap="round"
+                d="M12 4L2.5 20h19L12 4z"
+                stroke="#fbbf24"
+                strokeWidth="1.8"
+                strokeLinejoin="round"
             />
-            <circle cx="9" cy="9.5" r="1" fill="var(--color-warning)" />
-            <circle cx="15" cy="9.5" r="1" fill="var(--color-warning)" />
+            <path d="M12 10v4.5" stroke="#fbbf24" strokeWidth="2.2" strokeLinecap="round" />
+            <circle cx="12" cy="16.5" r="1" fill="#fbbf24" />
         </svg>
     );
 }
 
-// Close button rendered inside each toast
+// ── Close button ──────────────────────────────────────────────
+
 function CloseButton({ toastId }: { toastId: string | number }) {
     return (
         <button
@@ -119,22 +91,25 @@ function CloseButton({ toastId }: { toastId: string | number }) {
                 border: 'none',
                 cursor: 'pointer',
                 padding: 4,
-                color: 'var(--color-text-muted)',
+                color: 'rgba(200,195,230,0.35)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                borderRadius: 4,
+                borderRadius: '50%',
                 flexShrink: 0,
-                transition: 'color 150ms ease',
+                marginTop: 1,
+                transition: 'color 150ms ease, background 150ms ease',
             }}
-            onMouseEnter={(e) =>
-                (e.currentTarget.style.color = 'var(--color-text-primary)')
-            }
-            onMouseLeave={(e) =>
-                (e.currentTarget.style.color = 'var(--color-text-muted)')
-            }
+            onMouseEnter={(e) => {
+                e.currentTarget.style.color = 'rgba(200,195,230,0.85)';
+                e.currentTarget.style.background = 'rgba(255,255,255,0.07)';
+            }}
+            onMouseLeave={(e) => {
+                e.currentTarget.style.color = 'rgba(200,195,230,0.35)';
+                e.currentTarget.style.background = 'none';
+            }}
         >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" strokeWidth="2.5"
                 strokeLinecap="round" strokeLinejoin="round"
             >
@@ -145,7 +120,17 @@ function CloseButton({ toastId }: { toastId: string | number }) {
     );
 }
 
-// ── Toast content layout ──────────────────────────────────────
+// ── Toast content ─────────────────────────────────────────────
+
+interface ToastContentProps {
+    icon: React.ReactNode;
+    title: string;
+    description?: string;
+    id: string | number;
+    accentColor: string;
+    accentGlow: string;
+    accentBorder: string;
+}
 
 function ToastContent({
     icon,
@@ -153,47 +138,83 @@ function ToastContent({
     description,
     id,
     accentColor,
-}: {
-    icon: React.ReactNode;
-    title: string;
-    description?: string;
-    id: string | number;
-    accentColor: string;
-}) {
+    accentGlow,
+    accentBorder,
+}: ToastContentProps) {
     return (
         <div
             style={{
                 display: 'flex',
                 alignItems: 'flex-start',
-                gap: 10,
+                gap: 12,
                 width: '100%',
+                position: 'relative',
             }}
         >
-            {/* Left accent bar */}
+            {/* Aurora glow — radiates from icon side into card background */}
             <div
                 style={{
                     position: 'absolute',
-                    left: 0,
-                    top: 0,
-                    bottom: 0,
-                    width: 3,
-                    background: accentColor,
-                    borderRadius: '12px 0 0 12px',
+                    top: -16,
+                    left: -18,
+                    bottom: -16,
+                    width: '60%',
+                    background: `radial-gradient(ellipse 100% 130% at 0% 50%, ${accentGlow} 0%, transparent 65%)`,
+                    pointerEvents: 'none',
                 }}
             />
 
-            {/* Icon */}
-            <div style={{ marginTop: 1 }}>{icon}</div>
+            {/* Top gradient accent line */}
+            <div
+                style={{
+                    position: 'absolute',
+                    top: -16,
+                    left: -18,
+                    right: -18,
+                    height: 1.5,
+                    background: `linear-gradient(90deg, ${accentColor} 0%, ${accentColor}80 35%, transparent 70%)`,
+                    pointerEvents: 'none',
+                }}
+            />
+
+            {/* Icon with tinted circle backdrop */}
+            <div
+                style={{
+                    width: 34,
+                    height: 34,
+                    borderRadius: '50%',
+                    background: accentGlow,
+                    border: `1px solid ${accentBorder}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    position: 'relative',
+                    zIndex: 1,
+                    marginTop: 1,
+                }}
+            >
+                {icon}
+            </div>
 
             {/* Text */}
-            <div style={{ flex: 1, minWidth: 0 }}>
+            <div
+                style={{
+                    flex: 1,
+                    minWidth: 0,
+                    position: 'relative',
+                    zIndex: 1,
+                    paddingTop: description ? 2 : 7,
+                }}
+            >
                 <div
                     style={{
                         fontWeight: 600,
-                        fontSize: 14,
-                        color: 'var(--color-text-primary)',
+                        fontSize: 13.5,
+                        color: '#f0eeff',
                         lineHeight: 1.3,
-                        marginBottom: description ? 3 : 0,
+                        marginBottom: description ? 4 : 0,
+                        letterSpacing: '0.01em',
                     }}
                 >
                     {title}
@@ -201,9 +222,10 @@ function ToastContent({
                 {description && (
                     <div
                         style={{
-                            fontSize: 13,
-                            color: 'var(--color-text-secondary)',
-                            lineHeight: 1.4,
+                            fontSize: 12.5,
+                            color: 'rgba(200,195,230,0.65)',
+                            lineHeight: 1.5,
+                            letterSpacing: '0.005em',
                         }}
                     >
                         {description}
@@ -212,19 +234,18 @@ function ToastContent({
             </div>
 
             {/* Close */}
-            <CloseButton toastId={id} />
+            <div style={{ position: 'relative', zIndex: 1 }}>
+                <CloseButton toastId={id} />
+            </div>
         </div>
     );
 }
 
 // ── Public toast API ──────────────────────────────────────────
-// Usage:
-//   toast.success('Account created', { description: 'Check your email' })
-//   toast.error('Login failed', { description: 'Invalid credentials' })
 
 interface ToastOptions {
     description?: string;
-    duration?: number; // ms — default 4000
+    duration?: number;
 }
 
 export const toast = {
@@ -233,10 +254,12 @@ export const toast = {
             (id) => (
                 <ToastContent
                     id={id}
-                    icon={<HappyFace />}
+                    icon={<CheckIcon />}
                     title={title}
                     description={options.description}
-                    accentColor="var(--color-success)"
+                    accentColor="#34d399"
+                    accentGlow="rgba(52,211,153,0.14)"
+                    accentBorder="rgba(52,211,153,0.24)"
                 />
             ),
             { duration: options.duration ?? 4000 },
@@ -247,10 +270,12 @@ export const toast = {
             (id) => (
                 <ToastContent
                     id={id}
-                    icon={<SadFace />}
+                    icon={<XIcon />}
                     title={title}
                     description={options.description}
-                    accentColor="var(--color-error)"
+                    accentColor="#f87171"
+                    accentGlow="rgba(248,113,113,0.13)"
+                    accentBorder="rgba(248,113,113,0.24)"
                 />
             ),
             { duration: options.duration ?? 5000 },
@@ -261,10 +286,12 @@ export const toast = {
             (id) => (
                 <ToastContent
                     id={id}
-                    icon={<InfoFace />}
+                    icon={<InfoIcon />}
                     title={title}
                     description={options.description}
-                    accentColor="#60a5fa"
+                    accentColor="#93c5fd"
+                    accentGlow="rgba(147,197,253,0.13)"
+                    accentBorder="rgba(147,197,253,0.22)"
                 />
             ),
             { duration: options.duration ?? 4000 },
@@ -275,10 +302,12 @@ export const toast = {
             (id) => (
                 <ToastContent
                     id={id}
-                    icon={<WarningFace />}
+                    icon={<WarningIcon />}
                     title={title}
                     description={options.description}
-                    accentColor="var(--color-warning)"
+                    accentColor="#fbbf24"
+                    accentGlow="rgba(251,191,36,0.11)"
+                    accentBorder="rgba(251,191,36,0.22)"
                 />
             ),
             { duration: options.duration ?? 4500 },
