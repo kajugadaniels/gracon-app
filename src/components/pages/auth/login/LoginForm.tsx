@@ -146,42 +146,56 @@ export function LoginForm() {
                         </div>
                     )}
 
-                    <Button
-                        type="submit"
-                        fullWidth
-                        loading={loading}
-                        loadingVariant="spinner"
-                        loadingText="Signing in..."
-                        style={{ marginTop: 4 }}
-                    >
-                        Sign in
-                    </Button>
-                </form>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
 
-                {/* Footer link */}
-                <p
-                    style={{
-                        textAlign: 'center',
-                        fontSize: 13,
-                        color: 'var(--color-text-muted)',
-                        marginTop: 24,
-                        marginBottom: 0,
-                    }}
-                >
-                    Don&apos;t have an account?{' '}
-                    <a
-                        href="/register"
+                        href="/forgot-password"
                         style={{
-                            color: 'var(--color-primary)',
-                            fontWeight: 500,
+                            fontSize: 12,
+                            color: 'var(--color-text-muted)',
                             textDecoration: 'none',
+                            fontWeight: 500,
                         }}
-                    >
-                        Create one
+  >
+                        Forgot password?
                     </a>
-                </p>
-
             </div>
-        </Card>
+
+            <Button
+                type="submit"
+                fullWidth
+                loading={loading}
+                loadingVariant="spinner"
+                loadingText="Signing in..."
+                style={{ marginTop: 4 }}
+            >
+                Sign in
+            </Button>
+        </form>
+
+                {/* Footer link */ }
+    <p
+        style={{
+            textAlign: 'center',
+            fontSize: 13,
+            color: 'var(--color-text-muted)',
+            marginTop: 24,
+            marginBottom: 0,
+        }}
+    >
+        Don&apos;t have an account?{' '}
+        <a
+            href="/register"
+            style={{
+                color: 'var(--color-primary)',
+                fontWeight: 500,
+                textDecoration: 'none',
+            }}
+        >
+            Create one
+        </a>
+    </p>
+
+            </div >
+        </Card >
     );
 }
