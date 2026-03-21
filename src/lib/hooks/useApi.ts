@@ -17,8 +17,13 @@ interface UseApiReturn<T, P extends unknown[]> {
 
 /**
  * Generic hook wrapping any async API call.
- * Handles loading state, error extraction, and success callback.
- * Usage: const { execute, loading, error } = useApi(authApi.login)
+ * Handles loading state, error extraction, and callbacks.
+ *
+ * Usage:
+ *   const { execute, loading, error } = useApi(loginApi, {
+ *     onSuccess: (data) => router.push('/dashboard'),
+ *   });
+ *   await execute({ email, password });
  */
 export function useApi<T, P extends unknown[]>(
     apiCall: (...args: P) => Promise<{ data: T }>,
@@ -55,25 +60,24 @@ export function useApi<T, P extends unknown[]>(
     return { execute, loading, error, clearError };
 }
 
-// Extracts human-readable message from Axios errors
+// ── Error extraction ──────────────────────────────────────────
+
 function extractErrorMessage(error: unknown): string {
     if (error instanceof AxiosError) {
-        // NestJS returns { message: string } or { message: string[] }
         const data = error.response?.data;
+
         if (data?.message) {
-            return Array.isArray(data.message)
-                ? data.message[0]
-                : data.message;
+            return Array.isArray(data.message) ? data.message[0] : data.message;
         }
-        if (error.response?.status === 0 || error.code === 'ERR_NETWORK') {
+
+        const status = error.response?.status;
+        if (!status || error.code === 'ERR_NETWORK') {
             return 'Network error. Please check your connection.';
         }
-        if (error.response?.status === 429) {
-            return 'Too many attempts. Please wait before trying again.';
-        }
-        if (error.response?.status === 503) {
-            return 'Service temporarily unavailable. Please try again.';
-        }
+        if (status === 429) return 'Too many attempts. Please wait before trying again.';
+        if (status === 503) return 'Service temporarily unavailable. Please try again.';
+        if (status === 408) return 'Request timed out. Please try again.';
     }
+
     return 'Something went wrong. Please try again.';
 }
