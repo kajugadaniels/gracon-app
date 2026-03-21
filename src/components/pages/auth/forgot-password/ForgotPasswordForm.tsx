@@ -151,17 +151,18 @@ export function ForgotPasswordForm() {
                 <div style={{ marginBottom: 32 }}>
                     {/* Back link */}
 
-                    href="/login"
-                    style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 6,
-                        fontSize: 13,
-                        color: 'var(--color-text-muted)',
-                        textDecoration: 'none',
-                        marginBottom: 24,
-                    }}
-          >
+                    <a
+                        href="/login"
+                        style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 6,
+                            fontSize: 13,
+                            color: 'var(--color-text-muted)',
+                            textDecoration: 'none',
+                            marginBottom: 24,
+                        }}
+                    >
                     <svg
                         width="14" height="14" viewBox="0 0 24 24"
                         fill="none" stroke="currentColor"
