@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/auth.store';
 import { Navbar } from '@/components/shared';
@@ -12,23 +12,16 @@ export default function ProtectedLayout({
 }) {
     const { isHydrated, accessToken, user } = useAuthStore();
     const router = useRouter();
-    const [ready, setReady] = useState(false);
 
     useEffect(() => {
-        // Wait for store to hydrate before checking auth state
         if (!isHydrated) return;
-
         if (!accessToken || !user) {
-            // No valid session — send to login
             router.replace('/login');
-            return;
         }
-
-        setReady(true);
     }, [isHydrated, accessToken, user, router]);
 
-    // Show nothing while hydrating — prevents flash of protected content
-    if (!ready) {
+    // Waiting for sessionStorage → store hydration
+    if (!isHydrated) {
         return (
             <div
                 style={{
@@ -43,13 +36,18 @@ export default function ProtectedLayout({
                         width: 40,
                         height: 40,
                         borderRadius: '50%',
-                        border: '3px solid rgba(255,255,255,0.10)',
+                        border: '3px solid rgba(91,35,255,0.14)',
                         borderTopColor: 'var(--color-primary)',
                         animation: 'btn-spin 0.75s linear infinite',
                     }}
                 />
             </div>
         );
+    }
+
+    // Hydrated but not logged in — render nothing while redirect fires
+    if (!accessToken || !user) {
+        return null;
     }
 
     return (
