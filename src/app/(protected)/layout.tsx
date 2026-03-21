@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/auth.store';
 import { Navbar } from '@/components/shared';
+import { PremiumLoader } from '@/components/ui/Loader';
 
 export default function ProtectedLayout({
     children,
@@ -31,16 +32,7 @@ export default function ProtectedLayout({
                     justifyContent: 'center',
                 }}
             >
-                <div
-                    style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: '50%',
-                        border: '3px solid rgba(91,35,255,0.14)',
-                        borderTopColor: 'var(--color-primary)',
-                        animation: 'btn-spin 0.75s linear infinite',
-                    }}
-                />
+                <PremiumLoader size={40} color="primary" />
             </div>
         );
     }
