@@ -11,6 +11,11 @@ export interface VerificationResult {
     failReason: string | null;
     attemptsUsed: number;
     attemptsRemaining: number;
+    // Present when passed=true — upgraded full tokens
+    upgradedTokens?: {
+        accessToken: string;
+        refreshToken: string;
+    };
 }
 
 export interface SubmitVerificationResponse {
@@ -18,9 +23,6 @@ export interface SubmitVerificationResponse {
     data: VerificationResult;
 }
 
-// Submits ID card photo + selfie + NID confirmation for AI verification
-// Uses FormData — multipart/form-data upload
-// Timeout is 60s — Rekognition processing can take up to 30s
 export const submitVerificationApi = (
     documentNumber: string,
     idCard: File,
