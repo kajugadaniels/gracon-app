@@ -60,14 +60,14 @@ function StepDots({ current, total }: { current: number; total: number }) {
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: 8,
-                marginBottom: 32,
+                marginBottom: 28,
             }}
         >
             {Array.from({ length: total }).map((_, i) => (
                 <div
                     key={i}
                     style={{
-                        width: i === current ? 24 : 8,
+                        width: i === current ? 22 : 8,
                         height: 8,
                         borderRadius: 4,
                         background:
@@ -75,7 +75,7 @@ function StepDots({ current, total }: { current: number; total: number }) {
                                 ? 'var(--color-success)'
                                 : i === current
                                     ? 'var(--color-primary)'
-                                    : 'rgba(255,255,255,0.15)',
+                                    : 'rgba(91,35,255,0.14)',
                         transition: 'all 350ms cubic-bezier(0.34, 1.56, 0.64, 1)',
                     }}
                 />
@@ -145,16 +145,16 @@ export function RegistrationForm() {
     // ── Step 0: NID Entry
     if (step === 0) {
         return (
-            <Card strength="strong" style={{ width: '100%', maxWidth: 460 }}>
+            <Card strength="strong" style={{ width: '100%', maxWidth: 440 }}>
                 <div className="animate-fade-up">
                     <StepDots current={0} total={3} />
 
                     <h1
                         style={{
-                            fontSize: 24,
+                            fontSize: 18,
                             fontWeight: 700,
                             color: 'var(--color-text-primary)',
-                            marginBottom: 8,
+                            marginBottom: 6,
                             letterSpacing: '-0.02em',
                             textAlign: 'center',
                         }}
@@ -166,7 +166,8 @@ export function RegistrationForm() {
                             fontSize: 14,
                             color: 'var(--color-text-secondary)',
                             textAlign: 'center',
-                            marginBottom: 32,
+                            marginBottom: 28,
+                            marginTop: 0,
                         }}
                     >
                         Enter your National ID number to get started
@@ -174,7 +175,7 @@ export function RegistrationForm() {
 
                     <form
                         onSubmit={step1.handleSubmit(handleStep1Submit)}
-                        style={{ display: 'flex', flexDirection: 'column', gap: 20 }}
+                        style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
                         noValidate
                     >
                         <Input
@@ -206,7 +207,8 @@ export function RegistrationForm() {
                             textAlign: 'center',
                             fontSize: 13,
                             color: 'var(--color-text-muted)',
-                            marginTop: 24,
+                            marginTop: 20,
+                            marginBottom: 0,
                         }}
                     >
                         Already have an account?{' '}
@@ -220,28 +222,25 @@ export function RegistrationForm() {
                         >
                             Log in
                         </a>
-                </p>
-            </div>
-      </Card >
-    );
+                    </p>
+                </div>
+            </Card>
+        );
     }
 
     // ── Step 1: Account Details
     if (step === 1 && citizenData) {
         return (
-            <Card
-                strength="strong"
-                style={{ width: '100%', maxWidth: 520 }}
-            >
+            <Card strength="strong" style={{ width: '100%', maxWidth: 500 }}>
                 <div className="animate-fade-up">
                     <StepDots current={1} total={3} />
 
                     <h1
                         style={{
-                            fontSize: 24,
+                            fontSize: 18,
                             fontWeight: 700,
                             color: 'var(--color-text-primary)',
-                            marginBottom: 8,
+                            marginBottom: 6,
                             letterSpacing: '-0.02em',
                             textAlign: 'center',
                         }}
@@ -253,7 +252,8 @@ export function RegistrationForm() {
                             fontSize: 14,
                             color: 'var(--color-text-secondary)',
                             textAlign: 'center',
-                            marginBottom: 24,
+                            marginBottom: 20,
+                            marginTop: 0,
                         }}
                     >
                         We found your details. Now set up your account.
@@ -267,8 +267,8 @@ export function RegistrationForm() {
                         style={{
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: 20,
-                            marginTop: 24,
+                            gap: 16,
+                            marginTop: 20,
                         }}
                         noValidate
                     >
@@ -292,7 +292,7 @@ export function RegistrationForm() {
                             {...step2.register('phoneNumber')}
                         />
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                             <Input
                                 label="Password"
                                 showPasswordToggle
@@ -319,11 +319,12 @@ export function RegistrationForm() {
                         {registerError && (
                             <div
                                 role="alert"
+                                className="animate-scale-in"
                                 style={{
                                     background: 'var(--color-error-subtle)',
                                     border: '1px solid var(--color-error-border)',
                                     borderRadius: 'var(--radius-md)',
-                                    padding: '12px 16px',
+                                    padding: '10px 14px',
                                     fontSize: 13,
                                     color: 'var(--color-error)',
                                 }}
@@ -332,7 +333,7 @@ export function RegistrationForm() {
                             </div>
                         )}
 
-                        <div style={{ display: 'flex', gap: 12 }}>
+                        <div style={{ display: 'flex', gap: 10 }}>
                             <Button
                                 type="button"
                                 variant="ghost"
@@ -360,7 +361,7 @@ export function RegistrationForm() {
     // ── Step 2: Success
     if (step === 2) {
         return (
-            <Card strength="strong" style={{ width: '100%', maxWidth: 460 }}>
+            <Card strength="strong" style={{ width: '100%', maxWidth: 440 }}>
                 <div
                     className="animate-fade-up"
                     style={{
@@ -368,24 +369,25 @@ export function RegistrationForm() {
                         flexDirection: 'column',
                         alignItems: 'center',
                         textAlign: 'center',
-                        gap: 20,
+                        gap: 18,
                     }}
                 >
                     <StepDots current={2} total={3} />
 
                     {/* Success icon */}
                     <div
-                        className="glow-success"
+                        className="glow-success animate-scale-in"
                         style={{
-                            width: 72,
-                            height: 72,
+                            width: 64,
+                            height: 64,
                             borderRadius: '50%',
                             background: 'var(--color-success-subtle)',
                             border: '2px solid var(--color-success-border)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            fontSize: 32,
+                            fontSize: 26,
+                            color: 'var(--color-success)',
                         }}
                     >
                         ✓
@@ -394,10 +396,10 @@ export function RegistrationForm() {
                     <div>
                         <h1
                             style={{
-                                fontSize: 24,
+                                fontSize: 18,
                                 fontWeight: 700,
                                 color: 'var(--color-text-primary)',
-                                marginBottom: 8,
+                                marginBottom: 6,
                                 letterSpacing: '-0.02em',
                             }}
                         >
@@ -408,6 +410,7 @@ export function RegistrationForm() {
                                 fontSize: 14,
                                 color: 'var(--color-text-secondary)',
                                 lineHeight: 1.6,
+                                margin: 0,
                             }}
                         >
                             Check your email for a verification link. You must verify
@@ -418,12 +421,13 @@ export function RegistrationForm() {
                     {/* Platform ID — shown once */}
                     {platformId && (
                         <div
+                            className="animate-scale-in"
                             style={{
                                 width: '100%',
                                 background: 'var(--color-primary-subtle)',
                                 border: '1px solid var(--color-border-primary)',
                                 borderRadius: 'var(--radius-md)',
-                                padding: '16px 20px',
+                                padding: '14px 18px',
                             }}
                         >
                             <div
@@ -433,7 +437,7 @@ export function RegistrationForm() {
                                     color: 'var(--color-primary)',
                                     textTransform: 'uppercase',
                                     letterSpacing: '0.08em',
-                                    marginBottom: 6,
+                                    marginBottom: 5,
                                 }}
                             >
                                 Your Platform ID — save this
@@ -441,10 +445,10 @@ export function RegistrationForm() {
                             <div
                                 style={{
                                     fontFamily: 'var(--font-mono, monospace)',
-                                    fontSize: 22,
+                                    fontSize: 18,
                                     fontWeight: 700,
                                     color: 'var(--color-text-primary)',
-                                    letterSpacing: '0.12em',
+                                    letterSpacing: '0.10em',
                                 }}
                             >
                                 {platformId}
@@ -453,7 +457,7 @@ export function RegistrationForm() {
                                 style={{
                                     fontSize: 12,
                                     color: 'var(--color-text-muted)',
-                                    marginTop: 6,
+                                    marginTop: 5,
                                 }}
                             >
                                 This is shown only once. Copy it and store it safely.

@@ -19,28 +19,29 @@ export function CitizenPreview({ data }: CitizenPreviewProps) {
 
     return (
         <div
+            className="animate-scale-in"
             style={{
                 background: 'var(--color-success-subtle)',
                 border: '1px solid var(--color-success-border)',
                 borderRadius: 'var(--radius-md)',
-                padding: '16px 20px',
+                padding: '14px 16px',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 12,
+                gap: 10,
             }}
         >
             {/* Header */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span
                     style={{
-                        width: 20,
-                        height: 20,
+                        width: 18,
+                        height: 18,
                         borderRadius: '50%',
                         background: 'var(--color-success)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        fontSize: 11,
+                        fontSize: 10,
                         color: '#fff',
                         fontWeight: 700,
                         flexShrink: 0,
@@ -61,29 +62,30 @@ export function CitizenPreview({ data }: CitizenPreviewProps) {
 
             {/* Fields grid */}
             <div
+                className="stagger"
                 style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
                     gap: 8,
                 }}
             >
                 {fields.map(({ label, value }) => (
-                    <div key={label}>
+                    <div key={label} className="animate-fade-up">
                         <div
                             style={{
                                 fontSize: 11,
-                                fontWeight: 500,
+                                fontWeight: 600,
                                 color: 'var(--color-text-muted)',
                                 textTransform: 'uppercase',
                                 letterSpacing: '0.06em',
-                                marginBottom: 3,
+                                marginBottom: 2,
                             }}
                         >
                             {label}
                         </div>
                         <div
                             style={{
-                                fontSize: 14,
+                                fontSize: 13,
                                 fontWeight: 500,
                                 color: 'var(--color-text-primary)',
                             }}

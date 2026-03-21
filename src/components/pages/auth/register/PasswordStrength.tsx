@@ -30,10 +30,10 @@ function getStrength(password: string): StrengthResult {
         1 | 2 | 3 | 4,
         { label: string; color: string }
     > = {
-        1: { label: 'Weak', color: 'var(--color-error)' },
-        2: { label: 'Fair', color: 'var(--color-warning)' },
-        3: { label: 'Good', color: '#60a5fa' },
-        4: { label: 'Strong', color: 'var(--color-success)' },
+        1: { label: 'Weak',   color: 'var(--color-error)'   },
+        2: { label: 'Fair',   color: 'var(--color-warning)'  },
+        3: { label: 'Good',   color: '#7c3aed'               },
+        4: { label: 'Strong', color: 'var(--color-success)'  },
     };
 
     return clamped === 0
@@ -47,7 +47,7 @@ export function PasswordStrength({ password }: PasswordStrengthProps) {
     if (!password) return null;
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
             {/* Four strength bars */}
             <div style={{ display: 'flex', gap: 4 }}>
                 {[1, 2, 3, 4].map((level) => (
@@ -57,8 +57,8 @@ export function PasswordStrength({ password }: PasswordStrengthProps) {
                             flex: 1,
                             height: 4,
                             borderRadius: 2,
-                            background: level <= score ? color : 'rgba(255,255,255,0.10)',
-                            transition: 'background 300ms ease',
+                            background: level <= score ? color : 'rgba(91,35,255,0.10)',
+                            transition: 'background 280ms ease',
                         }}
                     />
                 ))}
@@ -67,11 +67,12 @@ export function PasswordStrength({ password }: PasswordStrengthProps) {
             {/* Label */}
             {label && (
                 <span
+                    className="animate-fade-in"
                     style={{
                         fontSize: 12,
                         fontWeight: 500,
                         color,
-                        transition: 'color 300ms ease',
+                        transition: 'color 280ms ease',
                     }}
                 >
                     {label} password
