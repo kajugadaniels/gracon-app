@@ -95,11 +95,20 @@ export function VerificationForm() {
         submitVerificationApi,
         {
             onSuccess: (res) => {
-                setResult(res.data ?? res);
+                const result = res.data ?? res;
+                setResult(result);
 
-                // Update user in store if verification passed
-                if ((res.data ?? res).passed && user) {
-                    setUser({ ...user, isIdVerified: true });
+                if (result.passed) {
+                    // Update user store — fully verified now
+                    if (user) setUser({ ...user, isIdVerified: true });
+
+                    // Upgrade tokens — replace limited token with full token
+                    if (result.upgradedTokens) {
+                        setTokens(
+                            result.upgradedTokens.accessToken,
+                            result.upgradedTokens.refreshToken,
+                        );
+                    }
                 }
             },
         },
@@ -430,3 +439,7 @@ export function VerificationForm() {
         </Card>
     );
 }
+function setTokens(accessToken: string, refreshToken: string) {
+    throw new Error('Function not implemented.');
+}
+
