@@ -9,8 +9,6 @@ import { loginApi } from '@/api/auth/login.api';
 import { useApi } from '@/lib/hooks/useApi';
 import { useAuthStore } from '@/lib/store/auth.store';
 
-// ── Validation schema ─────────────────────────────────────────
-
 const schema = z.object({
     email: z
         .string()
@@ -24,14 +22,11 @@ const schema = z.object({
 
 type LoginFields = z.infer<typeof schema>;
 
-// ── Component ─────────────────────────────────────────────────
-
 export function LoginForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { setTokens, setUser } = useAuthStore();
 
-    // Where to redirect after login — defaults to dashboard
     const nextPath = searchParams.get('next') ?? '/dashboard';
 
     const {
@@ -44,19 +39,22 @@ export function LoginForm() {
         onSuccess: (res) => {
             const { accessToken, refreshToken, user } = res.data;
 
-            // Store tokens in memory — never localStorage
             setTokens(accessToken, refreshToken);
             setUser(user);
 
-            // Set session indicator cookie — used by middleware for route protection
-            // httpOnly is NOT set — middleware needs to read it client-side
-            // No sensitive data in this cookie — just a boolean presence flag
-            document.cookie = `session_active=1; path=/; SameSite=Strict; max-age=${60 * 60 * 24 * 30}`;
+            // Set session cookie
+            document.cookie =
+                `session_active=1; path=/; SameSite=Strict; max-age=${60 * 60 * 24 * 30}`;
 
-            router.push(
-                // If user hasn't done ID verification yet — redirect there first
-                !user.isIdVerified ? '/verify-identity' : nextPath,
-            );
+            if (res.tokenType === 'limited') {
+                // User verified email but hasn't done ID verification yet
+                // Redirect to verify-identity — they have a limited token that allows this
+                router.push('/verify-identity');
+                return;
+            }
+
+            // Full token — go to intended destination
+            router.push(nextPath);
         },
     });
 
