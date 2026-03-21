@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
-import { VerifyEmailView } from '@/components/verify-email';
+import { VerifyEmailView } from '@/components/pages/auth/verify-email';
 
 export const metadata: Metadata = {
     title: 'Verify Email — ID Verify',
