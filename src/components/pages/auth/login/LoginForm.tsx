@@ -63,25 +63,26 @@ export function LoginForm() {
     const onSubmit = (values: LoginFields) => login(values);
 
     return (
-        <Card strength="strong" style={{ width: '100%', maxWidth: 420 }}>
-            <div className="animate-fade-up">
+        <Card strength="strong" style={{ width: '100%', maxWidth: 400 }}>
+            <div className="animate-fade-up" style={{ padding: '4px 0' }}>
+
                 {/* Header */}
-                <div style={{ textAlign: 'center', marginBottom: 36 }}>
+                <div style={{ textAlign: 'center', marginBottom: 32 }}>
                     {/* Logo mark */}
                     <div
                         style={{
-                            width: 48,
-                            height: 48,
+                            width: 44,
+                            height: 44,
                             borderRadius: 12,
                             background: 'var(--color-primary)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            fontSize: 22,
+                            fontSize: 16,
                             fontWeight: 700,
                             color: '#fff',
-                            margin: '0 auto 20px',
-                            boxShadow: '0 4px 20px var(--color-primary-glow)',
+                            margin: '0 auto 18px',
+                            boxShadow: '0 4px 16px var(--color-primary-glow)',
                         }}
                     >
                         ID
@@ -89,21 +90,16 @@ export function LoginForm() {
 
                     <h1
                         style={{
-                            fontSize: 26,
+                            fontSize: 18,
                             fontWeight: 700,
                             color: 'var(--color-text-primary)',
-                            marginBottom: 8,
+                            marginBottom: 6,
                             letterSpacing: '-0.02em',
                         }}
                     >
                         Welcome back
                     </h1>
-                    <p
-                        style={{
-                            fontSize: 14,
-                            color: 'var(--color-text-secondary)',
-                        }}
-                    >
+                    <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', margin: 0 }}>
                         Sign in to your verified account
                     </p>
                 </div>
@@ -111,7 +107,7 @@ export function LoginForm() {
                 {/* Form */}
                 <form
                     onSubmit={handleSubmit(onSubmit)}
-                    style={{ display: 'flex', flexDirection: 'column', gap: 20 }}
+                    style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
                     noValidate
                 >
                     <Input
@@ -138,11 +134,12 @@ export function LoginForm() {
                     {error && (
                         <div
                             role="alert"
+                            className="animate-scale-in"
                             style={{
                                 background: 'var(--color-error-subtle)',
                                 border: '1px solid var(--color-error-border)',
                                 borderRadius: 'var(--radius-md)',
-                                padding: '12px 16px',
+                                padding: '10px 14px',
                                 fontSize: 13,
                                 color: 'var(--color-error)',
                             }}
@@ -163,13 +160,14 @@ export function LoginForm() {
                     </Button>
                 </form>
 
-                {/* Footer links */}
+                {/* Footer link */}
                 <p
                     style={{
                         textAlign: 'center',
                         fontSize: 13,
                         color: 'var(--color-text-muted)',
-                        marginTop: 28,
+                        marginTop: 24,
+                        marginBottom: 0,
                     }}
                 >
                     Don&apos;t have an account?{' '}
@@ -183,8 +181,9 @@ export function LoginForm() {
                     >
                         Create one
                     </a>
-            </p>
-        </div>
-    </Card >
-  );
+                </p>
+
+            </div>
+        </Card>
+    );
 }
