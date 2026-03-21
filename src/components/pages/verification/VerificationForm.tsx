@@ -36,7 +36,7 @@ function ScoreBar({
     color: string;
 }) {
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
             <div
                 style={{
                     display: 'flex',
@@ -44,16 +44,10 @@ function ScoreBar({
                     alignItems: 'center',
                 }}
             >
-                <span style={{ fontSize: 13, color: 'var(--color-text-secondary)' }}>
+                <span style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
                     {label}
                 </span>
-                <span
-                    style={{
-                        fontSize: 13,
-                        fontWeight: 600,
-                        color,
-                    }}
-                >
+                <span style={{ fontSize: 12, fontWeight: 600, color }}>
                     {Math.round(value)}%
                 </span>
             </div>
@@ -61,7 +55,7 @@ function ScoreBar({
                 style={{
                     height: 6,
                     borderRadius: 3,
-                    background: 'rgba(255,255,255,0.08)',
+                    background: 'rgba(91,35,255,0.10)',
                     overflow: 'hidden',
                 }}
             >
@@ -145,7 +139,7 @@ export function VerificationForm() {
         return (
             <Card
                 strength="strong"
-                style={{ width: '100%', maxWidth: 520 }}
+                style={{ width: '100%', maxWidth: 500 }}
             >
                 <div
                     className="animate-fade-up"
@@ -153,7 +147,7 @@ export function VerificationForm() {
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
-                        gap: 28,
+                        gap: 24,
                     }}
                 >
                     {/* Status badge */}
@@ -167,17 +161,19 @@ export function VerificationForm() {
                     <ScoreRing
                         score={result.compositeScore}
                         passed={result.passed}
-                        size={160}
+                        size={148}
                     />
 
                     {/* Score breakdown */}
-                    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 14 }}>
+                    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 12 }}>
                         <h3
                             style={{
-                                fontSize: 14,
+                                fontSize: 13,
                                 fontWeight: 600,
                                 color: 'var(--color-text-secondary)',
                                 margin: 0,
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.05em',
                             }}
                         >
                             Score breakdown
@@ -186,12 +182,12 @@ export function VerificationForm() {
                         <ScoreBar
                             label="Face similarity"
                             value={result.faceScore}
-                            color="#60a5fa"
+                            color="#7c3aed"
                         />
                         <ScoreBar
                             label="Liveness confidence"
                             value={result.livenessScore}
-                            color="#a78bfa"
+                            color="var(--color-primary)"
                         />
 
                         {/* Document match — binary indicator */}
@@ -202,7 +198,7 @@ export function VerificationForm() {
                                 alignItems: 'center',
                             }}
                         >
-                            <span style={{ fontSize: 13, color: 'var(--color-text-secondary)' }}>
+                            <span style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
                                 Document number match
                             </span>
                             <StatusBadge
@@ -215,12 +211,13 @@ export function VerificationForm() {
                     {/* Fail reason */}
                     {!result.passed && result.failReason && (
                         <div
+                            className="animate-scale-in"
                             style={{
                                 width: '100%',
                                 background: 'var(--color-error-subtle)',
                                 border: '1px solid var(--color-error-border)',
                                 borderRadius: 'var(--radius-md)',
-                                padding: '12px 16px',
+                                padding: '10px 14px',
                                 fontSize: 13,
                                 color: 'var(--color-error)',
                                 lineHeight: 1.6,
@@ -234,7 +231,7 @@ export function VerificationForm() {
                     {!result.passed && (
                         <p
                             style={{
-                                fontSize: 13,
+                                fontSize: 12,
                                 color: 'var(--color-text-muted)',
                                 textAlign: 'center',
                                 margin: 0,
@@ -247,7 +244,7 @@ export function VerificationForm() {
                     )}
 
                     {/* Actions */}
-                    <div style={{ display: 'flex', gap: 12, width: '100%' }}>
+                    <div style={{ display: 'flex', gap: 10, width: '100%' }}>
                         {result.passed ? (
                             <Button fullWidth onClick={() => router.push('/dashboard')}>
                                 Go to dashboard
@@ -285,16 +282,16 @@ export function VerificationForm() {
 
     // ── Submission form
     return (
-        <Card strength="strong" style={{ width: '100%', maxWidth: 540 }}>
+        <Card strength="strong" style={{ width: '100%', maxWidth: 520 }}>
             <div className="animate-fade-up">
                 {/* Header */}
-                <div style={{ marginBottom: 28 }}>
+                <div style={{ marginBottom: 24 }}>
                     <h1
                         style={{
-                            fontSize: 24,
+                            fontSize: 18,
                             fontWeight: 700,
                             color: 'var(--color-text-primary)',
-                            marginBottom: 8,
+                            marginBottom: 6,
                             letterSpacing: '-0.02em',
                         }}
                     >
@@ -305,6 +302,7 @@ export function VerificationForm() {
                             fontSize: 14,
                             color: 'var(--color-text-secondary)',
                             lineHeight: 1.6,
+                            margin: 0,
                         }}
                     >
                         Upload your ID card and a selfie. We&apos;ll compare them to confirm
@@ -314,7 +312,7 @@ export function VerificationForm() {
 
                 <form
                     onSubmit={handleSubmit(onSubmit)}
-                    style={{ display: 'flex', flexDirection: 'column', gap: 24 }}
+                    style={{ display: 'flex', flexDirection: 'column', gap: 20 }}
                     noValidate
                 >
                     {/* NID confirmation */}
@@ -334,8 +332,8 @@ export function VerificationForm() {
                     <div
                         style={{
                             display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-                            gap: 16,
+                            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                            gap: 14,
                         }}
                     >
                         <DocumentUpload
@@ -362,10 +360,10 @@ export function VerificationForm() {
                             background: 'var(--color-bg-elevated)',
                             border: '1px solid var(--color-border)',
                             borderRadius: 'var(--radius-md)',
-                            padding: '12px 16px',
+                            padding: '12px 14px',
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: 6,
+                            gap: 5,
                         }}
                     >
                         {[
@@ -379,7 +377,7 @@ export function VerificationForm() {
                                     display: 'flex',
                                     gap: 8,
                                     alignItems: 'flex-start',
-                                    fontSize: 13,
+                                    fontSize: 12,
                                     color: 'var(--color-text-muted)',
                                     lineHeight: 1.5,
                                 }}
@@ -389,6 +387,7 @@ export function VerificationForm() {
                                         color: 'var(--color-primary)',
                                         flexShrink: 0,
                                         marginTop: 1,
+                                        fontWeight: 700,
                                     }}
                                 >
                                     •
@@ -402,11 +401,12 @@ export function VerificationForm() {
                     {apiError && (
                         <div
                             role="alert"
+                            className="animate-scale-in"
                             style={{
                                 background: 'var(--color-error-subtle)',
                                 border: '1px solid var(--color-error-border)',
                                 borderRadius: 'var(--radius-md)',
-                                padding: '12px 16px',
+                                padding: '10px 14px',
                                 fontSize: 13,
                                 color: 'var(--color-error)',
                             }}
