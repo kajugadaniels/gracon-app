@@ -36,13 +36,13 @@ export function ScoreRing({ score, size = 140, passed }: ScoreRingProps) {
                 height={size}
                 style={{ position: 'absolute', transform: 'rotate(-90deg)' }}
             >
-                {/* Background track */}
+                {/* Background track — light mode: subtle purple-tinted */}
                 <circle
                     cx={size / 2}
                     cy={size / 2}
                     r={radius}
                     fill="none"
-                    stroke="rgba(255,255,255,0.08)"
+                    stroke="rgba(91,35,255,0.10)"
                     strokeWidth={8}
                 />
                 {/* Progress arc */}
@@ -64,7 +64,7 @@ export function ScoreRing({ score, size = 140, passed }: ScoreRingProps) {
             <div style={{ textAlign: 'center', zIndex: 1 }}>
                 <div
                     style={{
-                        fontSize: size > 100 ? 28 : 22,
+                        fontSize: size > 100 ? 26 : 20,
                         fontWeight: 700,
                         color,
                         lineHeight: 1,
