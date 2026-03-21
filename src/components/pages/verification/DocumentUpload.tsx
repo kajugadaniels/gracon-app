@@ -62,7 +62,7 @@ export function DocumentUpload({
                 : 'var(--color-bg-elevated)';
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {/* Label */}
             <span
                 style={{
@@ -88,15 +88,15 @@ export function DocumentUpload({
                     border: `2px dashed ${borderColor}`,
                     borderRadius: 'var(--radius-md)',
                     background: bgColor,
-                    padding: '24px 16px',
+                    padding: '20px 14px',
                     cursor: disabled ? 'not-allowed' : 'pointer',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: 12,
-                    minHeight: 160,
-                    transition: 'all 200ms ease',
+                    gap: 10,
+                    minHeight: 148,
+                    transition: 'all 180ms ease',
                     outline: 'none',
                     opacity: disabled ? 0.5 : 1,
                     position: 'relative',
@@ -116,7 +116,7 @@ export function DocumentUpload({
                                 height: '100%',
                                 objectFit: 'cover',
                                 borderRadius: 'calc(var(--radius-md) - 2px)',
-                                opacity: 0.35,
+                                opacity: 0.28,
                             }}
                         />
                         {/* Overlay with checkmark */}
@@ -127,19 +127,19 @@ export function DocumentUpload({
                                 display: 'flex',
                                 flexDirection: 'column',
                                 alignItems: 'center',
-                                gap: 8,
+                                gap: 7,
                             }}
                         >
                             <span
                                 style={{
-                                    width: 36,
-                                    height: 36,
+                                    width: 32,
+                                    height: 32,
                                     borderRadius: '50%',
                                     background: 'var(--color-success)',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    fontSize: 18,
+                                    fontSize: 14,
                                     color: '#fff',
                                 }}
                             >
@@ -147,16 +147,14 @@ export function DocumentUpload({
                             </span>
                             <span
                                 style={{
-                                    fontSize: 13,
+                                    fontSize: 12,
                                     fontWeight: 500,
                                     color: 'var(--color-success)',
                                 }}
                             >
                                 {file?.name}
                             </span>
-                            <span
-                                style={{ fontSize: 12, color: 'var(--color-text-muted)' }}
-                            >
+                            <span style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>
                                 Click to change
                             </span>
                         </div>
@@ -166,19 +164,20 @@ export function DocumentUpload({
                         {/* Upload icon */}
                         <div
                             style={{
-                                width: 48,
-                                height: 48,
+                                width: 44,
+                                height: 44,
                                 borderRadius: '50%',
-                                background: 'rgba(255,255,255,0.06)',
+                                background: 'rgba(91,35,255,0.08)',
                                 border: '1px solid var(--color-border)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
+                                transition: 'background 180ms ease',
                             }}
                         >
                             <svg
-                                width="22" height="22" viewBox="0 0 24 24"
-                                fill="none" stroke="var(--color-text-muted)"
+                                width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="var(--color-primary)"
                                 strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
                             >
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -190,17 +189,15 @@ export function DocumentUpload({
                         <div style={{ textAlign: 'center' }}>
                             <div
                                 style={{
-                                    fontSize: 14,
+                                    fontSize: 13,
                                     fontWeight: 500,
                                     color: 'var(--color-text-primary)',
-                                    marginBottom: 4,
+                                    marginBottom: 3,
                                 }}
                             >
                                 {dragging ? 'Drop to upload' : 'Click or drag to upload'}
                             </div>
-                            <div
-                                style={{ fontSize: 12, color: 'var(--color-text-muted)' }}
-                            >
+                            <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>
                                 {hint}
                             </div>
                         </div>
@@ -222,11 +219,8 @@ export function DocumentUpload({
             {error && (
                 <p
                     role="alert"
-                    style={{
-                        fontSize: 12,
-                        color: 'var(--color-error)',
-                        margin: 0,
-                    }}
+                    className="animate-fade-in"
+                    style={{ fontSize: 12, color: 'var(--color-error)', margin: 0 }}
                 >
                     {error}
                 </p>
