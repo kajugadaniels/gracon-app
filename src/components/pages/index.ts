@@ -4,4 +4,4 @@
 
 export * from './auth';
 export * from './verification';
-export * from './dashboard';
+export * from './profile';
