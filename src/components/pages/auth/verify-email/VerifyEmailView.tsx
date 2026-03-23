@@ -207,7 +207,6 @@ export function VerifyEmailView() {
                             variant="ghost"
                             fullWidth
                             loading={resendLoading}
-                            loadingVariant="dots"
                             loadingText="Sending..."
                             onClick={handleResend}
                         >
