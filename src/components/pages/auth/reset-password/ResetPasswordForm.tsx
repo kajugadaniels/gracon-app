@@ -312,7 +312,6 @@ export function ResetPasswordForm() {
                         type="submit"
                         fullWidth
                         loading={loading}
-                        loadingVariant="spinner"
                         loadingText="Updating password..."
                     >
                         Update password
