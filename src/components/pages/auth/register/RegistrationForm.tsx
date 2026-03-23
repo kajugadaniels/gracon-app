@@ -204,7 +204,6 @@ export function RegistrationForm() {
                             type="submit"
                             fullWidth
                             loading={lookupLoading}
-                            loadingVariant="spinner"
                             loadingText="Looking up your ID..."
                         >
                             Look up my ID
@@ -354,7 +353,6 @@ export function RegistrationForm() {
                             <Button
                                 type="submit"
                                 loading={registerLoading}
-                                loadingVariant="dots"
                                 loadingText="Creating account..."
                                 style={{ flex: 2 }}
                             >
