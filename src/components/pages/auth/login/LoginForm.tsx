@@ -165,7 +165,6 @@ export function LoginForm() {
                 type="submit"
                 fullWidth
                 loading={loading}
-                loadingVariant="spinner"
                 loadingText="Signing in..."
                 style={{ marginTop: 4 }}
             >
