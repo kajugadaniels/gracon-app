@@ -46,7 +46,6 @@ export default function ProtectedLayout({
     return (
         <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column' }}>
             <Navbar />
-            <AppSidebar />
             <main style={{ flex: 1, padding: '32px 24px' }}>
                 {children}
             </main>
