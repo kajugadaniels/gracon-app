@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/auth.store';
 import { Navbar } from '@/components/shared';
 import { PremiumLoader } from '@/components/ui/Loader';
+import { AppSidebar } from '@/components/shared/AppSidebar';
 
 export default function ProtectedLayout({
     children,
@@ -45,6 +46,7 @@ export default function ProtectedLayout({
     return (
         <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column' }}>
             <Navbar />
+            <AppSidebar />
             <main style={{ flex: 1, padding: '32px 24px' }}>
                 {children}
             </main>
