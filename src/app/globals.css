@@ -309,3 +309,8 @@ body {
   background: rgba(91, 35, 255, 0.18);
   color: var(--color-text-primary);
 }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
