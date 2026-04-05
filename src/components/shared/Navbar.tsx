@@ -15,6 +15,7 @@ const NAV_LINKS = [
   { href: '/dashboard',          label: 'Dashboard',         icon: '🏠' },
   { href: '/profile/signature',  label: 'Digital Signature', icon: '📜' },
   { href: '/profile/signing',    label: 'Sign Documents',    icon: '✍️'  },
+  { href: '/profile',    label: 'Profile',           icon: '👤'  },
 ];
 
 export function Navbar() {
