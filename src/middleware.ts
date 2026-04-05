@@ -8,6 +8,7 @@ const AUTH_ROUTES = [
     '/login',
     '/register',
     '/verify-email',
+    '/verify',
     '/forgot-password',
     '/reset-password',
 ];
