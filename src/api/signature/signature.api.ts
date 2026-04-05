@@ -1,4 +1,34 @@
-import { apiClient } from '@/api/client';
+import axios from 'axios';
+
+// Dedicated client for api/signature (port 3002) — separate from api/auth (port 3000).
+// Inherits the Authorization header from the main client's request interceptor
+// by sharing the same token-reading logic.
+const SIGNATURE_BASE =
+    process.env.NEXT_PUBLIC_SIGNATURE_API_URL ?? 'http://localhost:3002/api/v1';
+
+const signatureClient = axios.create({
+    baseURL: SIGNATURE_BASE,
+    timeout: 30_000,
+    headers: { 'Content-Type': 'application/json' },
+});
+
+// Forward the Bearer token to api/signature using the same store/sessionStorage approach.
+signatureClient.interceptors.request.use((config) => {
+    try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { useAuthStore } = require('@/lib/store/auth.store');
+        const token: string | null = useAuthStore.getState().accessToken;
+        if (token) config.headers.Authorization = `Bearer ${token}`;
+    } catch {
+        if (typeof window !== 'undefined') {
+            try {
+                const token = sessionStorage.getItem('av_at');
+                if (token) config.headers.Authorization = `Bearer ${token}`;
+            } catch { /* ignore */ }
+        }
+    }
+    return config;
+});
 
 // ─── Signature Image ──────────────────────────────────────────────────────────
 
@@ -16,19 +46,19 @@ export async function uploadSignatureImage(
 ): Promise<{ id: string; mimeType: string; sizeBytes: number; createdAt: string }> {
     const form = new FormData();
     form.append('file', file);
-    const res = await apiClient.post('/signature/image/upload', form, {
+    const res = await signatureClient.post('/signature/image/upload', form, {
         headers: { 'Content-Type': 'multipart/form-data' },
     });
     return res.data;
 }
 
 export async function getSignatureImage(): Promise<SignatureImageResponse> {
-    const res = await apiClient.get('/signature/image');
+    const res = await signatureClient.get('/signature/image');
     return res.data;
 }
 
 export async function deleteSignatureImage(): Promise<{ message: string }> {
-    const res = await apiClient.delete('/signature/image');
+    const res = await signatureClient.delete('/signature/image');
     return res.data;
 }
 
@@ -47,19 +77,19 @@ export interface KeyPairResponse {
 export async function generateKeyPair(
     algorithm: KeyAlgorithm,
 ): Promise<KeyPairResponse> {
-    const res = await apiClient.post('/signature/keys/generate', { algorithm });
+    const res = await signatureClient.post('/signature/keys/generate', { algorithm });
     return res.data;
 }
 
 export async function getPublicKey(): Promise<KeyPairResponse> {
-    const res = await apiClient.get('/signature/keys/public');
+    const res = await signatureClient.get('/signature/keys/public');
     return res.data;
 }
 
 export async function rotateKeyPair(
     algorithm: KeyAlgorithm,
 ): Promise<KeyPairResponse> {
-    const res = await apiClient.post('/signature/keys/rotate', { algorithm });
+    const res = await signatureClient.post('/signature/keys/rotate', { algorithm });
     return res.data;
 }
 
@@ -80,19 +110,19 @@ export interface CertificateResponse {
 export async function issueCertificate(
     validityYears = 2,
 ): Promise<CertificateResponse> {
-    const res = await apiClient.post('/signature/certificates/issue', { validityYears });
+    const res = await signatureClient.post('/signature/certificates/issue', { validityYears });
     return res.data;
 }
 
 export async function getCurrentCertificate(): Promise<CertificateResponse> {
-    const res = await apiClient.get('/signature/certificates/current');
+    const res = await signatureClient.get('/signature/certificates/current');
     return res.data;
 }
 
 export async function revokeCertificate(
     reason: string,
 ): Promise<{ message: string; serialNumber: string; revokedAt: string }> {
-    const res = await apiClient.post('/signature/certificates/revoke', { reason });
+    const res = await signatureClient.post('/signature/certificates/revoke', { reason });
     return res.data;
 }
 
@@ -143,7 +173,7 @@ export async function signDocument(
     documentHash: string,
     documentName: string,
 ): Promise<SignResponse> {
-    const res = await apiClient.post('/signature/signing/sign', {
+    const res = await signatureClient.post('/signature/signing/sign', {
         documentHash,
         documentName,
     });
@@ -174,7 +204,7 @@ export async function getSigningHistory(
     page = 1,
     limit = 20,
 ): Promise<SigningHistoryResponse> {
-    const res = await apiClient.get('/signature/signing/history', {
+    const res = await signatureClient.get('/signature/signing/history', {
         params: { page, limit },
     });
     return res.data;
