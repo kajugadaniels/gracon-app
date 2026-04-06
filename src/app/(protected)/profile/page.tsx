@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuthStore } from '@/lib/store/auth.store';
 import { ProfileCard, PlatformIdCard, VerificationStatus } from '@/components/pages/profile';
 import { EditProfileModal } from '@/components/pages/profile/EditProfileModal';
@@ -79,6 +79,9 @@ export default function ProfilePage() {
     const [certificate, setCertificate] = useState<CertificateResponse | null>(null);
     const [sigImage, setSigImage] = useState<SignatureImageResponse | null>(null);
     const [sigLoading, setSigLoading] = useState(false);
+    // Prevents re-firing the auto-load effect when all requests fail (service down).
+    // Manual refreshes via onRefresh still work — they call loadSignatureData directly.
+    const sigAutoLoadFired = useRef(false);
 
     const loadSignatureData = useCallback(async () => {
         setSigLoading(true);
@@ -96,12 +99,15 @@ export default function ProfilePage() {
     // ─── Tab state ──────────────────────────────────────────────────────────────
     const [activeTab, setActiveTab] = useState<ProfileTab>('profile');
 
-    // Load signature data when user switches to that tab (lazy load)
+    // Load signature data once when user first switches to the tab.
+    // Using a ref guard so a failed load (service unavailable) doesn't
+    // re-trigger the effect infinitely when keyPair stays null.
     useEffect(() => {
-        if (activeTab === 'signature' && !keyPair && !sigLoading) {
+        if (activeTab === 'signature' && !sigAutoLoadFired.current && !sigLoading) {
+            sigAutoLoadFired.current = true;
             void loadSignatureData();
         }
-    }, [activeTab, keyPair, sigLoading, loadSignatureData]);
+    }, [activeTab, sigLoading, loadSignatureData]);
 
     // ─── Loading state ──────────────────────────────────────────────────────────
     if (profileLoading || !profile) {
