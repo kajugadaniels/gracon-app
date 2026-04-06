@@ -2,45 +2,40 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/lib/store/auth.store';
-import { ProfileCard } from '@/components/pages/profile';
-import { PlatformIdCard } from '@/components/pages/profile';
-import { VerificationStatus } from '@/components/pages/profile';
+import { ProfileCard, PlatformIdCard, VerificationStatus } from '@/components/pages/profile';
 import { EditProfileModal } from '@/components/pages/profile/EditProfileModal';
 import { ChangePasswordModal } from '@/components/pages/profile/ChangePasswordModal';
+import { Button, PremiumLoader } from '@/components/ui';
+import { useApi } from '@/lib/hooks/useApi';
+import { getProfileApi, UserProfileResponse } from '@/api/users/get-profile.api';
 import { KeyPairCard } from '@/components/pages/signature';
 import { CertificateCard } from '@/components/pages/signature';
 import { SignatureImageCard } from '@/components/pages/signature';
-import { Button, PremiumLoader } from '@/components/ui';
-import { useApi } from '@/lib/hooks/useApi';
-import { getProfileApi } from '@/api/users/get-profile.api';
-import type { UserProfileResponse } from '@/api/users/get-profile.api';
-import {
-    getPublicKey,
-    getCurrentCertificate,
-    getSignatureImage,
-} from '@/api/signature/signature.api';
 import type {
     KeyPairResponse,
     CertificateResponse,
     SignatureImageResponse,
 } from '@/api/signature/signature.api';
+import {
+    getPublicKey,
+    getCurrentCertificate,
+    getSignatureImage,
+} from '@/api/signature/signature.api';
 
 type ProfileTab = 'profile' | 'signature';
 
+const TABS: { id: ProfileTab; label: string; icon: string }[] = [
+    { id: 'profile', label: 'Profile', icon: '👤' },
+    { id: 'signature', label: 'Digital Signature', icon: '📜' },
+];
+
 export default function ProfilePage() {
     const { user, setUser } = useAuthStore();
-    const [tab, setTab] = useState<ProfileTab>('profile');
+
+    // ─── Profile data ───────────────────────────────────────────────────────────
     const [profile, setProfile] = useState<UserProfileResponse | null>(null);
     const [editOpen, setEditOpen] = useState(false);
     const [passwordOpen, setPasswordOpen] = useState(false);
-
-    // Signature state
-    const [keyPair, setKeyPair] = useState<KeyPairResponse | null>(null);
-    const [certificate, setCertificate] = useState<CertificateResponse | null>(null);
-    const [sigImage, setSigImage] = useState<SignatureImageResponse | null>(null);
-    const [sigLoading, setSigLoading] = useState(false);
-
-    // ── Profile load ───────────────────────────────────────────────────────────
 
     const syncStore = useCallback(
         (p: UserProfileResponse) => {
@@ -69,7 +64,21 @@ export default function ProfilePage() {
 
     useEffect(() => { void fetchProfile(); }, [fetchProfile]);
 
-    // ── Signature load — only when signature tab is opened ────────────────────
+    const handleImageUpload = (newUrl: string) => {
+        setProfile((prev) => (prev ? { ...prev, profileImageUrl: newUrl } : prev));
+        if (user) setUser({ ...user, imageUrl: newUrl });
+    };
+
+    const handleProfileUpdate = (updated: UserProfileResponse) => {
+        setProfile(updated);
+        syncStore(updated);
+    };
+
+    // ─── Signature data ─────────────────────────────────────────────────────────
+    const [keyPair, setKeyPair] = useState<KeyPairResponse | null>(null);
+    const [certificate, setCertificate] = useState<CertificateResponse | null>(null);
+    const [sigImage, setSigImage] = useState<SignatureImageResponse | null>(null);
+    const [sigLoading, setSigLoading] = useState(false);
 
     const loadSignatureData = useCallback(async () => {
         setSigLoading(true);
@@ -84,43 +93,40 @@ export default function ProfilePage() {
         setSigLoading(false);
     }, []);
 
-    // Load signature data when tab is first switched to
-    const [sigLoaded, setSigLoaded] = useState(false);
+    // ─── Tab state ──────────────────────────────────────────────────────────────
+    const [activeTab, setActiveTab] = useState<ProfileTab>('profile');
+
+    // Load signature data when user switches to that tab (lazy load)
     useEffect(() => {
-        if (tab === 'signature' && !sigLoaded) {
-            setSigLoaded(true);
+        if (activeTab === 'signature' && !keyPair && !sigLoading) {
             void loadSignatureData();
         }
-    }, [tab, sigLoaded, loadSignatureData]);
+    }, [activeTab, keyPair, sigLoading, loadSignatureData]);
 
-    // ── Handlers ───────────────────────────────────────────────────────────────
-
-    const handleImageUpload = (newUrl: string) => {
-        setProfile(prev => prev ? { ...prev, profileImageUrl: newUrl } : prev);
-        if (user) setUser({ ...user, imageUrl: newUrl });
-    };
-
-    const handleProfileUpdate = (updated: UserProfileResponse) => {
-        setProfile(updated);
-        syncStore(updated);
-    };
-
-    // ── Loading state ──────────────────────────────────────────────────────────
-
+    // ─── Loading state ──────────────────────────────────────────────────────────
     if (profileLoading || !profile) {
         return (
-            <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div
+                style={{
+                    minHeight: '60vh', display: 'flex',
+                    alignItems: 'center', justifyContent: 'center',
+                }}
+            >
                 <PremiumLoader size={40} color="primary" />
             </div>
         );
     }
 
-    // ── Render ─────────────────────────────────────────────────────────────────
-
     return (
-        <div style={{ maxWidth: 760, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
-
-            {/* Page header */}
+        <div
+            style={{
+                maxWidth: 760,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 24,
+            }}
+        >
+            {/* ── Page header ──────────────────────────────────────────────────── */}
             <div
                 style={{
                     display: 'flex',
@@ -140,15 +146,15 @@ export default function ProfilePage() {
                             letterSpacing: '-0.02em',
                         }}
                     >
-                        {profile.citizenIdentity?.postNames ?? 'Profile'}
+                        {profile.citizenIdentity?.postNames ?? 'My Account'}
                     </h1>
-                    <p style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>
-                        Manage your identity, security, and digital signature.
+                    <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', margin: 0 }}>
+                        Manage your identity, security, and digital signature settings.
                     </p>
                 </div>
 
-                {/* Action buttons — only on profile tab */}
-                {tab === 'profile' && (
+                {/* Action buttons — only shown on Profile tab */}
+                {activeTab === 'profile' && (
                     <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
                         <Button variant="ghost" size="sm" onClick={() => setPasswordOpen(true)}>
                             Change password
@@ -160,85 +166,123 @@ export default function ProfilePage() {
                 )}
             </div>
 
-            {/* ── Tab bar ── */}
+            {/* ── Tab bar ──────────────────────────────────────────────────────── */}
             <div
+                role="tablist"
+                aria-label="Profile sections"
                 style={{
                     display: 'flex',
                     gap: 4,
                     padding: 4,
-                    background: 'var(--color-bg-elevated)',
+                    background: 'var(--glass-bg)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
                     border: '1px solid var(--color-border)',
-                    borderRadius: 'var(--radius-lg)',
+                    borderRadius: 9999,
                     width: 'fit-content',
+                    boxShadow: 'var(--glass-shadow)',
                 }}
             >
-                {([
-                    { id: 'profile', label: '👤  Profile' },
-                    { id: 'signature', label: '📜  Digital Signature' },
-                ] as { id: ProfileTab; label: string }[]).map(({ id, label }) => {
-                    const active = tab === id;
+                {TABS.map((tab) => {
+                    const active = activeTab === tab.id;
                     return (
                         <button
-                            key={id}
-                            onClick={() => setTab(id)}
+                            key={tab.id}
+                            role="tab"
+                            aria-selected={active}
+                            onClick={() => setActiveTab(tab.id)}
                             style={{
-                                padding: '9px 20px',
-                                borderRadius: 'var(--radius-md)',
-                                border: active ? '1px solid var(--color-border-primary)' : '1px solid transparent',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 7,
+                                padding: '8px 20px',
+                                borderRadius: 9999,
+                                border: 'none',
                                 background: active ? 'var(--color-primary)' : 'transparent',
                                 color: active ? '#ffffff' : 'var(--color-text-secondary)',
-                                fontSize: 14,
+                                fontSize: 13,
                                 fontWeight: active ? 600 : 400,
-                                cursor: 'pointer',
-                                transition: 'all 150ms ease',
                                 fontFamily: 'var(--font-sans)',
+                                cursor: 'pointer',
+                                boxShadow: active
+                                    ? '0 2px 8px rgba(91,35,255,0.30), 0 1px 0 rgba(255,255,255,0.12) inset'
+                                    : 'none',
+                                transition: 'all 180ms cubic-bezier(0.4,0,0.2,1)',
                                 whiteSpace: 'nowrap',
-                                // Active tab: subtle glow matching the 3D button pattern
-                                boxShadow: active ? '0 2px 0 0 var(--color-primary-active), 0 4px 12px var(--color-primary-glow)' : 'none',
+                            }}
+                            onMouseEnter={e => {
+                                if (!active) {
+                                    (e.currentTarget as HTMLButtonElement).style.background = 'rgba(91,35,255,0.06)';
+                                    (e.currentTarget as HTMLButtonElement).style.color = 'var(--color-text-primary)';
+                                }
+                            }}
+                            onMouseLeave={e => {
+                                if (!active) {
+                                    (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
+                                    (e.currentTarget as HTMLButtonElement).style.color = 'var(--color-text-secondary)';
+                                }
                             }}
                         >
-                            {label}
+                            <span style={{ fontSize: 14 }}>{tab.icon}</span>
+                            {tab.label}
                         </button>
                     );
                 })}
             </div>
 
-            {/* ── Tab content ── */}
+            {/* ── Tab panels ───────────────────────────────────────────────────── */}
 
             {/* Profile tab */}
-            {tab === 'profile' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 20, animation: 'fadeIn 180ms ease' }}>
-                    <VerificationStatus />
-                    <ProfileCard profile={profile} onImageUpload={handleImageUpload} />
-                    {profile.isIdVerified && profile.platformId && (
-                        <PlatformIdCard platformId={profile.platformId} />
-                    )}
+            {activeTab === 'profile' && (
+                <div
+                    style={{ animation: 'slide-up-sm 220ms cubic-bezier(0.16,1,0.3,1) both' }}
+                >
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                        <VerificationStatus />
+
+                        <ProfileCard
+                            profile={profile}
+                            onImageUpload={handleImageUpload}
+                        />
+
+                        {profile.isIdVerified && profile.platformId && (
+                            <PlatformIdCard platformId={profile.platformId} />
+                        )}
+                    </div>
                 </div>
             )}
 
-            {/* Signature tab */}
-            {tab === 'signature' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 20, animation: 'fadeIn 180ms ease' }}>
+            {/* Digital Signature tab */}
+            {activeTab === 'signature' && (
+                <div
+                    style={{ animation: 'slide-up-sm 220ms cubic-bezier(0.16,1,0.3,1) both' }}
+                >
                     {sigLoading ? (
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 240 }}>
+                        <div
+                            style={{
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                minHeight: 320,
+                            }}
+                        >
                             <PremiumLoader size={36} color="primary" />
                         </div>
                     ) : (
-                        <>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                             {/* Setup progress */}
                             <SignatureSetupProgress
                                 hasKeyPair={!!keyPair}
-                                hasCertificate={!!certificate && !certificate.isRevoked && !certificate.isExpired}
+                                hasCertificate={!!certificate && !certificate.isRevoked}
                             />
+
                             <KeyPairCard keyPair={keyPair} onRefresh={loadSignatureData} />
                             <CertificateCard certificate={certificate} hasKeyPair={!!keyPair} onRefresh={loadSignatureData} />
                             <SignatureImageCard image={sigImage} onRefresh={loadSignatureData} />
-                        </>
+                        </div>
                     )}
                 </div>
             )}
 
-            {/* Modals */}
+            {/* ── Modals ───────────────────────────────────────────────────────── */}
             <EditProfileModal
                 isOpen={editOpen}
                 onClose={() => setEditOpen(false)}
@@ -253,7 +297,7 @@ export default function ProfilePage() {
     );
 }
 
-// ── Setup progress bar — shown on signature tab ────────────────────────────
+// ─── Setup progress bar (inline — no separate file needed) ───────────────────
 
 function SignatureSetupProgress({
     hasKeyPair,
@@ -263,45 +307,44 @@ function SignatureSetupProgress({
     hasCertificate: boolean;
 }) {
     const steps = [
-        { n: '1', label: 'Generate Key Pair', done: hasKeyPair, active: !hasKeyPair },
-        { n: '2', label: 'Issue Certificate', done: hasCertificate, active: hasKeyPair && !hasCertificate },
-        { n: '3', label: 'Ready to Sign', done: hasCertificate, active: false },
+        { n: 1, label: 'Generate Key Pair', done: hasKeyPair, active: !hasKeyPair },
+        { n: 2, label: 'Issue Certificate', done: hasCertificate, active: hasKeyPair && !hasCertificate },
+        { n: 3, label: 'Ready to Sign', done: hasCertificate, active: false },
     ];
 
     return (
         <div
+            className="glass"
             style={{
                 display: 'flex',
                 alignItems: 'center',
-                background: 'var(--color-bg-elevated)',
-                border: '1px solid var(--color-border)',
-                borderRadius: 'var(--radius-xl)',
                 padding: '16px 24px',
-                gap: 0,
+                borderRadius: 'var(--radius-xl)',
             }}
         >
             {steps.map((step, i) => (
-                <div key={step.n} style={{ display: 'flex', alignItems: 'center', flex: i < steps.length - 1 ? 1 : 'none' }}>
+                <div
+                    key={step.n}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        flex: i < steps.length - 1 ? 1 : 'none',
+                    }}
+                >
+                    {/* Step circle + label */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
                         <div
                             style={{
-                                width: 28,
-                                height: 28,
-                                borderRadius: '50%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                fontSize: 12,
-                                fontWeight: 700,
+                                width: 28, height: 28, borderRadius: '50%',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                fontSize: 12, fontWeight: 700,
                                 background: step.done
                                     ? 'var(--color-success)'
                                     : step.active
                                         ? 'var(--color-primary)'
-                                        : 'var(--color-bg-elevated-hover)',
+                                        : 'rgba(91,35,255,0.08)',
                                 color: step.done || step.active ? '#fff' : 'var(--color-text-muted)',
-                                boxShadow: step.active
-                                    ? '0 0 0 3px var(--color-primary-subtle)'
-                                    : 'none',
+                                boxShadow: step.active ? '0 0 0 3px rgba(91,35,255,0.15)' : 'none',
                                 transition: 'all 300ms ease',
                             }}
                         >
@@ -322,6 +365,7 @@ function SignatureSetupProgress({
                         </span>
                     </div>
 
+                    {/* Connector line */}
                     {i < steps.length - 1 && (
                         <div
                             style={{
