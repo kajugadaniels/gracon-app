@@ -62,12 +62,30 @@ function IconMenu() {
     );
 }
 
+function IconDocument() {
+    return (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+    );
+}
+
 // ─── Nav items ────────────────────────────────────────────────────────────────
 
 const NAV_ITEMS = [
-    { href: '/dashboard', label: 'Dashboard', Icon: IconDashboard, exact: true },
-    { href: '/profile', label: 'Profile', Icon: IconProfile, exact: false },
-    { href: '/profile/signing', label: 'Sign Documents', Icon: IconSign, exact: false },
+    { href: '/dashboard', label: 'Dashboard', Icon: IconDashboard, exact: true, external: false },
+    { href: '/profile', label: 'Profile', Icon: IconProfile, exact: false, external: false },
+    { href: '/profile/signing', label: 'Sign Documents', Icon: IconSign, exact: false, external: false },
+    {
+        href: process.env.NEXT_PUBLIC_DOCS_URL ?? 'http://localhost:4002/documents',
+        label: 'Documents',
+        Icon: IconDocument,
+        exact: false,
+        external: true,
+    },
 ] as const;
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -210,13 +228,15 @@ export function AppSidebar() {
                         padding: '12px 10px', display: 'flex', flexDirection: 'column', gap: 2,
                     }}
                 >
-                    {NAV_ITEMS.map(({ href, label, Icon, exact }) => {
-                        const active = isActive(href, exact);
+                    {NAV_ITEMS.map(({ href, label, Icon, exact, external }) => {
+                        const active = external ? false : isActive(href, exact);
                         return (
                             <Link
                                 key={href}
                                 href={href}
                                 title={collapsed ? label : undefined}
+                                target={external ? '_blank' : undefined}
+                                rel={external ? 'noopener noreferrer' : undefined}
                                 onClick={() => closeMobile()}
                                 style={{
                                     display: 'flex',
