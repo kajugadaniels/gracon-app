@@ -75,8 +75,20 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     // Saves tokens to store AND sessionStorage
     setTokens: (accessToken, refreshToken) => {
+        // Existing sessionStorage writes — keep these
         storage.set(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
         storage.set(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
+
+        // NEW — write access token to a cookie shared across all Gracon 360 apps
+        // SameSite=Lax allows the cookie to be sent on cross-origin navigations
+        // No HttpOnly — the token needs to be readable by JavaScript in app/documents
+        // In production replace 'localhost' with your actual domain e.g. .gracon360.com
+        if (typeof document !== 'undefined') {
+            const maxAge = 60 * 60 * 24 * 30; // 30 days — same as refresh token lifetime
+            document.cookie = `g360_at=${accessToken}; path=/; max-age=${maxAge}; SameSite=Lax`;
+            document.cookie = `g360_rt=${refreshToken}; path=/; max-age=${maxAge}; SameSite=Lax`;
+        }
+
         set({ accessToken, refreshToken });
     },
 
@@ -91,6 +103,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     // Clears everything from store and storage
     clearAuth: () => {
         storage.clear();
+
+        // NEW — clear the shared cookies
+        if (typeof document !== 'undefined') {
+            document.cookie = 'g360_at=; path=/; max-age=0; SameSite=Lax';
+            document.cookie = 'g360_rt=; path=/; max-age=0; SameSite=Lax';
+        }
+
         set({ accessToken: null, refreshToken: null, user: null });
     },
 
