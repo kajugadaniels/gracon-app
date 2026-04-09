@@ -6,11 +6,14 @@
 import { useRef, useState } from 'react';
 import type { SignatureImageResponse } from '@/api/signature/signature.api';
 import { uploadSignatureImage, deleteSignatureImage } from '@/api/signature/signature.api';
+import { SignaturePad } from './SignaturePad';
 
 interface SignatureImageCardProps {
     image: SignatureImageResponse | null;
-    onRefresh: () => void;
+    onRefresh: () => Promise<void> | void;
 }
+
+type EditorMode = 'draw' | 'upload';
 
 /** Format bytes into a human-readable size string. */
 function formatBytes(bytes: number): string {
@@ -25,6 +28,8 @@ export function SignatureImageCard({ image, onRefresh }: SignatureImageCardProps
     const [deleting, setDeleting] = useState(false);
     const [dragging, setDragging] = useState(false);
     const [error, setError]      = useState<string | null>(null);
+    const [mode, setMode]        = useState<EditorMode>('draw');
+    const [editing, setEditing]  = useState(false);
 
     function validateAndUpload(file: File) {
         if (!['image/png', 'image/svg+xml'].includes(file.type)) {
@@ -40,7 +45,11 @@ export function SignatureImageCard({ image, onRefresh }: SignatureImageCardProps
 
     async function doUpload(file: File) {
         setLoading(true); setError(null);
-        try { await uploadSignatureImage(file); onRefresh(); }
+        try {
+            await uploadSignatureImage(file);
+            await onRefresh();
+            setEditing(false);
+        }
         catch (e: unknown) { setError(e instanceof Error ? e.message : 'Upload failed'); }
         finally {
             setLoading(false);
@@ -50,7 +59,11 @@ export function SignatureImageCard({ image, onRefresh }: SignatureImageCardProps
 
     async function handleDelete() {
         setDeleting(true); setError(null);
-        try { await deleteSignatureImage(); onRefresh(); }
+        try {
+            await deleteSignatureImage();
+            await onRefresh();
+            setEditing(false);
+        }
         catch (e: unknown) { setError(e instanceof Error ? e.message : 'Failed to remove image'); }
         finally { setDeleting(false); }
     }
@@ -60,6 +73,8 @@ export function SignatureImageCard({ image, onRefresh }: SignatureImageCardProps
         const file = e.dataTransfer.files?.[0];
         if (file) validateAndUpload(file);
     }
+
+    const showEditor = !image || editing;
 
     return (
         <div className="glass" style={{ borderRadius: 'var(--radius-xl)', padding: 28, boxShadow: 'var(--glass-shadow)' }}>
@@ -107,7 +122,7 @@ export function SignatureImageCard({ image, onRefresh }: SignatureImageCardProps
                 </div>
             )}
 
-            {image ? (
+            {image && !editing ? (
                 <>
                     {/* Image preview */}
                     <div style={{
@@ -127,9 +142,22 @@ export function SignatureImageCard({ image, onRefresh }: SignatureImageCardProps
                         </span>
                     </div>
 
-                    <div style={{ display: 'flex', gap: 8 }}>
-                        <button onClick={() => inputRef.current?.click()} disabled={loading} className="btn-ghost" style={{ flex: 1 }}>
-                            {loading ? 'Uploading…' : 'Replace Image'}
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                        <button
+                            onClick={() => { setMode('draw'); setEditing(true); setError(null); }}
+                            disabled={loading}
+                            className="btn-ghost"
+                            style={{ flex: 1 }}
+                        >
+                            Draw New
+                        </button>
+                        <button
+                            onClick={() => { setMode('upload'); setEditing(true); setError(null); }}
+                            disabled={loading}
+                            className="btn-ghost"
+                            style={{ flex: 1 }}
+                        >
+                            Upload File
                         </button>
                         <button onClick={handleDelete} disabled={deleting} style={{
                             flex: 1, padding: '9px 0', borderRadius: 9999,
@@ -141,37 +169,101 @@ export function SignatureImageCard({ image, onRefresh }: SignatureImageCardProps
                         </button>
                     </div>
                 </>
-            ) : (
-                <div
-                    onClick={() => !loading && inputRef.current?.click()}
-                    onDragOver={e => { e.preventDefault(); setDragging(true); }}
-                    onDragLeave={() => setDragging(false)}
-                    onDrop={handleDrop}
-                    style={{
-                        border: `2px dashed ${dragging ? 'var(--color-primary)' : 'var(--color-border)'}`,
-                        borderRadius: 'var(--radius-lg)', padding: '36px 24px',
-                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8,
-                        cursor: loading ? 'not-allowed' : 'pointer',
-                        background: dragging ? 'var(--color-primary-subtle)' : 'transparent',
-                        transition: 'border-color 150ms ease, background 150ms ease',
-                        opacity: loading ? 0.6 : 1,
-                    }}
-                >
-                    <div style={{
-                        width: 44, height: 44, borderRadius: 12,
-                        background: 'var(--color-primary-subtle)', border: '1px solid var(--color-border-primary)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22,
-                    }}>
-                        {loading ? '⏳' : '📤'}
+            ) : null}
+
+            {showEditor && (
+                <div style={{ display: 'grid', gap: 14 }}>
+                    <div
+                        style={{
+                            display: 'inline-flex',
+                            gap: 4,
+                            padding: 4,
+                            borderRadius: 9999,
+                            border: '1px solid var(--color-border)',
+                            background: 'rgba(255,255,255,0.54)',
+                            width: 'fit-content',
+                        }}
+                    >
+                        {[
+                            { id: 'draw', label: 'Draw' },
+                            { id: 'upload', label: 'Upload' },
+                        ].map((option) => {
+                            const active = mode === option.id;
+
+                            return (
+                                <button
+                                    key={option.id}
+                                    onClick={() => setMode(option.id as EditorMode)}
+                                    style={{
+                                        padding: '7px 16px',
+                                        borderRadius: 9999,
+                                        border: 'none',
+                                        background: active ? 'var(--color-primary)' : 'transparent',
+                                        color: active ? '#fff' : 'var(--color-text-secondary)',
+                                        fontSize: 12,
+                                        fontWeight: 600,
+                                        cursor: 'pointer',
+                                        transition: 'all 150ms ease',
+                                    }}
+                                >
+                                    {option.label}
+                                </button>
+                            );
+                        })}
                     </div>
-                    <div style={{ textAlign: 'center' }}>
-                        <p style={{ margin: '0 0 4px', fontSize: 13, fontWeight: 600, color: 'var(--color-text-primary)' }}>
-                            {loading ? 'Uploading…' : 'Upload signature image'}
-                        </p>
-                        <p style={{ margin: 0, fontSize: 12, color: 'var(--color-text-muted)' }}>
-                            PNG or SVG · Max 2 MB · Drag & drop or click
-                        </p>
-                    </div>
+
+                    {mode === 'draw' ? (
+                        <SignaturePad
+                            saving={loading}
+                            onSave={async (file) => {
+                                await doUpload(file);
+                            }}
+                        />
+                    ) : (
+                        <div
+                            onClick={() => !loading && inputRef.current?.click()}
+                            onDragOver={e => { e.preventDefault(); setDragging(true); }}
+                            onDragLeave={() => setDragging(false)}
+                            onDrop={handleDrop}
+                            style={{
+                                border: `2px dashed ${dragging ? 'var(--color-primary)' : 'var(--color-border)'}`,
+                                borderRadius: 'var(--radius-lg)', padding: '36px 24px',
+                                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8,
+                                cursor: loading ? 'not-allowed' : 'pointer',
+                                background: dragging ? 'var(--color-primary-subtle)' : 'transparent',
+                                transition: 'border-color 150ms ease, background 150ms ease',
+                                opacity: loading ? 0.6 : 1,
+                            }}
+                        >
+                            <div style={{
+                                width: 44, height: 44, borderRadius: 12,
+                                background: 'var(--color-primary-subtle)', border: '1px solid var(--color-border-primary)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22,
+                            }}>
+                                {loading ? '⏳' : '📤'}
+                            </div>
+                            <div style={{ textAlign: 'center' }}>
+                                <p style={{ margin: '0 0 4px', fontSize: 13, fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                                    {loading ? 'Uploading…' : 'Upload signature image'}
+                                </p>
+                                <p style={{ margin: 0, fontSize: 12, color: 'var(--color-text-muted)' }}>
+                                    PNG or SVG · Max 2 MB · Drag & drop or click
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
+                    {image && (
+                        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                            <button
+                                onClick={() => { setEditing(false); setError(null); }}
+                                className="btn-ghost"
+                                style={{ fontSize: 12 }}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    )}
                 </div>
             )}
 
