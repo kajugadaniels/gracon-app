@@ -55,6 +55,17 @@ export function LoginForm() {
 
             // Full token — go to intended destination
             router.push(nextPath);
+
+            // After successful login, check for a ?next param to redirect back to app/documents
+            const searchParams = new URLSearchParams(window.location.search);
+            const next = searchParams.get('next');
+
+            if (next && next.startsWith(process.env.NEXT_PUBLIC_DOCS_URL ?? 'http://localhost:4002')) {
+            // Safe redirect back to app/documents — only allow our own docs URL
+            window.location.href = next;
+            } else {
+            router.replace('/dashboard');
+            }
         },
     });
 
