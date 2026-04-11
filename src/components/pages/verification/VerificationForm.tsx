@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button, Input, Card, StatusBadge } from '@/components/ui';
 import { toast } from '@/components/ui';
 import { CameraCapture } from './CameraCapture';
@@ -174,6 +174,7 @@ function ScoreBar({ label, value, color }: { label: string; value: number; color
 
 export function VerificationForm() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { user, setUser, setTokens } = useAuthStore();
 
     const [step, setStep] = useState<VerifyStep>('nid');
@@ -217,6 +218,31 @@ export function VerificationForm() {
             }
         },
     });
+
+    function continueAfterVerification() {
+        const next = searchParams.get('next');
+
+        if (!next) {
+            router.push('/dashboard');
+            return;
+        }
+
+        const docsBase = process.env.NEXT_PUBLIC_DOCS_URL ?? 'http://localhost:4002';
+
+        try {
+            const docsUrl = new URL(docsBase);
+            const targetUrl = new URL(next);
+
+            if (targetUrl.origin === docsUrl.origin) {
+                window.location.href = targetUrl.toString();
+                return;
+            }
+        } catch {
+            // Fall back to dashboard when next is not a safe absolute URL.
+        }
+
+        router.push('/dashboard');
+    }
 
     // ── Handlers ──────────────────────────────────────────────────
 
@@ -635,7 +661,7 @@ export function VerificationForm() {
                         {/* Actions */}
                         <div style={{ display: 'flex', gap: 10, width: '100%' }}>
                             {result.passed ? (
-                                <Button fullWidth size="lg" onClick={() => router.push('/dashboard')}>
+                                <Button fullWidth size="lg" onClick={continueAfterVerification}>
                                     Continue to dashboard
                                 </Button>
                             ) : result.attemptsRemaining > 0 ? (
