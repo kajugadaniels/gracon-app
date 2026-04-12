@@ -6,16 +6,7 @@ import Link from 'next/link';
 import { useAuthStore } from '@/lib/store/auth.store';
 import { logoutApi } from '@/api/auth/logout.api';
 import { Button } from '@/components/ui';
-
-// Shared navbar — rendered on all protected pages.
-// Desktop: inline nav links between brand and user controls.
-// Mobile (<768px): hamburger toggle reveals the same links in a dropdown.
-
-const NAV_LINKS = [
-  { href: '/dashboard',          label: 'Dashboard',         icon: '🏠' },
-  { href: '/profile/signature',  label: 'Digital Signature', icon: '📜' },
-  { href: '/profile',    label: 'Profile',           icon: '👤'  },
-];
+import { NAV_LINKS } from '@/constants/nav';
 
 export function Navbar() {
   const router   = useRouter();
