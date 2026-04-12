@@ -52,6 +52,16 @@ function IconMenu() {
     );
 }
 
+function IconSignature() {
+    return (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+        </svg>
+    );
+}
+
 function IconDocument() {
     return (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -66,8 +76,9 @@ function IconDocument() {
 // ─── Nav items ────────────────────────────────────────────────────────────────
 
 const NAV_ITEMS = [
-    { href: '/dashboard', label: 'Dashboard', Icon: IconDashboard, exact: true, external: false },
-    { href: '/profile', label: 'Profile', Icon: IconProfile, exact: false, external: false },
+    { href: '/dashboard',          label: 'Dashboard',        Icon: IconDashboard, exact: true,  external: false },
+    { href: '/profile',            label: 'Profile',          Icon: IconProfile,   exact: true,  external: false },
+    { href: '/profile/signature',  label: 'Digital Signature',Icon: IconSignature, exact: false, external: false },
     {
         href: process.env.NEXT_PUBLIC_DOCS_URL ?? 'http://localhost:4002/documents',
         label: 'Documents',
@@ -97,9 +108,6 @@ export function AppSidebar() {
 
     function isActive(href: string, exact: boolean) {
         if (exact) return pathname === href;
-        if (href === '/profile') {
-            return pathname === '/profile' || pathname.startsWith('/profile/signature');
-        }
         return pathname.startsWith(href);
     }
 
