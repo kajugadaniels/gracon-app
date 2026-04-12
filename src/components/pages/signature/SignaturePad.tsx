@@ -63,8 +63,8 @@ export function SignaturePad({
         context.lineCap = 'round';
         context.lineJoin = 'round';
         context.lineWidth = 2.6;
-        context.strokeStyle = '#111827';
-        context.fillStyle = '#111827';
+        context.strokeStyle = '#5B23FF';
+        context.fillStyle = '#5B23FF';
     }, []);
 
     const redraw = useCallback(() => {
@@ -258,8 +258,8 @@ export function SignaturePad({
         context.lineCap = 'round';
         context.lineJoin = 'round';
         context.lineWidth = 2.6;
-        context.strokeStyle = '#111827';
-        context.fillStyle = '#111827';
+        context.strokeStyle = '#5B23FF';
+        context.fillStyle = '#5B23FF';
 
         const translatedStrokes = strokesRef.current.map((stroke) =>
             stroke.map((point) => ({
