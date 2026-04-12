@@ -126,16 +126,7 @@ export async function revokeCertificate(
     return res.data;
 }
 
-// ─── Signing ──────────────────────────────────────────────────────────────────
-
-export interface SignResponse {
-    signatureId: string;
-    signatureBytes: string;
-    certificateId: string;
-    documentHash: string;
-    documentName: string;
-    signedAt: string;
-}
+// ─── Verify ───────────────────────────────────────────────────────────────────
 
 export interface VerifyRequest {
     documentHash: string;
@@ -152,32 +143,6 @@ export interface VerifyResponse {
         notAfter: string;
     };
     reason?: string;
-}
-
-export interface SignedDocumentRecord {
-    id: string;
-    documentName: string;
-    documentHash: string;
-    certificateId: string;
-    signedAt: string;
-}
-
-export interface SigningHistoryResponse {
-    total: number;
-    page: number;
-    limit: number;
-    items: SignedDocumentRecord[];
-}
-
-export async function signDocument(
-    documentHash: string,
-    documentName: string,
-): Promise<SignResponse> {
-    const res = await signatureClient.post('/signature/signing/sign', {
-        documentHash,
-        documentName,
-    });
-    return res.data;
 }
 
 export async function verifySignature(
@@ -200,12 +165,3 @@ export async function verifySignature(
     return res.json();
 }
 
-export async function getSigningHistory(
-    page = 1,
-    limit = 20,
-): Promise<SigningHistoryResponse> {
-    const res = await signatureClient.get('/signature/signing/history', {
-        params: { page, limit },
-    });
-    return res.data;
-}
