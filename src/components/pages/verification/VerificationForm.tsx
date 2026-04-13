@@ -176,6 +176,7 @@ export function VerificationForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { user, setUser, setTokens } = useAuthStore();
+    const isInvitationChallenge = searchParams.get('challenge') === 'invitation';
 
     const [step, setStep] = useState<VerifyStep>('nid');
     const [documentNumber, setDocumentNumber] = useState('');
@@ -209,7 +210,9 @@ export function VerificationForm() {
                     );
                 }
                 toast.success('Identity verified!', {
-                    description: `Score: ${Math.round(data.compositeScore)}% — you can now access your dashboard.`,
+                    description: isInvitationChallenge
+                        ? `Score: ${Math.round(data.compositeScore)}% — invitation verification is complete.`
+                        : `Score: ${Math.round(data.compositeScore)}% — you can now access your dashboard.`,
                 });
             } else {
                 toast.error('Verification failed', {
@@ -282,7 +285,12 @@ export function VerificationForm() {
             });
             return;
         }
-        await submit(documentNumber, idCardFile, selfieFile);
+        await submit(
+            documentNumber,
+            idCardFile,
+            selfieFile,
+            isInvitationChallenge ? 'INVITATION' : undefined,
+        );
     };
 
     // ── Render by step ────────────────────────────────────────────
@@ -304,14 +312,15 @@ export function VerificationForm() {
                                     fontWeight: 700,
                                     color: 'var(--color-text-primary)',
                                     marginBottom: 8,
-                                    letterSpacing: '-0.02em',
-                                }}
-                            >
-                                Confirm your ID number
+                                letterSpacing: '-0.02em',
+                            }}
+                        >
+                                {isInvitationChallenge ? 'Confirm your identity for this invitation' : 'Confirm your ID number'}
                             </h1>
                             <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>
-                                Enter your 16-digit National ID number to begin. We&apos;ll compare it
-                                against the one you registered with.
+                                {isInvitationChallenge
+                                    ? 'Enter your 16-digit National ID number to continue the secure invitation challenge. We will compare it against the one registered on your account.'
+                                    : 'Enter your 16-digit National ID number to begin. We&apos;ll compare it against the one you registered with.'}
                             </p>
                         </div>
 
@@ -662,7 +671,7 @@ export function VerificationForm() {
                         <div style={{ display: 'flex', gap: 10, width: '100%' }}>
                             {result.passed ? (
                                 <Button fullWidth size="lg" onClick={continueAfterVerification}>
-                                    Continue to dashboard
+                                    {isInvitationChallenge ? 'Return to invitation' : 'Continue to dashboard'}
                                 </Button>
                             ) : result.attemptsRemaining > 0 ? (
                                 <>
