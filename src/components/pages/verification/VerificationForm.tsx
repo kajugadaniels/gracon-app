@@ -667,6 +667,13 @@ export function VerificationForm() {
                             </p>
                         )}
 
+                        {!result.passed && result.attemptsRemaining === 0 && result.lockout.retryAvailableAt && (
+                            <p style={{ fontSize: 12, color: 'var(--color-text-muted)', textAlign: 'center', margin: 0, lineHeight: 1.6 }}>
+                                Verification is locked for the current window. You can try again after{' '}
+                                {new Date(result.lockout.retryAvailableAt).toLocaleString()}.
+                            </p>
+                        )}
+
                         {/* Actions */}
                         <div style={{ display: 'flex', gap: 10, width: '100%' }}>
                             {result.passed ? (
