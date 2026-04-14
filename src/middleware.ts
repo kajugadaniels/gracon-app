@@ -32,10 +32,12 @@ export function middleware(req: NextRequest) {
     }
 
     // ── Unauthenticated user tries to access protected pages ───────
-    // Redirect to login, preserve intended destination in ?next param
+    // Redirect to login, preserve full intended URL (path + search) in ?next param
+    // so that query params like ?challenge=invitation&next=... survive the round-trip
     if (!isAuthRoute && !hasSession) {
         const loginUrl = new URL('/login', req.url);
-        loginUrl.searchParams.set('next', pathname);
+        const fullPath = `${pathname}${req.nextUrl.search}`;
+        loginUrl.searchParams.set('next', fullPath);
         return NextResponse.redirect(loginUrl);
     }
 
