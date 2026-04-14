@@ -1,5 +1,14 @@
 import { apiClient } from '@/api/client';
 
+export type VerificationChallengeMode = 'STANDARD' | 'INVITATION';
+
+export interface VerificationLockoutState {
+    maxAttempts: number;
+    attemptWindowHours: number;
+    retryAvailableAt: string | null;
+    retryAfterSeconds: number | null;
+}
+
 export interface VerificationResult {
     success: boolean;
     passed: boolean;
@@ -11,6 +20,7 @@ export interface VerificationResult {
     failReason: string | null;
     attemptsUsed: number;
     attemptsRemaining: number;
+    lockout: VerificationLockoutState;
     idInfo?: {
         fullName: string;
         dateOfBirth: string; // ISO string
@@ -21,7 +31,7 @@ export interface VerificationResult {
         accessToken: string;
         refreshToken: string;
     };
-    challengeMode?: 'STANDARD' | 'INVITATION';
+    challengeMode?: VerificationChallengeMode;
 }
 
 export interface SubmitVerificationResponse {
