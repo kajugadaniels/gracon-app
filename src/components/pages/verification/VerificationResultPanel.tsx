@@ -2,11 +2,13 @@
  * Presents the verification outcome, captured-photo previews, scores, and next actions.
  */
 
+import {
+    VerificationBiometricSummary,
+    VerificationIdentitySummary,
+    VerificationResultPreviews,
+    type VerificationResult,
+} from '@gracon/verification-ui';
 import { Button, StatusBadge } from '@/components/ui';
-import type { VerificationResult } from '@/api/verification/submit-verification.api';
-import { VerificationBiometricSummary } from './VerificationBiometricSummary';
-import { VerificationIdentitySummary } from './VerificationIdentitySummary';
-import { VerificationResultPreviews } from './VerificationResultPreviews';
 
 type VerificationResultPanelProps = {
     result: VerificationResult;
@@ -49,7 +51,6 @@ export function VerificationResultPanel({
                             ? 'Identity verified'
                             : 'Verification failed'
                     }
-                    pulse={result.passed}
                 />
             </div>
 
