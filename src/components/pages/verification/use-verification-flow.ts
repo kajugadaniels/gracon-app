@@ -15,6 +15,7 @@ import {
     type SubmitVerificationResponse,
     type VerificationResult,
 } from '@/api/verification/submit-verification.api';
+import type { VerificationChallengeMode } from '@/api/verification/verification-contract';
 import { useApi } from '@/lib/hooks/useApi';
 import { useAuthStore } from '@/lib/store/auth.store';
 
@@ -113,15 +114,6 @@ function verificationFlowReducer(
     }
 }
 
-function getSuccessDescription(
-    result: VerificationResult,
-    isInvitationChallenge: boolean,
-) {
-    return isInvitationChallenge
-        ? `Score: ${Math.round(result.compositeScore)}% — invitation verification is complete.`
-        : `Score: ${Math.round(result.compositeScore)}% — you can now access your dashboard.`;
-}
-
 function normalizeVerificationResult(
     response: SubmitVerificationResponse | VerificationResult,
 ) {
@@ -129,7 +121,8 @@ function normalizeVerificationResult(
 }
 
 function useVerificationSubmitController(
-    isInvitationChallenge: boolean,
+    challengeMode: VerificationChallengeMode,
+    getSuccessDescription: (result: VerificationResult) => string,
     state: VerificationFlowState,
     dispatch: Dispatch<VerificationFlowAction>,
 ) {
@@ -151,10 +144,7 @@ function useVerificationSubmitController(
                     );
                 }
                 toast.success('Identity verified!', {
-                    description: getSuccessDescription(
-                        result,
-                        isInvitationChallenge,
-                    ),
+                    description: getSuccessDescription(result),
                 });
                 return;
             }
@@ -165,7 +155,7 @@ function useVerificationSubmitController(
                     'Please try again with better lighting.',
             });
         },
-        [dispatch, isInvitationChallenge, setTokens, setUser, user],
+        [dispatch, getSuccessDescription, setTokens, setUser, user],
     );
 
     const { execute: submit, loading } = useApi(submitVerificationApi, {
@@ -185,10 +175,10 @@ function useVerificationSubmitController(
             state.documentNumber,
             state.idCardFile,
             state.selfieFile,
-            isInvitationChallenge ? 'INVITATION' : undefined,
+            challengeMode === 'INVITATION' ? 'INVITATION' : undefined,
         );
     }, [
-        isInvitationChallenge,
+        challengeMode,
         state.documentNumber,
         state.idCardFile,
         state.selfieFile,
@@ -204,13 +194,17 @@ function useVerificationSubmitController(
 /**
  * Owns the verification flow state machine for the current page session.
  */
-export function useVerificationFlow(isInvitationChallenge: boolean) {
+export function useVerificationFlow(options: {
+    challengeMode: VerificationChallengeMode;
+    getSuccessDescription: (result: VerificationResult) => string;
+}) {
     const [state, dispatch] = useReducer(
         verificationFlowReducer,
         INITIAL_STATE,
     );
     const { loading, submitVerification } = useVerificationSubmitController(
-        isInvitationChallenge,
+        options.challengeMode,
+        options.getSuccessDescription,
         state,
         dispatch,
     );
@@ -256,3 +250,5 @@ export function useVerificationFlow(isInvitationChallenge: boolean) {
         submitVerification,
     };
 }
+
+export type VerificationFlowController = ReturnType<typeof useVerificationFlow>;
