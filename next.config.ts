@@ -3,11 +3,13 @@ import { fileURLToPath } from "node:url";
 import type { NextConfig } from "next";
 
 const projectRoot = path.dirname(fileURLToPath(import.meta.url));
+const workspaceRoot = path.dirname(projectRoot);
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
+  transpilePackages: ["@gracon/verification-ui"],
   turbopack: {
-    root: projectRoot,
+    root: workspaceRoot,
   },
 };
 
