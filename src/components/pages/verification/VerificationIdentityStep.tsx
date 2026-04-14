@@ -6,7 +6,8 @@ import type { UseFormHandleSubmit, UseFormRegister } from 'react-hook-form';
 import { Button, Input } from '@/components/ui';
 
 type VerificationIdentityStepProps = {
-    isInvitationChallenge: boolean;
+    title: string;
+    description: string;
     error?: string;
     register: UseFormRegister<{ documentNumber: string }>;
     handleSubmit: UseFormHandleSubmit<{ documentNumber: string }>;
@@ -17,7 +18,8 @@ type VerificationIdentityStepProps = {
  * Collects the 16-digit national ID before photo capture begins.
  */
 export function VerificationIdentityStep({
-    isInvitationChallenge,
+    title,
+    description,
     error,
     register,
     handleSubmit,
@@ -35,9 +37,7 @@ export function VerificationIdentityStep({
                         letterSpacing: '-0.02em',
                     }}
                 >
-                    {isInvitationChallenge
-                        ? 'Confirm your identity for this invitation'
-                        : 'Confirm your ID number'}
+                    {title}
                 </h1>
                 <p
                     style={{
@@ -46,9 +46,7 @@ export function VerificationIdentityStep({
                         lineHeight: 1.6,
                     }}
                 >
-                    {isInvitationChallenge
-                        ? 'Enter your 16-digit National ID number to continue the secure invitation challenge. We will compare it against the one registered on your account.'
-                        : 'Enter your 16-digit National ID number to begin. We&apos;ll compare it against the one you registered with.'}
+                    {description}
                 </p>
             </div>
 
