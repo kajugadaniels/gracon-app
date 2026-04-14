@@ -14,12 +14,14 @@ export function VerificationStatus() {
     const [attemptsRemaining, setAttemptsRemaining] = useState<number | null>(null);
     const [isVerified, setIsVerified] = useState<boolean | null>(null);
     const [canAttempt, setCanAttempt] = useState(false);
+    const [retryAvailableAt, setRetryAvailableAt] = useState<string | null>(null);
 
     const { execute: fetchStatus, loading } = useApi(getVerificationStatusApi, {
         onSuccess: (res) => {
             setIsVerified(res.isIdVerified);
             setAttemptsRemaining(res.attemptsRemaining);
             setCanAttempt(res.canAttempt);
+            setRetryAvailableAt(res.lockout.retryAvailableAt);
         },
     });
 
@@ -154,9 +156,13 @@ export function VerificationStatus() {
                             fontSize: 12,
                             color: 'var(--color-error)',
                             margin: 0,
+                            lineHeight: 1.6,
                         }}
                     >
-                        Maximum attempts reached for today. Please try again tomorrow or contact support.
+                        Maximum attempts reached for the current window.
+                        {retryAvailableAt
+                            ? ` You can try again after ${new Date(retryAvailableAt).toLocaleString()}.`
+                            : ' Please try again later or contact support.'}
                     </p>
                 )}
             </div>
