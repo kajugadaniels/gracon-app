@@ -1,4 +1,5 @@
 import { apiClient } from '@/api/client';
+import type { VerificationLockoutState } from './submit-verification.api';
 
 export interface VerificationStatusResponse {
     isIdVerified: boolean;
@@ -6,6 +7,7 @@ export interface VerificationStatusResponse {
     attemptsRemaining: number;
     canAttempt: boolean;
     lastAttemptAt: string | null;
+    lockout: VerificationLockoutState;
 }
 
 // Returns the user's current ID verification status
