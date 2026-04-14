@@ -1,20 +1,16 @@
 'use client';
 
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button, Input, Card, StatusBadge } from '@/components/ui';
-import { toast } from '@/components/ui';
 import { CameraCapture } from './CameraCapture';
 import { ScoreRing } from './ScoreRing';
 import {
-    submitVerificationApi,
-    type VerificationResult,
-} from '@/api/verification/submit-verification.api';
-import { useApi } from '@/lib/hooks/useApi';
-import { useAuthStore } from '@/lib/store/auth.store';
+    useVerificationFlow,
+    type VerifyStep as VerificationStep,
+} from './use-verification-flow';
 
 // ── Validation schema ─────────────────────────────────────────
 
@@ -27,11 +23,7 @@ const schema = z.object({
 
 type FormFields = z.infer<typeof schema>;
 
-// ── Step definitions ──────────────────────────────────────────
-
-type VerifyStep = 'nid' | 'id-card' | 'selfie' | 'result';
-
-const STEPS: { key: VerifyStep; label: string }[] = [
+const STEPS: { key: VerificationStep; label: string }[] = [
     { key: 'nid', label: 'Confirm ID' },
     { key: 'id-card', label: 'ID Card' },
     { key: 'selfie', label: 'Selfie' },
@@ -40,7 +32,7 @@ const STEPS: { key: VerifyStep; label: string }[] = [
 
 // ── Step progress indicator ───────────────────────────────────
 
-function StepProgress({ current }: { current: VerifyStep }) {
+function StepProgress({ current }: { current: VerificationStep }) {
     const currentIndex = STEPS.findIndex((s) => s.key === current);
 
     return (
@@ -175,52 +167,30 @@ function ScoreBar({ label, value, color }: { label: string; value: number; color
 export function VerificationForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { user, setUser, setTokens } = useAuthStore();
     const isInvitationChallenge = searchParams.get('challenge') === 'invitation';
-
-    const [step, setStep] = useState<VerifyStep>('nid');
-    const [documentNumber, setDocumentNumber] = useState('');
-    const [idCardFile, setIdCardFile] = useState<File | null>(null);
-    const [selfieFile, setSelfieFile] = useState<File | null>(null);
-    const [idCardPreview, setIdCardPreview] = useState<string | null>(null);
-    const [selfiePreview, setSelfiePreview] = useState<string | null>(null);
-    const [idCaptured, setIdCaptured] = useState(false);
-    const [selfieCaptured, setSelfieCaptured] = useState(false);
-    const [result, setResult] = useState<VerificationResult | null>(null);
+    const {
+        step,
+        idCaptured,
+        selfieCaptured,
+        idCardPreview,
+        selfiePreview,
+        result,
+        loading,
+        confirmDocumentNumber,
+        captureIdCard,
+        captureSelfie,
+        retakeIdCard,
+        retakeSelfie,
+        setStep,
+        resetForRetry,
+        submitVerification,
+    } = useVerificationFlow(isInvitationChallenge);
 
     const {
         register,
         handleSubmit,
         formState: { errors },
     } = useForm<FormFields>({ resolver: zodResolver(schema) });
-
-    const { execute: submit, loading } = useApi(submitVerificationApi, {
-        showErrorToast: true,
-        onSuccess: (res) => {
-            const data = res.data ?? res;
-            setResult(data);
-            setStep('result');
-
-            if (data.passed) {
-                if (user) setUser({ ...user, isIdVerified: true });
-                if (data.upgradedTokens) {
-                    setTokens(
-                        data.upgradedTokens.accessToken,
-                        data.upgradedTokens.refreshToken,
-                    );
-                }
-                toast.success('Identity verified!', {
-                    description: isInvitationChallenge
-                        ? `Score: ${Math.round(data.compositeScore)}% — invitation verification is complete.`
-                        : `Score: ${Math.round(data.compositeScore)}% — you can now access your dashboard.`,
-                });
-            } else {
-                toast.error('Verification failed', {
-                    description: data.failReason ?? 'Please try again with better lighting.',
-                });
-            }
-        },
-    });
 
     function continueAfterVerification() {
         const next = searchParams.get('next');
@@ -250,47 +220,7 @@ export function VerificationForm() {
     // ── Handlers ──────────────────────────────────────────────────
 
     const handleNidSubmit = (values: FormFields) => {
-        setDocumentNumber(values.documentNumber);
-        setStep('id-card');
-    };
-
-    const handleIdCardCapture = (dataUrl: string, file: File) => {
-        setIdCardFile(file);
-        setIdCardPreview(dataUrl);
-        setIdCaptured(true);
-    };
-
-    const handleSelfieCapture = (dataUrl: string, file: File) => {
-        setSelfieFile(file);
-        setSelfiePreview(dataUrl);
-        setSelfieCaptured(true);
-    };
-
-    const handleIdCardRetake = () => {
-        setIdCardFile(null);
-        setIdCardPreview(null);
-        setIdCaptured(false);
-    };
-
-    const handleSelfieRetake = () => {
-        setSelfieFile(null);
-        setSelfiePreview(null);
-        setSelfieCaptured(false);
-    };
-
-    const handleSubmitVerification = async () => {
-        if (!idCardFile || !selfieFile) {
-            toast.error('Missing photos', {
-                description: 'Please capture both your ID card and selfie.',
-            });
-            return;
-        }
-        await submit(
-            documentNumber,
-            idCardFile,
-            selfieFile,
-            isInvitationChallenge ? 'INVITATION' : undefined,
-        );
+        confirmDocumentNumber(values.documentNumber);
     };
 
     // ── Render by step ────────────────────────────────────────────
@@ -371,8 +301,8 @@ export function VerificationForm() {
 
                         <CameraCapture
                             mode="id-card"
-                            onCapture={handleIdCardCapture}
-                            onRetake={handleIdCardRetake}
+                            onCapture={captureIdCard}
+                            onRetake={retakeIdCard}
                             captured={idCaptured}
                         />
 
@@ -418,8 +348,8 @@ export function VerificationForm() {
 
                         <CameraCapture
                             mode="selfie"
-                            onCapture={handleSelfieCapture}
-                            onRetake={handleSelfieRetake}
+                            onCapture={captureSelfie}
+                            onRetake={retakeSelfie}
                             captured={selfieCaptured}
                         />
 
@@ -435,7 +365,7 @@ export function VerificationForm() {
                                 disabled={!selfieCaptured || loading}
                                 loading={loading}
                                 loadingText="Verifying..."
-                                onClick={handleSubmitVerification}
+                                onClick={submitVerification}
                                 style={{ flex: 2 }}
                             >
                                 {selfieCaptured ? 'Submit for verification' : 'Capture selfie first'}
@@ -685,16 +615,7 @@ export function VerificationForm() {
                                     <Button
                                         variant="ghost"
                                         style={{ flex: 1 }}
-                                        onClick={() => {
-                                            setIdCaptured(false);
-                                            setSelfieFile(null);
-                                            setIdCardFile(null);
-                                            setIdCardPreview(null);
-                                            setSelfiePreview(null);
-                                            setSelfieCaptured(false);
-                                            setResult(null);
-                                            setStep('nid');
-                                        }}
+                                        onClick={resetForRetry}
                                     >
                                         Try again
                                     </Button>
