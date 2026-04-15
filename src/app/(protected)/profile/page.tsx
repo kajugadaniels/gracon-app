@@ -7,6 +7,7 @@ import { EditProfileModal } from '@/components/pages/profile/EditProfileModal';
 import { ChangePasswordModal } from '@/components/pages/profile/ChangePasswordModal';
 import { Button, PremiumLoader } from '@/components/ui';
 import { useApi } from '@/lib/hooks/useApi';
+import { normalizeImageUrl } from '@/lib/normalize-image-url';
 import { getProfileApi, UserProfileResponse } from '@/api/users/get-profile.api';
 
 export default function ProfilePage() {
@@ -22,7 +23,7 @@ export default function ProfilePage() {
                 userId: p.id,
                 email: p.email,
                 phoneNumber: p.phoneNumber,
-                imageUrl: p.profileImageUrl,
+                imageUrl: normalizeImageUrl(p.profileImageUrl),
                 surName: p.citizenIdentity?.surName ?? '',
                 postNames: p.citizenIdentity?.postNames ?? '',
                 sex: p.citizenIdentity?.sex ?? '',
@@ -45,7 +46,7 @@ export default function ProfilePage() {
 
     const handleImageUpload = (newUrl: string) => {
         setProfile((prev) => (prev ? { ...prev, profileImageUrl: newUrl } : prev));
-        if (user) setUser({ ...user, imageUrl: newUrl });
+        if (user) setUser({ ...user, imageUrl: normalizeImageUrl(newUrl) });
     };
 
     const handleProfileUpdate = (updated: UserProfileResponse) => {
