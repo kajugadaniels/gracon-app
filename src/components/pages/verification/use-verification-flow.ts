@@ -11,7 +11,7 @@ import {
     type VerificationChallengeMode,
     type VerificationFlowController,
     type VerificationResult,
-} from '@gracon/verification-ui';
+} from './shared';
 import {
     submitVerificationApi,
 } from '@/api/verification/submit-verification.api';
