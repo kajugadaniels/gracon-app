@@ -1,5 +1,5 @@
 /**
- * Re-exports the shared verification contract for the main app transport.
+ * Local verification contract for the main app transport.
  */
 
 export type {
@@ -9,4 +9,4 @@ export type {
     VerificationLockoutState,
     VerificationResult,
     VerificationStatusResponse,
-} from '@gracon/verification-ui';
+} from '@/components/pages/verification/shared/types';
