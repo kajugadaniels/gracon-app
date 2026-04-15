@@ -4,7 +4,7 @@
 
 import {
     VerificationFlowContent,
-} from '@gracon/verification-ui';
+} from './shared';
 import { Card } from '@/components/ui';
 import { VerificationCaptureStep } from './VerificationCaptureStep';
 import { VerificationResultPanel } from './VerificationResultPanel';
