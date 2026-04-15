@@ -18,18 +18,22 @@ export default function ProtectedLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const { isHydrated, accessToken, user } = useAuthStore();
+    const { isHydrated, isLoading, accessToken, user } = useAuthStore();
     const router = useRouter();
     const pathname = usePathname();
+    const hasSessionCookie =
+        typeof document !== 'undefined' && document.cookie.includes('session_active=');
 
     useEffect(() => {
         if (!isHydrated) return;
+        if (isLoading) return;
+        if (!accessToken && !user && hasSessionCookie) return;
         if (!accessToken || !user) {
             router.replace('/login');
         }
-    }, [isHydrated, accessToken, user, router]);
+    }, [isHydrated, isLoading, accessToken, user, hasSessionCookie, router]);
 
-    if (!isHydrated) {
+    if (!isHydrated || isLoading || (!accessToken && !user && hasSessionCookie)) {
         return (
             <div
                 style={{
