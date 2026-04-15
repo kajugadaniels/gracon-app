@@ -1,10 +1,13 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/auth.store';
 import { AppSidebar } from '@/components/shared/AppSidebar';
 import { PremiumLoader } from '@/components/ui/Loader';
+
+// Routes that render full-screen with no sidebar or layout chrome.
+const FULL_SCREEN_ROUTES = new Set(['/verify-identity']);
 
 // Sidebar width constants — must match AppSidebar
 const SIDEBAR_EXPANDED = 240;
@@ -17,6 +20,7 @@ export default function ProtectedLayout({
 }) {
     const { isHydrated, accessToken, user } = useAuthStore();
     const router = useRouter();
+    const pathname = usePathname();
 
     useEffect(() => {
         if (!isHydrated) return;
@@ -39,6 +43,12 @@ export default function ProtectedLayout({
     }
 
     if (!accessToken || !user) return null;
+
+    // Full-screen routes bypass the sidebar layout entirely — they own
+    // their own page chrome (header, background, etc.)
+    if (FULL_SCREEN_ROUTES.has(pathname)) {
+        return <>{children}</>;
+    }
 
     return (
         <>
