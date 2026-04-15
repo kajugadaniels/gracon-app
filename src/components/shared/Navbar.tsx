@@ -20,10 +20,8 @@ export function Navbar() {
     } catch {
       // Logout always succeeds client-side even if the server call fails
     } finally {
-      document.cookie =
-        'session_active=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
       clearAuth();
-      router.push('/login');
+      window.location.replace('/login');
     }
   };
 
