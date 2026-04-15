@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useSidebarStore } from '@/lib/store/sidebar.store';
 import { useAuthStore } from '@/lib/store/auth.store';
+import { normalizeImageUrl } from '@/lib/normalize-image-url';
 import { NAV_ITEMS } from '@/constants/nav';
 
 // ─── Internal icons (not part of nav data) ────────────────────────────────────
@@ -62,6 +63,7 @@ export function AppSidebar() {
     const displayName = user
         ? `${user.postNames} ${user.surName}`.trim()
         : 'User';
+    const profileImageUrl = normalizeImageUrl(user?.imageUrl);
 
     function isActive(href: string, exact: boolean) {
         if (exact) return pathname === href;
@@ -273,9 +275,9 @@ export function AppSidebar() {
                             overflow: 'hidden',
                         }}
                     >
-                        {user?.imageUrl ? (
+                        {profileImageUrl ? (
                             // eslint-disable-next-line @next/next/no-img-element
-                            <img src={user.imageUrl} alt={displayName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            <img src={profileImageUrl} alt={displayName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         ) : (
                             initials
                         )}
