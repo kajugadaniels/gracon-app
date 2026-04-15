@@ -1,7 +1,7 @@
 'use client';
 
 // Step 2 card — X.509 digital certificate management.
-// Shows validity expiry bar, PEM toggle, and revoke confirmation.
+// Shows validity expiry bar and revoke confirmation.
 
 import { useState } from 'react';
 import type { CertificateResponse } from '@/api/signature/signature.api';
@@ -88,7 +88,6 @@ function RevokeConfirm({ reason, onChange, onConfirm, onCancel, loading }: {
 
 export function CertificateCard({ certificate, hasKeyPair, onRefresh }: CertificateCardProps) {
     const [loading, setLoading]         = useState(false);
-    const [showPem, setShowPem]         = useState(false);
     const [showRevoke, setShowRevoke]   = useState(false);
     const [revokeReason, setReason]     = useState('');
     const [error, setError]             = useState<string | null>(null);
@@ -198,35 +197,6 @@ export function CertificateCard({ certificate, hasKeyPair, onRefresh }: Certific
                             </div>
                         ))}
                     </div>
-
-                    {/* PEM toggle */}
-                    <button onClick={() => setShowPem(v => !v)} style={{
-                        background: 'none', border: 'none', cursor: 'pointer', padding: 0,
-                        fontSize: 12, color: 'var(--color-primary)', fontWeight: 500,
-                        display: 'flex', alignItems: 'center', gap: 4, marginBottom: showPem ? 10 : 0,
-                    }}>
-                        <span style={{ fontSize: 10, transition: 'transform 150ms', transform: showPem ? 'rotate(90deg)' : 'none' }}>▶</span>
-                        {showPem ? 'Hide certificate PEM' : 'Show certificate PEM'}
-                    </button>
-                    {showPem && (
-                        <div style={{ position: 'relative', marginBottom: 16 }}>
-                            <pre style={{
-                                margin: 0, padding: '12px 14px', borderRadius: 'var(--radius-md)',
-                                background: 'rgba(91,35,255,0.03)', border: '1px solid var(--color-border)',
-                                fontSize: 10, color: 'var(--color-text-secondary)',
-                                overflowX: 'auto', whiteSpace: 'pre-wrap', wordBreak: 'break-all',
-                                maxHeight: 160, overflowY: 'auto', fontFamily: 'monospace', lineHeight: 1.7,
-                            }}>
-                                {certificate!.certificatePem}
-                            </pre>
-                            <button onClick={() => navigator.clipboard.writeText(certificate!.certificatePem)} style={{
-                                position: 'absolute', top: 8, right: 8,
-                                padding: '2px 8px', borderRadius: 6, fontSize: 10, cursor: 'pointer',
-                                background: 'rgba(255,255,255,0.9)', border: '1px solid var(--color-border)',
-                                color: 'var(--color-text-secondary)',
-                            }}>Copy</button>
-                        </div>
-                    )}
 
                     {/* Revoke */}
                     {!showRevoke ? (
