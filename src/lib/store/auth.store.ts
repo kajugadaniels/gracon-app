@@ -66,6 +66,15 @@ const storage = {
     },
 };
 
+function clearSessionCookies(): void {
+    if (typeof document === 'undefined') return;
+
+    const expired = 'expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    document.cookie = `g360_at=; path=/; ${expired}; max-age=0; SameSite=Lax`;
+    document.cookie = `g360_rt=; path=/; ${expired}; max-age=0; SameSite=Lax`;
+    document.cookie = `session_active=; path=/; ${expired}; max-age=0; SameSite=Strict`;
+}
+
 export const useAuthStore = create<AuthState>((set, get) => ({
     accessToken: null,
     refreshToken: null,
@@ -103,12 +112,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     // Clears everything from store and storage
     clearAuth: () => {
         storage.clear();
-
-        // NEW — clear the shared cookies
-        if (typeof document !== 'undefined') {
-            document.cookie = 'g360_at=; path=/; max-age=0; SameSite=Lax';
-            document.cookie = 'g360_rt=; path=/; max-age=0; SameSite=Lax';
-        }
+        clearSessionCookies();
 
         set({ accessToken: null, refreshToken: null, user: null });
     },
