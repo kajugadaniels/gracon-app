@@ -42,7 +42,20 @@ export default function ProtectedLayout({
         );
     }
 
-    if (!accessToken || !user) return null;
+    if (!accessToken || !user) {
+        return (
+            <div
+                style={{
+                    minHeight: '100dvh',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                }}
+            >
+                <PremiumLoader size={40} color="primary" />
+            </div>
+        );
+    }
 
     // Full-screen routes bypass the sidebar layout entirely — they own
     // their own page chrome (header, background, etc.)
