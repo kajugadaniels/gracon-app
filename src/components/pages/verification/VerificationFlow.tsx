@@ -2,29 +2,23 @@
  * Config-driven composition wrapper for the verification UI.
  */
 
-import type {
-    UseFormHandleSubmit,
-    UseFormRegister,
-} from 'react-hook-form';
-import { VerificationStepProgress } from '@gracon/verification-ui';
+import {
+    VerificationIdentityStep,
+    VerificationStepProgress,
+} from '@gracon/verification-ui';
 import { Card } from '@/components/ui';
 import { VerificationCaptureStep } from './VerificationCaptureStep';
-import { VerificationIdentityStep } from './VerificationIdentityStep';
 import { VerificationResultPanel } from './VerificationResultPanel';
 import type { VerificationFlowConfig } from './verification-flow-config';
 import type { VerificationFlowController } from './use-verification-flow';
 
-type VerificationFormFields = {
-    documentNumber: string;
-};
-
 type VerificationFlowProps = {
     config: VerificationFlowConfig;
     controller: VerificationFlowController;
-    register: UseFormRegister<VerificationFormFields>;
-    handleSubmit: UseFormHandleSubmit<VerificationFormFields>;
     documentNumberError?: string;
-    onNidSubmit: (values: VerificationFormFields) => void;
+    documentNumber: string;
+    onDocumentNumberChange: (value: string) => void;
+    onNidSubmit: () => void;
     onContinue: () => void;
     onDashboard: () => void;
 };
@@ -35,9 +29,9 @@ type VerificationFlowProps = {
 export function VerificationFlow({
     config,
     controller,
-    register,
-    handleSubmit,
     documentNumberError,
+    documentNumber,
+    onDocumentNumberChange,
     onNidSubmit,
     onContinue,
     onDashboard,
@@ -52,8 +46,8 @@ export function VerificationFlow({
                         title={config.identity.title}
                         description={config.identity.description}
                         error={documentNumberError}
-                        register={register}
-                        handleSubmit={handleSubmit}
+                        value={documentNumber}
+                        onChange={onDocumentNumberChange}
                         onSubmit={onNidSubmit}
                     />
                 )}
