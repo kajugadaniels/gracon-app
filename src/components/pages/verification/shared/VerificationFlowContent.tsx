@@ -45,6 +45,12 @@ type VerificationFlowContentProps = {
     onNidSubmit: () => void;
     onContinue: () => void;
     onDashboard: () => void;
+    /**
+     * When false, suppresses the internal VerificationStepProgress bar.
+     * Use this when the parent renders its own step indicator outside the card.
+     * Defaults to true.
+     */
+    showInternalProgress?: boolean;
     renderCaptureStep: (
         props: VerificationCaptureStepSharedProps,
     ) => ReactNode;
@@ -66,12 +72,15 @@ export function VerificationFlowContent({
     onNidSubmit,
     onContinue,
     onDashboard,
+    showInternalProgress = true,
     renderCaptureStep,
     renderResultPanel,
 }: VerificationFlowContentProps) {
     return (
         <div className="animate-fade-up">
-            <VerificationStepProgress current={controller.step} />
+            {showInternalProgress && (
+                <VerificationStepProgress current={controller.step} />
+            )}
 
             {controller.step === 'nid' && (
                 <VerificationIdentityStep
