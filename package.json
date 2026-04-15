@@ -10,7 +10,6 @@
     "test": "node --no-warnings --experimental-strip-types --test --test-concurrency=1 test/verification/*.test.ts"
   },
   "dependencies": {
-    "@gracon/verification-ui": "file:../shared/verification",
     "@hookform/resolvers": "^5.2.2",
     "axios": "^1.13.6",
     "js-cookie": "^3.0.5",
