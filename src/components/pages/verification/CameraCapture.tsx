@@ -1,238 +1,26 @@
 'use client';
 
+/**
+ * Main-app camera capture widget built on the shared camera layer.
+ */
+
 import { useEffect } from 'react';
+import {
+    CameraCaptureReview,
+    CameraPermissionDenied,
+    CameraQualityBar,
+    useCamera,
+    type CameraFacing,
+} from '@gracon/verification-ui';
 import { Button } from '@/components/ui';
 import { PremiumLoader } from '@/components/ui/Loader';
-import { useCamera, type CameraFacing, type QualityResult } from './hooks/useCamera';
 
 interface CameraCaptureProps {
-    // "id-card" = back camera default, "selfie" = front camera default
     mode: 'id-card' | 'selfie';
     onCapture: (dataUrl: string, file: File) => void;
     onRetake?: () => void;
-    // Pass captured state up so parent knows when step is complete
     captured: boolean;
 }
-
-// ── Quality indicator bar ─────────────────────────────────────
-
-function QualityBar({ quality }: { quality: QualityResult }) {
-    const icons: Record<QualityResult['label'], string> = {
-        loading: '⟳',
-        dark: '🔅',
-        bright: '☀',
-        blurry: '〰',
-        good: '✓',
-    };
-
-    return (
-        <div
-            style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '8px 14px',
-                borderRadius: 8,
-                background: 'rgba(0,0,0,0.60)',
-                backdropFilter: 'blur(8px)',
-                border: `1px solid ${quality.color}44`,
-                transition: 'border-color 300ms ease',
-                minWidth: 240,
-            }}
-        >
-            {/* Icon */}
-            <span style={{ fontSize: 16, lineHeight: 1, flexShrink: 0 }}>
-                {icons[quality.label]}
-            </span>
-
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                {/* Message */}
-                <span
-                    style={{
-                        fontSize: 12,
-                        fontWeight: 500,
-                        color: quality.color,
-                        lineHeight: 1.3,
-                    }}
-                >
-                    {quality.message}
-                </span>
-
-                {/* Score bar */}
-                <div
-                    style={{
-                        height: 3,
-                        background: 'rgba(255,255,255,0.12)',
-                        borderRadius: 2,
-                        overflow: 'hidden',
-                    }}
-                >
-                    <div
-                        style={{
-                            height: '100%',
-                            width: `${quality.score}%`,
-                            background: quality.color,
-                            borderRadius: 2,
-                            transition: 'width 400ms ease, background 400ms ease',
-                        }}
-                    />
-                </div>
-            </div>
-        </div>
-    );
-}
-
-// ── Permission denied screen ──────────────────────────────────
-
-function PermissionDenied({
-    error,
-    onRetry,
-}: {
-    error: string;
-    onRetry: () => void;
-}) {
-    return (
-        <div
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 16,
-                padding: 40,
-                textAlign: 'center',
-                minHeight: 360,
-            }}
-        >
-            <div
-                style={{
-                    width: 64,
-                    height: 64,
-                    borderRadius: '50%',
-                    background: 'var(--color-error-subtle)',
-                    border: '2px solid var(--color-error-border)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: 28,
-                }}
-            >
-                ⊘
-            </div>
-            <div>
-                <div
-                    style={{
-                        fontSize: 16,
-                        fontWeight: 600,
-                        color: 'var(--color-text-primary)',
-                        marginBottom: 8,
-                    }}
-                >
-                    Camera access required
-                </div>
-                <div
-                    style={{
-                        fontSize: 13,
-                        color: 'var(--color-text-secondary)',
-                        lineHeight: 1.6,
-                        maxWidth: 320,
-                    }}
-                >
-                    {error}
-                </div>
-            </div>
-            <Button onClick={onRetry} size="sm">
-                Try again
-            </Button>
-        </div>
-    );
-}
-
-// ── Captured image review ─────────────────────────────────────
-
-function CaptureReview({
-    dataUrl: imageUrl,
-    mode,
-    onRetake,
-}: {
-    dataUrl: string;
-    mode: 'id-card' | 'selfie';
-    onRetake: () => void;
-}) {
-    return (
-        <div
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 16,
-            }}
-        >
-            {/* Preview */}
-            <div
-                style={{
-                    position: 'relative',
-                    borderRadius: 12,
-                    overflow: 'hidden',
-                    border: '2px solid var(--color-success-border)',
-                    aspectRatio: mode === 'id-card' ? '16/10' : '3/4',
-                    background: '#000',
-                }}
-            >
-                <img
-                    src={imageUrl}
-                    alt="Captured"
-                    style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        display: 'block',
-                    }}
-                />
-
-                {/* Success overlay badge */}
-                <div
-                    style={{
-                        position: 'absolute',
-                        top: 12,
-                        right: 12,
-                        background: 'rgba(0,0,0,0.65)',
-                        backdropFilter: 'blur(8px)',
-                        border: '1px solid var(--color-success-border)',
-                        borderRadius: 20,
-                        padding: '5px 12px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 6,
-                        fontSize: 12,
-                        fontWeight: 600,
-                        color: 'var(--color-success)',
-                    }}
-                >
-                    <span>✓</span>
-                    <span>Captured</span>
-                </div>
-            </div>
-
-            {/* Retake button */}
-            <Button
-                variant="ghost"
-                fullWidth
-                onClick={onRetake}
-                leftIcon={
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M23 4v6h-6" />
-                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
-                    </svg>
-                }
-            >
-                Retake photo
-            </Button>
-        </div>
-    );
-}
-
-// ── Main CameraCapture component ──────────────────────────────
 
 export function CameraCapture({
     mode,
@@ -262,32 +50,28 @@ export function CameraCapture({
         onCapture,
     });
 
-    // Start camera on mount
     useEffect(() => {
-        startCamera();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+        void startCamera();
+    }, [startCamera]);
 
     const handleRetake = () => {
         retake();
         onRetake?.();
     };
 
-    // ── Permission denied state
     if (hasPermission === false && permissionError) {
         return (
-            <PermissionDenied
+            <CameraPermissionDenied
                 error={permissionError}
                 onRetry={startCamera}
             />
         );
     }
 
-    // ── Captured — show review
     if (capturedImage) {
         return (
-            <CaptureReview
-                dataUrl={capturedImage}
+            <CameraCaptureReview
+                imageUrl={capturedImage}
                 mode={mode}
                 onRetake={handleRetake}
             />
@@ -299,7 +83,6 @@ export function CameraCapture({
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {/* Viewfinder container */}
             <div
                 style={{
                     position: 'relative',
@@ -316,7 +99,6 @@ export function CameraCapture({
                     transition: 'border-color 400ms ease',
                 }}
             >
-                {/* Video stream */}
                 <video
                     ref={videoRef}
                     autoPlay
@@ -327,16 +109,13 @@ export function CameraCapture({
                         height: '100%',
                         objectFit: 'cover',
                         display: 'block',
-                        // Mirror front camera so it feels like a mirror
                         transform: facing === 'user' ? 'scaleX(-1)' : 'none',
                     }}
                 />
 
-                {/* Hidden canvas for frame analysis and capture */}
                 <canvas ref={canvasRef} style={{ display: 'none' }} />
 
-                {/* ID card overlay guide — only in id-card mode */}
-                {mode === 'id-card' && isReady && !capturedImage && (
+                {mode === 'id-card' && isReady && !captured && (
                     <div
                         style={{
                             position: 'absolute',
@@ -347,7 +126,6 @@ export function CameraCapture({
                             pointerEvents: 'none',
                         }}
                     >
-                        {/* Card outline guide */}
                         <div
                             style={{
                                 width: '82%',
@@ -357,7 +135,6 @@ export function CameraCapture({
                                 boxShadow: 'inset 0 0 0 4000px rgba(0,0,0,0.15)',
                             }}
                         >
-                            {/* Corner markers */}
                             {['top-left', 'top-right', 'bottom-left', 'bottom-right'].map(
                                 (corner) => {
                                     const isTop = corner.includes('top');
@@ -390,8 +167,7 @@ export function CameraCapture({
                     </div>
                 )}
 
-                {/* Selfie face guide oval */}
-                {mode === 'selfie' && isReady && !capturedImage && (
+                {mode === 'selfie' && isReady && !captured && (
                     <div
                         style={{
                             position: 'absolute',
@@ -413,7 +189,6 @@ export function CameraCapture({
                     </div>
                 )}
 
-                {/* Loading overlay */}
                 {(isAnalyzing || !isReady) && (
                     <div
                         style={{
@@ -440,7 +215,6 @@ export function CameraCapture({
                     </div>
                 )}
 
-                {/* Top controls bar — flip camera button */}
                 {isReady && (
                     <div
                         style={{
@@ -451,7 +225,6 @@ export function CameraCapture({
                             gap: 8,
                         }}
                     >
-                        {/* Flip camera */}
                         <button
                             onClick={flipCamera}
                             aria-label="Flip camera"
@@ -490,7 +263,6 @@ export function CameraCapture({
                     </div>
                 )}
 
-                {/* Camera label */}
                 {isReady && (
                     <div
                         style={{
@@ -516,14 +288,12 @@ export function CameraCapture({
                 )}
             </div>
 
-            {/* Quality indicator */}
             {isReady && (
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
-                    <QualityBar quality={quality} />
+                    <CameraQualityBar quality={quality} />
                 </div>
             )}
 
-            {/* Capture button */}
             {isReady && (
                 <Button
                     fullWidth
@@ -551,7 +321,6 @@ export function CameraCapture({
                 </Button>
             )}
 
-            {/* Guidance tip */}
             {isReady && mode === 'id-card' && (
                 <p
                     style={{
