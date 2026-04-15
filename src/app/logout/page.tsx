@@ -2,19 +2,37 @@
 
 import { useEffect } from 'react';
 import { useAuthStore } from '@/lib/store/auth.store';
-import { useRouter } from 'next/navigation';
+import { logoutApi } from '@/api/auth/logout.api';
 
 // This page handles logout triggered by app/documents or any other sub-app.
 // It clears the app/app auth store, clears cookies, and redirects to login.
 
 export default function LogoutPage() {
-    const { clearAuth } = useAuthStore();
-    const router = useRouter();
+    const { clearAuth, refreshToken } = useAuthStore();
 
     useEffect(() => {
-        clearAuth();          // clears sessionStorage + g360_at + g360_rt cookies
-        router.replace('/login');
-    }, [clearAuth, router]);
+        let cancelled = false;
+
+        const runLogout = async () => {
+            try {
+                if (refreshToken) {
+                    await logoutApi(refreshToken);
+                }
+            } catch {
+                // Local logout must still complete even if token revocation fails.
+            } finally {
+                if (cancelled) return;
+                clearAuth();
+                window.location.replace('/login');
+            }
+        };
+
+        void runLogout();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [clearAuth, refreshToken]);
 
     return (
         <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
