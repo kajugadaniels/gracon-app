@@ -37,6 +37,7 @@ async function refreshSession(refreshToken: string) {
 function clearSessionCookies(response: NextResponse) {
     response.cookies.set('g360_at', '', { maxAge: 0, path: '/' });
     response.cookies.set('g360_rt', '', { maxAge: 0, path: '/' });
+    response.cookies.set('session_active', '', { maxAge: 0, path: '/' });
     return response;
 }
 
@@ -56,6 +57,11 @@ function applySessionCookies(
         maxAge,
         path: '/',
         sameSite: 'lax',
+    });
+    response.cookies.set('session_active', '1', {
+        maxAge,
+        path: '/',
+        sameSite: 'strict',
     });
 
     return response;
@@ -110,7 +116,26 @@ export async function GET(req: NextRequest) {
         }
 
         const data = await profileResponse.json();
-        const response = NextResponse.json(data);
+        const profile = data?.data ?? data;
+        const effectiveRefreshToken =
+            refreshedTokens?.refreshToken ?? refreshToken ?? null;
+
+        const response = NextResponse.json({
+            accessToken,
+            refreshToken: effectiveRefreshToken,
+            user: {
+                userId: profile?.id ?? '',
+                email: profile?.email ?? '',
+                phoneNumber: profile?.phoneNumber ?? null,
+                imageUrl: profile?.profileImageUrl ?? null,
+                surName: profile?.citizenIdentity?.surName ?? '',
+                postNames: profile?.citizenIdentity?.postNames ?? '',
+                sex: profile?.citizenIdentity?.sex ?? '',
+                isIdVerified: Boolean(profile?.isIdVerified),
+                idVerifiedAt: profile?.idVerifiedAt ?? null,
+                createdAt: profile?.createdAt ?? '',
+            },
+        });
 
         if (refreshedTokens) {
             applySessionCookies(
