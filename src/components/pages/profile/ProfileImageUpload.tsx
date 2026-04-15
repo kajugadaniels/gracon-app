@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react';
 import { PremiumLoader, toast } from '@/components/ui';
 import { uploadProfileImageApi } from '@/api/users/upload-profile-image.api';
+import { normalizeImageUrl } from '@/lib/normalize-image-url';
 
 // ── Constants ──────────────────────────────────────────────────────────────
 
@@ -30,7 +31,7 @@ export function ProfileImageUpload({
     const [uploading, setUploading] = useState(false);
     const [hovered, setHovered] = useState(false);
 
-    const displayUrl = optimisticUrl ?? imageUrl;
+    const displayUrl = normalizeImageUrl(optimisticUrl ?? imageUrl);
 
     const handleClick = () => {
         if (!uploading) fileInputRef.current?.click();
