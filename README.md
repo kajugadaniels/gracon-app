@@ -1,36 +1,122 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# App App
 
-## Getting Started
+Primary user-facing frontend for the Gracon platform.
 
-First, run the development server:
+This application handles account onboarding, login, email verification, password reset, profile management, identity verification, digital-signature setup, and general account/dashboard surfaces. It is also the identity gateway that `app/documents` redirects to when a user needs to authenticate or complete verification.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Overview
+
+- Runtime: Next.js 15 + React + TypeScript
+- Default port: `4000`
+- Styling: Tailwind CSS
+- State: Zustand + sessionStorage
+- Forms: React Hook Form + Zod
+- Media capture: browser camera flow for identity verification
+
+## What This App Owns
+
+- Login, register, verify-email, forgot/reset-password
+- Protected dashboard and profile pages
+- Identity verification UI
+- Signature-key and certificate setup UI
+- Public document verification page
+- Shared-login entry point for the documents app
+
+## Core Skills Needed
+
+- Next.js App Router and middleware
+- Secure token/session handling in frontend apps
+- Camera and multipart verification UX
+- Profile/account UX patterns
+- Cross-origin handoff between related web apps
+
+## Techniques Used
+
+- Zustand in-memory auth store with sessionStorage hydration
+- `session_active` cookie as middleware signal, not as token container
+- Cross-app redirect handling for `app/documents` return flows
+- Limited-token vs full-token user journeys
+- Local verification component stack in `src/components/pages/verification/shared`
+- Silent refresh through Next.js route handlers
+
+## Main Areas
+
+```text
+src/app/
+  (auth)/         login, register, verify-email, forgot/reset-password
+  (protected)/    dashboard, profile, verify-identity
+  api/            local refresh and current-user handlers
+  verify/         public document-authenticity page
+components/
+  pages/
+    auth/
+    profile/
+    signature/
+    verification/
+    verify/
+  shared/
+  ui/
+api/
+  auth/
+  users/
+  verification/
+  signature/
+lib/
+  store/
+  hooks/
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Folder Structure
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```text
+app/app/
+  src/
+    app/
+    api/
+    components/
+    lib/
+    constants/
+  public/
+  test/
+  package.json
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Local Commands
 
-## Learn More
+```bash
+npm install
+npm run dev
+npm run build
+npm run lint
+npm run test
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Environment Notes
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Key variables:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3000/api/v1
+NEXT_PUBLIC_SIGNATURE_API_URL=http://localhost:3002/api/v1
+NEXT_PUBLIC_DOCS_URL=http://localhost:4002
+```
 
-## Deploy on Vercel
+## Integration Boundaries
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Calls `api/auth` and `api/signature`
+- Acts as the login/verification destination for `app/documents`
+- Must not absorb document-editor business logic
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Important Rules
+
+- Keep tokens out of `localStorage`
+- Use hard navigation for cross-origin jumps back to `app/documents`
+- Preserve the distinction between full-token and limited-token experiences
+- Keep verification logic local to this app now that the shared package has been rolled back
+
+## Contribution Checklist
+
+- Update middleware when adding new public routes
+- Keep auth recovery and redirect behavior explicit
+- Test verification, login, and return-to-documents flows after auth changes
+
