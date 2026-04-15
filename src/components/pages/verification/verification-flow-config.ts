@@ -6,7 +6,7 @@ import {
     createVerificationFlowConfig as createSharedVerificationFlowConfig,
     type VerificationFlowConfig,
     type VerificationChallengeMode,
-} from '@gracon/verification-ui';
+} from './shared';
 import type { VerificationResult } from '@/api/verification/verification-contract';
 
 export type { VerificationFlowConfig };
