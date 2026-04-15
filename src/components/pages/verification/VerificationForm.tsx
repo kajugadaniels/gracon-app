@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useVerificationDocumentNumber } from '@gracon/verification-ui';
 import { VerificationFlow } from './VerificationFlow';
 import { createVerificationFlowConfig } from './verification-flow-config';
+import { resolveMainAppVerificationRedirect } from './verification-routing';
 import { useVerificationFlow } from './use-verification-flow';
 import { toast } from '@/components/ui';
 
@@ -29,28 +30,18 @@ export function VerificationForm() {
     });
 
     function continueAfterVerification() {
-        const next = searchParams.get('next');
+        const docsBase = process.env.NEXT_PUBLIC_DOCS_URL ?? 'http://localhost:4002';
+        const redirect = resolveMainAppVerificationRedirect(
+            searchParams.get('next'),
+            docsBase,
+        );
 
-        if (!next) {
-            router.push('/dashboard');
+        if (redirect.kind === 'external') {
+            window.location.href = redirect.destination;
             return;
         }
 
-        const docsBase = process.env.NEXT_PUBLIC_DOCS_URL ?? 'http://localhost:4002';
-
-        try {
-            const docsUrl = new URL(docsBase);
-            const targetUrl = new URL(next);
-
-            if (targetUrl.origin === docsUrl.origin) {
-                window.location.href = targetUrl.toString();
-                return;
-            }
-        } catch {
-            // Fall back to dashboard when next is not a safe absolute URL.
-        }
-
-        router.push('/dashboard');
+        router.push(redirect.destination);
     }
 
     // ── Render by step ────────────────────────────────────────────
