@@ -5,7 +5,7 @@
 import {
     VerificationResultPanelContent,
     type VerificationResult,
-} from '@gracon/verification-ui';
+} from './shared';
 import { Button, StatusBadge } from '@/components/ui';
 
 type VerificationResultPanelProps = {
