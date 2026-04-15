@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useSidebarStore } from '@/lib/store/sidebar.store';
 import { useAuthStore } from '@/lib/store/auth.store';
 import { NAV_ITEMS } from '@/constants/nav';
@@ -31,10 +31,24 @@ function IconMenu() {
     );
 }
 
+function IconLogout({ size = 16 }: { size?: number }) {
+    return (
+        <svg
+            width={size} height={size} viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+        >
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+        </svg>
+    );
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function AppSidebar() {
     const pathname = usePathname();
+    const router = useRouter();
     const collapsed = useSidebarStore((s) => s.collapsed);
     const mobileOpen = useSidebarStore((s) => s.mobileOpen);
     const toggle = useSidebarStore((s) => s.toggle);
@@ -238,8 +252,9 @@ export function AppSidebar() {
                         padding: collapsed ? '12px 10px' : '12px 14px',
                         borderTop: '1px solid var(--color-border)',
                         display: 'flex',
+                        flexDirection: collapsed ? 'column' : 'row',
                         alignItems: 'center',
-                        gap: 10,
+                        gap: collapsed ? 8 : 10,
                         flexShrink: 0,
                         justifyContent: collapsed ? 'center' : 'flex-start',
                     }}
@@ -288,6 +303,36 @@ export function AppSidebar() {
                             </p>
                         </div>
                     )}
+
+                    {/* Logout button — shown next to name when expanded, below avatar when collapsed */}
+                    <button
+                        onClick={() => router.push('/logout')}
+                        title="Log out"
+                        aria-label="Log out"
+                        style={{
+                            width: 30, height: 30, borderRadius: 8, flexShrink: 0,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            background: 'transparent',
+                            border: '1px solid var(--color-border)',
+                            color: 'var(--color-text-muted)',
+                            cursor: 'pointer',
+                            transition: 'background 150ms ease, border-color 150ms ease, color 150ms ease',
+                        }}
+                        onMouseEnter={e => {
+                            const btn = e.currentTarget as HTMLButtonElement;
+                            btn.style.background = 'var(--color-error-subtle)';
+                            btn.style.borderColor = 'var(--color-error-border)';
+                            btn.style.color = 'var(--color-error)';
+                        }}
+                        onMouseLeave={e => {
+                            const btn = e.currentTarget as HTMLButtonElement;
+                            btn.style.background = 'transparent';
+                            btn.style.borderColor = 'var(--color-border)';
+                            btn.style.color = 'var(--color-text-muted)';
+                        }}
+                    >
+                        <IconLogout size={14} />
+                    </button>
                 </div>
             </aside>
         </>
