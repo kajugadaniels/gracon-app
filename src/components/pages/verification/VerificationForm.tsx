@@ -1,29 +1,19 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { VerificationFlow } from './VerificationFlow';
 import { createVerificationFlowConfig } from './verification-flow-config';
 import { useVerificationFlow } from './use-verification-flow';
-
-// ── Validation schema ─────────────────────────────────────────
-
-const schema = z.object({
-    documentNumber: z
-        .string()
-        .length(16, 'National ID must be exactly 16 digits')
-        .regex(/^\d{16}$/, 'Must contain only digits'),
-});
-
-type FormFields = z.infer<typeof schema>;
+import { toast } from '@/components/ui';
 
 // ── Main component ────────────────────────────────────────────
 
 export function VerificationForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const [documentNumber, setDocumentNumber] = useState('');
+    const [documentNumberError, setDocumentNumberError] = useState<string>();
     const challengeMode =
         searchParams.get('challenge') === 'invitation'
             ? 'INVITATION'
@@ -33,12 +23,6 @@ export function VerificationForm() {
         challengeMode: config.challengeMode,
         getSuccessDescription: config.getSuccessDescription,
     });
-
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-    } = useForm<FormFields>({ resolver: zodResolver(schema) });
 
     function continueAfterVerification() {
         const next = searchParams.get('next');
@@ -67,9 +51,17 @@ export function VerificationForm() {
 
     // ── Handlers ──────────────────────────────────────────────────
 
-    const handleNidSubmit = (values: FormFields) => {
-        controller.confirmDocumentNumber(values.documentNumber);
-    };
+    function handleNidSubmit() {
+        if (documentNumber.length !== 16) {
+            const message = 'National ID must be exactly 16 digits';
+            setDocumentNumberError(message);
+            toast.error('Invalid National ID', { description: message });
+            return;
+        }
+
+        setDocumentNumberError(undefined);
+        controller.confirmDocumentNumber(documentNumber);
+    }
 
     // ── Render by step ────────────────────────────────────────────
 
@@ -77,9 +69,14 @@ export function VerificationForm() {
         <VerificationFlow
             config={config}
             controller={controller}
-            register={register}
-            handleSubmit={handleSubmit}
-            documentNumberError={errors.documentNumber?.message}
+            documentNumber={documentNumber}
+            documentNumberError={documentNumberError}
+            onDocumentNumberChange={(value) => {
+                setDocumentNumber(value);
+                if (documentNumberError) {
+                    setDocumentNumberError(undefined);
+                }
+            }}
             onNidSubmit={handleNidSubmit}
             onContinue={continueAfterVerification}
             onDashboard={() => router.push('/dashboard')}
