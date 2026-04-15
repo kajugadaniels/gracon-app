@@ -11,7 +11,7 @@ import {
     VerificationCameraViewport,
     useCamera,
     type CameraFacing,
-} from '@gracon/verification-ui';
+} from './shared';
 import { Button } from '@/components/ui';
 import { PremiumLoader } from '@/components/ui/Loader';
 
