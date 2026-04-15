@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useVerificationDocumentNumber } from '@gracon/verification-ui';
+import { useVerificationDocumentNumber } from './shared';
 import { VerificationFlow } from './VerificationFlow';
 import { createVerificationFlowConfig } from './verification-flow-config';
 import { resolveMainAppVerificationRedirect } from './verification-routing';
