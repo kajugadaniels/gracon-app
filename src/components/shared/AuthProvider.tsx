@@ -13,8 +13,17 @@ interface AuthProviderProps {
 // Without this, page refreshes clear the in-memory store and every
 // authenticated request gets a 401.
 export function AuthProvider({ children }: AuthProviderProps) {
-    const { hydrate, isHydrated } = useAuthStore();
+    const {
+        hydrate,
+        accessToken,
+        user,
+        setTokens,
+        setUser,
+        setLoading,
+        clearAuth,
+    } = useAuthStore();
     const hydrated = useRef(false);
+    const restoredFromCookies = useRef(false);
 
     useEffect(() => {
         // Only hydrate once — guard against double-invocation in React StrictMode
@@ -24,7 +33,49 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
     }, [hydrate]);
 
-    // Render children immediately — hydration is synchronous from sessionStorage
-    // so by the time any child component fires an API call the store is populated
+    useEffect(() => {
+        if (restoredFromCookies.current) return;
+        if (accessToken && user) return;
+        if (typeof document === 'undefined') return;
+        if (!document.cookie.includes('session_active=')) return;
+
+        restoredFromCookies.current = true;
+        setLoading(true);
+
+        const restoreSession = async () => {
+            try {
+                const response = await fetch('/api/me', {
+                    method: 'GET',
+                    credentials: 'include',
+                    cache: 'no-store',
+                });
+
+                if (!response.ok) {
+                    clearAuth();
+                    return;
+                }
+
+                const payload = await response.json();
+                const restoredAccessToken = payload?.accessToken;
+                const restoredRefreshToken = payload?.refreshToken;
+                const restoredUser = payload?.user;
+
+                if (!restoredAccessToken || !restoredRefreshToken || !restoredUser) {
+                    clearAuth();
+                    return;
+                }
+
+                setTokens(restoredAccessToken, restoredRefreshToken);
+                setUser(restoredUser);
+            } catch {
+                clearAuth();
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        void restoreSession();
+    }, [accessToken, clearAuth, setLoading, setTokens, setUser, user]);
+
     return <>{children}</>;
 }
