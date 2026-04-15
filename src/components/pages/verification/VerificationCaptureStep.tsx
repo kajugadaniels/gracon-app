@@ -2,7 +2,7 @@
  * Main-app adapter around the shared capture-step layout.
  */
 
-import { VerificationCaptureStepLayout } from '@gracon/verification-ui';
+import { VerificationCaptureStepLayout } from './shared';
 import { CameraCapture } from './CameraCapture';
 
 type VerificationCaptureStepProps = {
