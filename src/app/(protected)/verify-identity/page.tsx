@@ -272,7 +272,7 @@ export default function VerifyIdentityPage() {
             >
                 <span>End-to-end encrypted</span>
                 <span aria-hidden="true" style={{ opacity: 0.35 }}>·</span>
-                <span>Powered by Gracon</span>
+                <span>Powered by Gracon Tech</span>
                 <span aria-hidden="true" style={{ opacity: 0.35 }}>·</span>
                 <span>Your data is never shared</span>
             </footer>
