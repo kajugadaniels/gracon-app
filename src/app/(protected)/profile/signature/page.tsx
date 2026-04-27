@@ -1,8 +1,8 @@
 'use client';
 
 /**
- * Digital Signature page — orchestrates key pair, certificate, and image state.
- * Loads all three in parallel and passes data to the individual card components.
+ * Digital Signature page — orchestrates key pair, certificate, request, and image state.
+ * Loads them in parallel and passes data to the individual card components.
  */
 
 import { useCallback, useEffect, useState } from 'react';
@@ -12,13 +12,31 @@ import { SignatureImageCard } from '@/components/pages/signature';
 import type {
     KeyPairResponse,
     CertificateResponse,
+    CertificateRequestResponse,
     SignatureImageResponse,
 } from '@/api/signature/signature.api';
 import {
     getPublicKey,
     getCurrentCertificate,
+    getCurrentCertificateRequest,
     getSignatureImage,
 } from '@/api/signature/signature.api';
+
+async function fetchSignatureState() {
+    const [keyPair, certificate, certificateRequest, image] = await Promise.allSettled([
+        getPublicKey(),
+        getCurrentCertificate(),
+        getCurrentCertificateRequest(),
+        getSignatureImage(),
+    ]);
+
+    return {
+        keyPair: keyPair.status === 'fulfilled' ? keyPair.value : null,
+        certificate: certificate.status === 'fulfilled' ? certificate.value : null,
+        certificateRequest: certificateRequest.status === 'fulfilled' ? certificateRequest.value : null,
+        image: image.status === 'fulfilled' ? image.value : null,
+    };
+}
 
 // ─── Spinner ──────────────────────────────────────────────────────────────────
 
@@ -45,10 +63,18 @@ function Spinner() {
 
 // ─── Setup stepper ────────────────────────────────────────────────────────────
 
-function SetupStepper({ hasKey, hasCert }: { hasKey: boolean; hasCert: boolean }) {
+function SetupStepper({
+    hasKey,
+    hasCert,
+    hasPendingRequest,
+}: {
+    hasKey: boolean;
+    hasCert: boolean;
+    hasPendingRequest: boolean;
+}) {
     const steps = [
         { label: 'Generate Key Pair', done: hasKey,  active: !hasKey },
-        { label: 'Issue Certificate', done: hasCert, active: hasKey && !hasCert },
+        { label: hasPendingRequest ? 'Await Approval' : 'Request Certificate', done: hasCert, active: hasKey && !hasCert },
         { label: 'Ready to Sign',     done: hasCert, active: false },
     ];
 
@@ -142,32 +168,75 @@ function ReadyBanner() {
     );
 }
 
+function PendingBanner() {
+    return (
+        <div style={{
+            marginBottom: 28, padding: '14px 18px',
+            borderRadius: 'var(--radius-lg)',
+            background: 'rgba(245, 158, 11, 0.08)',
+            border: '1px solid rgba(245, 158, 11, 0.24)',
+            display: 'flex', alignItems: 'center', gap: 12,
+        }}>
+            <div style={{
+                width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
+                background: 'var(--color-warning)', color: '#fff',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 16, fontWeight: 700,
+                boxShadow: '0 0 0 4px rgba(245,158,11,0.14)',
+            }}>!</div>
+            <div>
+                <p style={{ margin: '0 0 2px', fontSize: 13, fontWeight: 700, color: 'var(--color-warning)' }}>
+                    Certificate approval pending
+                </p>
+                <p style={{ margin: 0, fontSize: 12, color: 'var(--color-warning)', opacity: 0.88, lineHeight: 1.5 }}>
+                    Your request is waiting for admin review. You will be able to sign only after approval.
+                </p>
+            </div>
+        </div>
+    );
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function SignaturePage() {
     const [keyPair, setKeyPair]         = useState<KeyPairResponse | null>(null);
     const [certificate, setCertificate] = useState<CertificateResponse | null>(null);
+    const [certificateRequest, setCertificateRequest] = useState<CertificateRequestResponse | null>(null);
     const [image, setImage]             = useState<SignatureImageResponse | null>(null);
     const [loading, setLoading]         = useState(true);
 
     const load = useCallback(async () => {
         setLoading(true);
-        const [kp, cert, img] = await Promise.allSettled([
-            getPublicKey(),
-            getCurrentCertificate(),
-            getSignatureImage(),
-        ]);
-        setKeyPair(kp.status === 'fulfilled' ? kp.value : null);
-        setCertificate(cert.status === 'fulfilled' ? cert.value : null);
-        setImage(img.status === 'fulfilled' ? img.value : null);
+        const nextState = await fetchSignatureState();
+        setKeyPair(nextState.keyPair);
+        setCertificate(nextState.certificate);
+        setCertificateRequest(nextState.certificateRequest);
+        setImage(nextState.image);
         setLoading(false);
     }, []);
 
-    useEffect(() => { load(); }, [load]);
+    useEffect(() => {
+        let active = true;
+
+        void (async () => {
+            const nextState = await fetchSignatureState();
+            if (!active) return;
+            setKeyPair(nextState.keyPair);
+            setCertificate(nextState.certificate);
+            setCertificateRequest(nextState.certificateRequest);
+            setImage(nextState.image);
+            setLoading(false);
+        })();
+
+        return () => {
+            active = false;
+        };
+    }, []);
 
     if (loading) return <Spinner />;
 
     const hasCert = !!certificate && !certificate.isRevoked && !certificate.isExpired;
+    const hasPendingRequest = certificateRequest?.status === 'PENDING';
     const isReady = !!keyPair && hasCert;
 
     return (
@@ -198,22 +267,30 @@ export default function SignaturePage() {
                         margin: 0, fontSize: 13, color: 'var(--color-text-secondary)',
                         lineHeight: 1.65, maxWidth: 500,
                     }}>
-                        Your cryptographic identity. Generate an RSA-2048 key pair, issue an X.509 certificate,
-                        and sign documents with legal verifiability.
+                        Your cryptographic identity. Generate an RSA-2048 key pair, request an X.509 certificate,
+                        wait for admin approval, and then sign documents with legal verifiability.
                     </p>
                 </div>
             </div>
 
             {/* ── Setup stepper ──────────────────────────────────── */}
-            <SetupStepper hasKey={!!keyPair} hasCert={hasCert} />
+            <SetupStepper hasKey={!!keyPair} hasCert={hasCert} hasPendingRequest={hasPendingRequest} />
 
             {/* ── Ready banner ───────────────────────────────────── */}
             {isReady && <ReadyBanner />}
+            {!isReady && hasPendingRequest && <PendingBanner />}
 
             {/* ── Cards ──────────────────────────────────────────── */}
             <div className="stagger" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <div className="animate-fade-up"><KeyPairCard keyPair={keyPair} onRefresh={load} /></div>
-                <div className="animate-fade-up"><CertificateCard certificate={certificate} hasKeyPair={!!keyPair} onRefresh={load} /></div>
+                <div className="animate-fade-up">
+                    <CertificateCard
+                        certificate={certificate}
+                        certificateRequest={certificateRequest}
+                        hasKeyPair={!!keyPair}
+                        onRefresh={load}
+                    />
+                </div>
                 <div className="animate-fade-up"><SignatureImageCard image={image} onRefresh={load} /></div>
             </div>
         </div>
