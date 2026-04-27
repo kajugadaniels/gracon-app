@@ -18,7 +18,7 @@ This application handles account onboarding, login, email verification, password
 - Login, register, verify-email, forgot/reset-password
 - Protected dashboard and profile pages
 - Identity verification UI
-- Signature-key and certificate setup UI
+- Signature-key setup UI and admin-approved certificate request tracking
 - Public document verification page
 - Shared-login entry point for the documents app
 
@@ -119,4 +119,3 @@ NEXT_PUBLIC_DOCS_URL=http://localhost:4002
 - Update middleware when adding new public routes
 - Keep auth recovery and redirect behavior explicit
 - Test verification, login, and return-to-documents flows after auth changes
-
