@@ -107,15 +107,41 @@ export interface CertificateResponse {
     daysRemaining: number;
 }
 
+export type CertificateRequestStatus =
+    | 'PENDING'
+    | 'APPROVED'
+    | 'REJECTED'
+    | 'CANCELLED';
+
+export interface CertificateRequestResponse {
+    requestId: string;
+    status: CertificateRequestStatus;
+    requestedValidityYears: number;
+    reviewReason: string | null;
+    cancellationReason: string | null;
+    reviewedByAdminId: string | null;
+    reviewedAt: string | null;
+    cancelledAt: string | null;
+    issuedCertificateId: string | null;
+    requestedAt: string;
+    updatedAt: string;
+    message?: string;
+}
+
 export async function issueCertificate(
     validityYears = 2,
-): Promise<CertificateResponse> {
+): Promise<CertificateRequestResponse> {
     const res = await signatureClient.post('/signature/certificates/issue', { validityYears });
     return res.data;
 }
 
 export async function getCurrentCertificate(): Promise<CertificateResponse> {
     const res = await signatureClient.get('/signature/certificates/current');
+    return res.data;
+}
+
+export async function getCurrentCertificateRequest(): Promise<CertificateRequestResponse> {
+    const res = await signatureClient.get('/signature/certificates/request/current');
     return res.data;
 }
 
@@ -164,4 +190,3 @@ export async function verifySignature(
     }
     return res.json();
 }
-
