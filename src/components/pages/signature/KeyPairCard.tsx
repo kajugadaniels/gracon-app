@@ -131,7 +131,7 @@ function RotateConfirm({ onConfirm, onCancel, loading }: {
             border: '1px solid var(--color-error-border)',
         }}>
             <p style={{ margin: '0 0 16px', fontSize: 13, fontWeight: 500, color: 'var(--color-error)', lineHeight: 1.55 }}>
-                Rotating permanently revokes your current certificate. You will need to issue a new one before signing again.
+                Rotating permanently revokes your current certificate. You will need to submit a fresh certificate request before signing again.
             </p>
             <div style={{ display: 'flex', gap: 8 }}>
                 <button onClick={onCancel} className="btn-ghost" style={{ flex: 1 }}>Cancel</button>
