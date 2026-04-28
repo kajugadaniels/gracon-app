@@ -21,6 +21,7 @@ interface CertificateCardProps {
 
 type CardState =
     | 'ACTIVE'
+    | 'APPROVED'
     | 'REVOKED'
     | 'EXPIRED'
     | 'PENDING'
@@ -154,6 +155,10 @@ function determineCardState(
         return 'PENDING';
     }
 
+    if (request?.status === 'APPROVED') {
+        return 'APPROVED';
+    }
+
     if (request?.status === 'REJECTED') {
         return 'REJECTED';
     }
@@ -179,6 +184,8 @@ function getStatusMeta(state: CardState) {
             return { label: 'Active', color: 'var(--color-success)' };
         case 'PENDING':
             return { label: 'Pending Approval', color: 'var(--color-warning)' };
+        case 'APPROVED':
+            return { label: 'Approved', color: 'var(--color-primary)' };
         case 'REJECTED':
             return { label: 'Rejected', color: 'var(--color-error)' };
         case 'CANCELLED':
@@ -219,12 +226,16 @@ function RequestStatusPanel({
 }) {
     const title = request.status === 'PENDING'
         ? 'Awaiting administrator approval'
+        : request.status === 'APPROVED'
+            ? 'Approved, certificate activation in progress'
         : request.status === 'REJECTED'
             ? 'Request rejected'
             : 'Request cancelled';
 
     const body = request.status === 'PENDING'
         ? 'Your request has been recorded. You cannot sign documents until an administrator approves and issues the real certificate.'
+        : request.status === 'APPROVED'
+            ? 'An administrator approved your request. If your active certificate is not visible yet, refresh this page to sync the issued certificate.'
         : request.status === 'REJECTED'
             ? 'An administrator reviewed your request and rejected it. Review the note below before sending a fresh request.'
             : 'This request is no longer active. If you still need a certificate, submit a fresh request with your current key pair.';
@@ -239,6 +250,15 @@ function RequestStatusPanel({
                 <RequestMeta label="Status" value={request.status.toLowerCase()} />
                 <RequestMeta label="Updated" value={formatLongDate(request.updatedAt)} />
             </div>
+            {request.reviewedAt && (
+                <div style={requestMetaRowStyle}>
+                    <RequestMeta label="Reviewed At" value={formatLongDate(request.reviewedAt)} />
+                    <RequestMeta
+                        label="Issued Certificate"
+                        value={request.issuedCertificateId ?? 'Pending sync'}
+                    />
+                </div>
+            )}
             {request.reviewReason && (
                 <div style={reasonPanelStyle}>
                     <span style={reasonLabelStyle}>Admin note</span>
@@ -449,7 +469,12 @@ export function CertificateCard({
             {!isActive && certificateRequest && (
                 <>
                     <RequestStatusPanel request={certificateRequest} />
-                    {certificateRequest.status !== 'PENDING' && (
+                    {certificateRequest.status === 'APPROVED' && (
+                        <button onClick={onRefresh} className="btn-ghost" style={{ width: '100%' }}>
+                            Refresh Certificate Status
+                        </button>
+                    )}
+                    {certificateRequest.status !== 'PENDING' && certificateRequest.status !== 'APPROVED' && (
                         <button onClick={handleIssue} disabled={loading || !hasKeyPair} className="btn-primary" style={{ width: '100%' }}>
                             {loading ? 'Submitting Request…' : 'Submit Fresh Certificate Request'}
                         </button>
@@ -780,6 +805,13 @@ const requestMetaGridStyle = {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
     gap: 12,
+} satisfies CSSProperties;
+
+const requestMetaRowStyle = {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+    gap: 12,
+    marginTop: 12,
 } satisfies CSSProperties;
 
 const requestMetaLabelStyle = {
