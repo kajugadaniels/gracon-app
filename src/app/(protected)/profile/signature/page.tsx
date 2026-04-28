@@ -276,15 +276,24 @@ export default function SignaturePage() {
     const [image, setImage]             = useState<SignatureImageResponse | null>(null);
     const [loading, setLoading]         = useState(true);
 
-    const load = useCallback(async () => {
-        setLoading(true);
-        const nextState = await fetchSignatureState();
+    const applyState = useCallback((nextState: Awaited<ReturnType<typeof fetchSignatureState>>) => {
         setKeyPair(nextState.keyPair);
         setCertificate(nextState.certificate);
         setCertificateRequest(nextState.certificateRequest);
         setImage(nextState.image);
-        setLoading(false);
     }, []);
+
+    const load = useCallback(async () => {
+        setLoading(true);
+        const nextState = await fetchSignatureState();
+        applyState(nextState);
+        setLoading(false);
+    }, [applyState]);
+
+    const refreshInBackground = useCallback(async () => {
+        const nextState = await fetchSignatureState();
+        applyState(nextState);
+    }, [applyState]);
 
     useEffect(() => {
         let active = true;
@@ -292,23 +301,36 @@ export default function SignaturePage() {
         void (async () => {
             const nextState = await fetchSignatureState();
             if (!active) return;
-            setKeyPair(nextState.keyPair);
-            setCertificate(nextState.certificate);
-            setCertificateRequest(nextState.certificateRequest);
-            setImage(nextState.image);
+            applyState(nextState);
             setLoading(false);
         })();
 
         return () => {
             active = false;
         };
-    }, []);
-
-    if (loading) return <Spinner />;
+    }, [applyState]);
 
     const hasCert = !!certificate && !certificate.isRevoked && !certificate.isExpired;
     const requestStatus = certificateRequest?.status ?? null;
     const isReady = !!keyPair && hasCert;
+
+    useEffect(() => {
+        if (isReady || !requestStatus) {
+            return;
+        }
+
+        if (requestStatus !== 'PENDING' && requestStatus !== 'APPROVED') {
+            return;
+        }
+
+        const interval = window.setInterval(() => {
+            void refreshInBackground();
+        }, 30_000);
+
+        return () => window.clearInterval(interval);
+    }, [isReady, refreshInBackground, requestStatus]);
+
+    if (loading) return <Spinner />;
 
     return (
         <div style={{ maxWidth: 760, margin: '0 auto', padding: '40px 24px 72px' }} className="animate-fade-up">
