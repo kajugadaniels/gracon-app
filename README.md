@@ -18,7 +18,7 @@ This application handles account onboarding, login, email verification, password
 - Login, register, verify-email, forgot/reset-password
 - Protected dashboard and profile pages
 - Identity verification UI
-- Signature-key setup UI and admin-approved certificate request tracking
+- Signature-key setup UI with certificate request states for pending, approved, rejected, and cancelled review outcomes
 - Public document verification page
 - Shared-login entry point for the documents app
 
