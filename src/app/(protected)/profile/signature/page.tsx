@@ -13,6 +13,7 @@ import type {
     KeyPairResponse,
     CertificateResponse,
     CertificateRequestResponse,
+    CertificateRequestStatus,
     SignatureImageResponse,
 } from '@/api/signature/signature.api';
 import {
@@ -66,15 +67,19 @@ function Spinner() {
 function SetupStepper({
     hasKey,
     hasCert,
-    hasPendingRequest,
+    requestStatus,
 }: {
     hasKey: boolean;
     hasCert: boolean;
-    hasPendingRequest: boolean;
+    requestStatus: CertificateRequestStatus | null;
 }) {
     const steps = [
         { label: 'Generate Key Pair', done: hasKey,  active: !hasKey },
-        { label: hasPendingRequest ? 'Await Approval' : 'Request Certificate', done: hasCert, active: hasKey && !hasCert },
+        {
+            label: getStepTwoLabel(requestStatus),
+            done: hasCert,
+            active: hasKey && !hasCert,
+        },
         { label: 'Ready to Sign',     done: hasCert, active: false },
     ];
 
@@ -138,6 +143,14 @@ function SetupStepper({
     );
 }
 
+function getStepTwoLabel(requestStatus: CertificateRequestStatus | null) {
+    if (requestStatus === 'PENDING') return 'Await Approval';
+    if (requestStatus === 'APPROVED') return 'Activate Certificate';
+    if (requestStatus === 'REJECTED') return 'Review Rejection';
+    if (requestStatus === 'CANCELLED') return 'Request Again';
+    return 'Request Certificate';
+}
+
 // ─── Ready banner ─────────────────────────────────────────────────────────────
 
 function ReadyBanner() {
@@ -168,32 +181,90 @@ function ReadyBanner() {
     );
 }
 
-function PendingBanner() {
+function RequestBanner({ status }: { status: CertificateRequestStatus }) {
+    const content = getRequestBannerContent(status);
+
     return (
         <div style={{
             marginBottom: 28, padding: '14px 18px',
             borderRadius: 'var(--radius-lg)',
-            background: 'rgba(245, 158, 11, 0.08)',
-            border: '1px solid rgba(245, 158, 11, 0.24)',
+            background: content.background,
+            border: `1px solid ${content.border}`,
             display: 'flex', alignItems: 'center', gap: 12,
         }}>
             <div style={{
                 width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
-                background: 'var(--color-warning)', color: '#fff',
+                background: content.iconBackground, color: '#fff',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 16, fontWeight: 700,
-                boxShadow: '0 0 0 4px rgba(245,158,11,0.14)',
-            }}>!</div>
+                boxShadow: `0 0 0 4px ${content.ring}`,
+            }}>{content.icon}</div>
             <div>
-                <p style={{ margin: '0 0 2px', fontSize: 13, fontWeight: 700, color: 'var(--color-warning)' }}>
-                    Certificate approval pending
+                <p style={{ margin: '0 0 2px', fontSize: 13, fontWeight: 700, color: content.titleColor }}>
+                    {content.title}
                 </p>
-                <p style={{ margin: 0, fontSize: 12, color: 'var(--color-warning)', opacity: 0.88, lineHeight: 1.5 }}>
-                    Your request is waiting for admin review. You will be able to sign only after approval.
+                <p style={{ margin: 0, fontSize: 12, color: content.bodyColor, opacity: 0.88, lineHeight: 1.5 }}>
+                    {content.body}
                 </p>
             </div>
         </div>
     );
+}
+
+function getRequestBannerContent(status: CertificateRequestStatus) {
+    if (status === 'APPROVED') {
+        return {
+            title: 'Request approved',
+            body: 'Your certificate request has been approved. Refresh the certificate card if the active certificate has not appeared yet.',
+            titleColor: 'var(--color-primary)',
+            bodyColor: 'var(--color-primary)',
+            background: 'var(--color-primary-subtle)',
+            border: 'var(--color-border-primary)',
+            iconBackground: 'var(--color-primary)',
+            ring: 'rgba(91,35,255,0.14)',
+            icon: '✓',
+        };
+    }
+
+    if (status === 'REJECTED') {
+        return {
+            title: 'Request rejected',
+            body: 'Review the admin note in the certificate card, fix the issue, then submit a fresh request.',
+            titleColor: 'var(--color-error)',
+            bodyColor: 'var(--color-error)',
+            background: 'var(--color-error-subtle)',
+            border: 'var(--color-error-border)',
+            iconBackground: 'var(--color-error)',
+            ring: 'rgba(239,68,68,0.14)',
+            icon: '×',
+        };
+    }
+
+    if (status === 'CANCELLED') {
+        return {
+            title: 'Request no longer active',
+            body: 'Your previous request was cancelled. Generate or keep your current key pair, then submit a fresh certificate request.',
+            titleColor: 'var(--color-text-secondary)',
+            bodyColor: 'var(--color-text-secondary)',
+            background: 'rgba(148,163,184,0.10)',
+            border: 'rgba(148,163,184,0.22)',
+            iconBackground: 'var(--color-text-muted)',
+            ring: 'rgba(148,163,184,0.14)',
+            icon: '•',
+        };
+    }
+
+    return {
+        title: 'Certificate approval pending',
+        body: 'Your request is waiting for admin review. You will be able to sign only after approval.',
+        titleColor: 'var(--color-warning)',
+        bodyColor: 'var(--color-warning)',
+        background: 'rgba(245, 158, 11, 0.08)',
+        border: 'rgba(245, 158, 11, 0.24)',
+        iconBackground: 'var(--color-warning)',
+        ring: 'rgba(245,158,11,0.14)',
+        icon: '!',
+    };
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -236,7 +307,7 @@ export default function SignaturePage() {
     if (loading) return <Spinner />;
 
     const hasCert = !!certificate && !certificate.isRevoked && !certificate.isExpired;
-    const hasPendingRequest = certificateRequest?.status === 'PENDING';
+    const requestStatus = certificateRequest?.status ?? null;
     const isReady = !!keyPair && hasCert;
 
     return (
@@ -274,11 +345,11 @@ export default function SignaturePage() {
             </div>
 
             {/* ── Setup stepper ──────────────────────────────────── */}
-            <SetupStepper hasKey={!!keyPair} hasCert={hasCert} hasPendingRequest={hasPendingRequest} />
+            <SetupStepper hasKey={!!keyPair} hasCert={hasCert} requestStatus={requestStatus} />
 
             {/* ── Ready banner ───────────────────────────────────── */}
             {isReady && <ReadyBanner />}
-            {!isReady && hasPendingRequest && <PendingBanner />}
+            {!isReady && requestStatus && <RequestBanner status={requestStatus} />}
 
             {/* ── Cards ──────────────────────────────────────────── */}
             <div className="stagger" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
