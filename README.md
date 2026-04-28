@@ -19,6 +19,7 @@ This application handles account onboarding, login, email verification, password
 - Protected dashboard and profile pages
 - Identity verification UI
 - Signature-key setup UI with certificate request states for pending, approved, rejected, and cancelled review outcomes
+- Background certificate-state refresh while requests are pending or newly approved
 - Public document verification page
 - Shared-login entry point for the documents app
 
