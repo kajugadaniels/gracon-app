@@ -6,6 +6,7 @@ import type {
     CertificateRequestStatus,
     CertificateRequestResponse,
     CertificateResponse,
+    CertificateStatusResponse,
 } from '@/api/signature/signature.api';
 import {
     issueCertificate,
@@ -15,12 +16,14 @@ import {
 interface CertificateCardProps {
     certificate: CertificateResponse | null;
     certificateRequest: CertificateRequestResponse | null;
+    certificateStatus: CertificateStatusResponse | null;
     hasKeyPair: boolean;
     onRefresh: () => void;
 }
 
 type CardState =
     | 'ACTIVE'
+    | 'BANNED'
     | 'APPROVED'
     | 'REVOKED'
     | 'EXPIRED'
@@ -146,7 +149,12 @@ function RevokeConfirm({
 function determineCardState(
     certificate: CertificateResponse | null,
     request: CertificateRequestResponse | null,
+    status: CertificateStatusResponse | null,
 ): CardState {
+    if (status?.accessPolicy.isBanned) {
+        return 'BANNED';
+    }
+
     if (certificate && !certificate.isRevoked && !certificate.isExpired) {
         return 'ACTIVE';
     }
@@ -182,6 +190,8 @@ function getStatusMeta(state: CardState) {
     switch (state) {
         case 'ACTIVE':
             return { label: 'Active', color: 'var(--color-success)' };
+        case 'BANNED':
+            return { label: 'Restricted', color: 'var(--color-error)' };
         case 'PENDING':
             return { label: 'Pending Approval', color: 'var(--color-warning)' };
         case 'APPROVED':
@@ -288,10 +298,12 @@ function EmptyCertificateState({
     hasKeyPair,
     loading,
     onIssue,
+    disabledReason,
 }: {
     hasKeyPair: boolean;
     loading: boolean;
     onIssue: () => void;
+    disabledReason?: string;
 }) {
     if (!hasKeyPair) {
         return (
@@ -315,7 +327,12 @@ function EmptyCertificateState({
             <p style={emptySecondaryTextStyle}>
                 Your X.509 certificate binds your verified identity to your public key. Submit a request, then wait for admin approval before signing.
             </p>
-            <button onClick={onIssue} disabled={loading} className="btn-primary" style={{ width: '100%' }}>
+            {disabledReason && (
+                <div style={blockedPanelStyle}>
+                    {disabledReason}
+                </div>
+            )}
+            <button onClick={onIssue} disabled={loading || !!disabledReason} className="btn-primary" style={{ width: '100%' }}>
                 {loading ? 'Submitting Request…' : 'Request Certificate Approval'}
             </button>
         </div>
@@ -363,6 +380,7 @@ function formatLongDate(value: string | null) {
 export function CertificateCard({
     certificate,
     certificateRequest,
+    certificateStatus,
     hasKeyPair,
     onRefresh,
 }: CertificateCardProps) {
@@ -372,13 +390,20 @@ export function CertificateCard({
     const [error, setError] = useState<string | null>(null);
 
     const state = useMemo(
-        () => determineCardState(certificate, certificateRequest),
-        [certificate, certificateRequest],
+        () => determineCardState(certificate, certificateRequest, certificateStatus),
+        [certificate, certificateRequest, certificateStatus],
     );
     const statusMeta = getStatusMeta(state);
     const isActive = state === 'ACTIVE';
+    const banReason = certificateStatus?.accessPolicy.banReason;
+    const isBanned = certificateStatus?.accessPolicy.isBanned ?? false;
 
     async function handleIssue() {
+        if (isBanned) {
+            setError('Certificate access is restricted. You cannot submit a new certificate request until this restriction is lifted.');
+            return;
+        }
+
         setLoading(true);
         setError(null);
         try {
@@ -438,6 +463,16 @@ export function CertificateCard({
                 </div>
             )}
 
+            {isBanned && (
+                <div style={blockedPanelStyle}>
+                    <strong>Certificate access restricted.</strong>
+                    <span>
+                        You cannot request a new certificate or sign documents until an administrator lifts this restriction.
+                    </span>
+                    {banReason && <span>Reason: {banReason}</span>}
+                </div>
+            )}
+
             {isActive && certificate && (
                 <>
                     <ValidityBar
@@ -474,7 +509,7 @@ export function CertificateCard({
                             Refresh Certificate Status
                         </button>
                     )}
-                    {certificateRequest.status !== 'PENDING' && certificateRequest.status !== 'APPROVED' && (
+                    {certificateRequest.status !== 'PENDING' && certificateRequest.status !== 'APPROVED' && !isBanned && (
                         <button onClick={handleIssue} disabled={loading || !hasKeyPair} className="btn-primary" style={{ width: '100%' }}>
                             {loading ? 'Submitting Request…' : 'Submit Fresh Certificate Request'}
                         </button>
@@ -487,6 +522,11 @@ export function CertificateCard({
                     hasKeyPair={hasKeyPair}
                     loading={loading}
                     onIssue={handleIssue}
+                    disabledReason={
+                        isBanned
+                            ? 'Certificate access is restricted by platform administrators.'
+                            : undefined
+                    }
                 />
             )}
         </div>
@@ -558,6 +598,20 @@ const errorBannerStyle = {
     fontSize: 13,
     color: 'var(--color-error)',
     lineHeight: 1.5,
+} satisfies CSSProperties;
+
+const blockedPanelStyle = {
+    marginBottom: 18,
+    padding: '12px 14px',
+    borderRadius: 'var(--radius-md)',
+    background: 'var(--color-error-subtle)',
+    border: '1px solid var(--color-error-border)',
+    fontSize: 12,
+    color: 'var(--color-error)',
+    lineHeight: 1.6,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 4,
 } satisfies CSSProperties;
 
 function toggleButtonStyle(open: boolean): CSSProperties {
