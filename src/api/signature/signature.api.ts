@@ -128,6 +128,30 @@ export interface CertificateRequestResponse {
     message?: string;
 }
 
+export type CertificateAccessPolicyStatus = 'ALLOWED' | 'BANNED';
+
+export interface CertificateAccessPolicyResponse {
+    status: CertificateAccessPolicyStatus;
+    isBanned: boolean;
+    banReason: string | null;
+    bannedAt: string | null;
+    unbanReason: string | null;
+    unbannedAt: string | null;
+    updatedAt: string | null;
+}
+
+export interface CertificateStatusResponse {
+    accessPolicy: CertificateAccessPolicyResponse;
+    latestRequest: CertificateRequestResponse | null;
+    currentCertificate: Omit<CertificateResponse, 'certificatePem' | 'isRevoked'> | null;
+    latestRevocation: {
+        certificateId: string;
+        serialNumber: string;
+        revokedAt: string | null;
+        revokedReason: string | null;
+    } | null;
+}
+
 export async function issueCertificate(
     validityYears = 2,
 ): Promise<CertificateRequestResponse> {
@@ -142,6 +166,11 @@ export async function getCurrentCertificate(): Promise<CertificateResponse> {
 
 export async function getCurrentCertificateRequest(): Promise<CertificateRequestResponse> {
     const res = await signatureClient.get('/signature/certificates/request/current');
+    return res.data;
+}
+
+export async function getCurrentCertificateStatus(): Promise<CertificateStatusResponse> {
+    const res = await signatureClient.get('/signature/certificates/status');
     return res.data;
 }
 
