@@ -126,6 +126,7 @@ export interface CertificateRequestResponse {
     requestedAt: string;
     updatedAt: string;
     message?: string;
+    keyPairRotated?: boolean;
 }
 
 export type CertificateAccessPolicyStatus = 'ALLOWED' | 'BANNED';
