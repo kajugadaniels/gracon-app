@@ -388,6 +388,7 @@ export function CertificateCard({
     const [showRevoke, setShowRevoke] = useState(false);
     const [revokeReason, setRevokeReason] = useState('');
     const [error, setError] = useState<string | null>(null);
+    const [notice, setNotice] = useState<string | null>(null);
 
     const state = useMemo(
         () => determineCardState(certificate, certificateRequest, certificateStatus),
@@ -406,8 +407,12 @@ export function CertificateCard({
 
         setLoading(true);
         setError(null);
+        setNotice(null);
         try {
-            await issueCertificate(2);
+            const request = await issueCertificate(2);
+            if (request.message) {
+                setNotice(request.message);
+            }
             await onRefresh();
         } catch (nextError: unknown) {
             setError(nextError instanceof Error ? nextError.message : 'Failed to submit certificate request');
@@ -460,6 +465,12 @@ export function CertificateCard({
             {error && (
                 <div style={errorBannerStyle}>
                     {error}
+                </div>
+            )}
+
+            {notice && (
+                <div style={noticeBannerStyle}>
+                    {notice}
                 </div>
             )}
 
@@ -597,6 +608,17 @@ const errorBannerStyle = {
     border: '1px solid var(--color-error-border)',
     fontSize: 13,
     color: 'var(--color-error)',
+    lineHeight: 1.5,
+} satisfies CSSProperties;
+
+const noticeBannerStyle = {
+    marginBottom: 18,
+    padding: '11px 14px',
+    borderRadius: 'var(--radius-md)',
+    background: 'var(--color-warning-subtle)',
+    border: '1px solid color-mix(in srgb, var(--color-warning) 24%, transparent)',
+    fontSize: 13,
+    color: 'var(--color-warning)',
     lineHeight: 1.5,
 } satisfies CSSProperties;
 
