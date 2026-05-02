@@ -5,6 +5,7 @@
  * Loads them in parallel and passes data to the individual card components.
  */
 
+import type { CSSProperties } from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import { KeyPairCard } from '@/components/pages/signature';
 import { CertificateCard } from '@/components/pages/signature';
@@ -14,20 +15,23 @@ import type {
     CertificateResponse,
     CertificateRequestResponse,
     CertificateRequestStatus,
+    CertificateStatusResponse,
     SignatureImageResponse,
 } from '@/api/signature/signature.api';
 import {
     getPublicKey,
     getCurrentCertificate,
     getCurrentCertificateRequest,
+    getCurrentCertificateStatus,
     getSignatureImage,
 } from '@/api/signature/signature.api';
 
 async function fetchSignatureState() {
-    const [keyPair, certificate, certificateRequest, image] = await Promise.allSettled([
+    const [keyPair, certificate, certificateRequest, certificateStatus, image] = await Promise.allSettled([
         getPublicKey(),
         getCurrentCertificate(),
         getCurrentCertificateRequest(),
+        getCurrentCertificateStatus(),
         getSignatureImage(),
     ]);
 
@@ -35,6 +39,7 @@ async function fetchSignatureState() {
         keyPair: keyPair.status === 'fulfilled' ? keyPair.value : null,
         certificate: certificate.status === 'fulfilled' ? certificate.value : null,
         certificateRequest: certificateRequest.status === 'fulfilled' ? certificateRequest.value : null,
+        certificateStatus: certificateStatus.status === 'fulfilled' ? certificateStatus.value : null,
         image: image.status === 'fulfilled' ? image.value : null,
     };
 }
@@ -211,6 +216,53 @@ function RequestBanner({ status }: { status: CertificateRequestStatus }) {
     );
 }
 
+function CertificateAccessBanner({
+    status,
+}: {
+    status: CertificateStatusResponse;
+}) {
+    const isBanned = status.accessPolicy.isBanned;
+    const revocation = status.latestRevocation;
+
+    if (!isBanned && !revocation) {
+        return null;
+    }
+
+    const title = isBanned
+        ? 'Certificate access restricted'
+        : 'Certificate revoked';
+    const body = isBanned
+        ? 'You cannot request certificates or sign documents until this restriction is lifted.'
+        : 'You must submit a fresh certificate request before signing again.';
+    const reason = isBanned
+        ? status.accessPolicy.banReason
+        : revocation?.revokedReason;
+    const date = isBanned
+        ? status.accessPolicy.bannedAt
+        : revocation?.revokedAt ?? null;
+
+    return (
+        <div style={certificateAccessBannerStyle}>
+            <div style={certificateAccessIconStyle}>!</div>
+            <div style={{ minWidth: 0 }}>
+                <p style={certificateAccessTitleStyle}>{title}</p>
+                <p style={certificateAccessBodyStyle}>{body}</p>
+                {reason && (
+                    <div style={certificateAccessReasonStyle}>
+                        <span style={certificateAccessReasonLabelStyle}>Admin reason</span>
+                        <p style={certificateAccessReasonTextStyle}>{reason}</p>
+                    </div>
+                )}
+                {date && (
+                    <p style={certificateAccessDateStyle}>
+                        Updated {formatLongDate(date)}
+                    </p>
+                )}
+            </div>
+        </div>
+    );
+}
+
 function getRequestBannerContent(status: CertificateRequestStatus) {
     if (status === 'APPROVED') {
         return {
@@ -267,12 +319,96 @@ function getRequestBannerContent(status: CertificateRequestStatus) {
     };
 }
 
+function formatLongDate(value: string | null) {
+    if (!value) return 'unknown time';
+
+    return new Date(value).toLocaleString('en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+}
+
+const certificateAccessBannerStyle = {
+    marginBottom: 28,
+    padding: '16px 18px',
+    borderRadius: 'var(--radius-lg)',
+    background: 'var(--color-error-subtle)',
+    border: '1px solid var(--color-error-border)',
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: 12,
+} satisfies CSSProperties;
+
+const certificateAccessIconStyle = {
+    width: 34,
+    height: 34,
+    borderRadius: '50%',
+    flexShrink: 0,
+    background: 'var(--color-error)',
+    color: '#fff',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: 16,
+    fontWeight: 800,
+    boxShadow: '0 0 0 4px rgba(239,68,68,0.14)',
+} satisfies CSSProperties;
+
+const certificateAccessTitleStyle = {
+    margin: '0 0 2px',
+    fontSize: 13,
+    fontWeight: 800,
+    color: 'var(--color-error)',
+} satisfies CSSProperties;
+
+const certificateAccessBodyStyle = {
+    margin: 0,
+    fontSize: 12,
+    color: 'var(--color-error)',
+    opacity: 0.88,
+    lineHeight: 1.5,
+} satisfies CSSProperties;
+
+const certificateAccessReasonStyle = {
+    marginTop: 10,
+    paddingTop: 10,
+    borderTop: '1px solid var(--color-error-border)',
+} satisfies CSSProperties;
+
+const certificateAccessReasonLabelStyle = {
+    display: 'inline-block',
+    marginBottom: 4,
+    fontSize: 10,
+    fontWeight: 800,
+    color: 'var(--color-error)',
+    letterSpacing: '0.07em',
+    textTransform: 'uppercase',
+} satisfies CSSProperties;
+
+const certificateAccessReasonTextStyle = {
+    margin: 0,
+    fontSize: 12,
+    color: 'var(--color-error)',
+    lineHeight: 1.55,
+} satisfies CSSProperties;
+
+const certificateAccessDateStyle = {
+    margin: '8px 0 0',
+    fontSize: 11,
+    color: 'var(--color-error)',
+    opacity: 0.72,
+} satisfies CSSProperties;
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function SignaturePage() {
     const [keyPair, setKeyPair]         = useState<KeyPairResponse | null>(null);
     const [certificate, setCertificate] = useState<CertificateResponse | null>(null);
     const [certificateRequest, setCertificateRequest] = useState<CertificateRequestResponse | null>(null);
+    const [certificateStatus, setCertificateStatus] = useState<CertificateStatusResponse | null>(null);
     const [image, setImage]             = useState<SignatureImageResponse | null>(null);
     const [loading, setLoading]         = useState(true);
 
@@ -280,6 +416,7 @@ export default function SignaturePage() {
         setKeyPair(nextState.keyPair);
         setCertificate(nextState.certificate);
         setCertificateRequest(nextState.certificateRequest);
+        setCertificateStatus(nextState.certificateStatus);
         setImage(nextState.image);
     }, []);
 
@@ -370,6 +507,7 @@ export default function SignaturePage() {
             <SetupStepper hasKey={!!keyPair} hasCert={hasCert} requestStatus={requestStatus} />
 
             {/* ── Ready banner ───────────────────────────────────── */}
+            {certificateStatus && <CertificateAccessBanner status={certificateStatus} />}
             {isReady && <ReadyBanner />}
             {!isReady && requestStatus && <RequestBanner status={requestStatus} />}
 
@@ -380,6 +518,7 @@ export default function SignaturePage() {
                     <CertificateCard
                         certificate={certificate}
                         certificateRequest={certificateRequest}
+                        certificateStatus={certificateStatus}
                         hasKeyPair={!!keyPair}
                         onRefresh={load}
                     />
