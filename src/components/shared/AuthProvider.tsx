@@ -15,6 +15,7 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
     const {
         hydrate,
+        isHydrated,
         accessToken,
         user,
         setTokens,
@@ -35,6 +36,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     useEffect(() => {
         if (restoredFromCookies.current) return;
+        if (!isHydrated) return;
         if (accessToken && user) return;
         if (typeof document === 'undefined') return;
         if (!document.cookie.includes('session_active=')) return;
@@ -75,7 +77,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         };
 
         void restoreSession();
-    }, [accessToken, clearAuth, setLoading, setTokens, setUser, user]);
+    }, [accessToken, clearAuth, isHydrated, setLoading, setTokens, setUser, user]);
 
     return <>{children}</>;
 }
