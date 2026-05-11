@@ -6,6 +6,7 @@ import { Card, Button } from '@/components/ui';
 import { PremiumLoader } from '@/components/ui/Loader';
 import { verifyEmailApi } from '@/api/auth/verify-email.api';
 import { resendVerificationApi } from '@/api/auth/resend-verification.api';
+import { useAuthStore } from '@/lib/store/auth.store';
 
 type VerifyState = 'loading' | 'success' | 'error' | 'already_verified';
 
@@ -13,6 +14,7 @@ export function VerifyEmailView() {
     const searchParams = useSearchParams();
     const userId = searchParams.get('userId') ?? '';
     const token = searchParams.get('token') ?? '';
+    const { setTokens, setUser } = useAuthStore();
 
     const [state, setState] = useState<VerifyState>('loading');
     const [message, setMessage] = useState('');
@@ -30,6 +32,17 @@ export function VerifyEmailView() {
         verifyEmailApi(userId, token)
             .then((res) => {
                 const msg = res.data.message ?? '';
+                const session = res.data.data;
+
+                if (res.data.tokenType === 'limited' && session) {
+                    setTokens(session.accessToken, session.refreshToken);
+                    setUser(session.user);
+                    document.cookie =
+                        `session_active=1; path=/; SameSite=Strict; max-age=${60 * 60 * 24 * 30}`;
+                    window.location.replace('/verify-identity?source=onboarding&next=/login');
+                    return;
+                }
+
                 if (msg.toLowerCase().includes('already')) {
                     setState('already_verified');
                 } else {
@@ -44,7 +57,7 @@ export function VerifyEmailView() {
                     'Verification failed. The link may have expired.',
                 );
             });
-    }, [userId, token]);
+    }, [setTokens, setUser, userId, token]);
 
     const handleResend = async () => {
         setResendLoading(true);
@@ -152,7 +165,7 @@ export function VerifyEmailView() {
                         <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', lineHeight: 1.6, margin: 0 }}>
                             {state === 'already_verified'
                                 ? 'Your email is already verified. You can log in.'
-                                : 'Your account is now active. Complete your identity verification to access your dashboard.'}
+                                : 'Your account is ready. You can log in.'}
                         </p>
                     </div>
 
