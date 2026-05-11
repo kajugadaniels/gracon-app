@@ -16,12 +16,21 @@ export type { VerificationFlowConfig };
  */
 export function createVerificationFlowConfig(
     challengeMode: VerificationChallengeMode,
+    destination: 'dashboard' | 'login' = 'dashboard',
 ): VerificationFlowConfig {
+    const isLoginDestination = destination === 'login';
+
     return createSharedVerificationFlowConfig(challengeMode, {
         dashboardActionLabel: 'Dashboard',
-        standardSuccessActionLabel: 'Continue to dashboard',
-        standardLockedActionLabel: 'Return to dashboard',
+        standardSuccessActionLabel: isLoginDestination
+            ? 'Continue to login'
+            : 'Continue to dashboard',
+        standardLockedActionLabel: isLoginDestination
+            ? 'Continue to login'
+            : 'Return to dashboard',
         standardSuccessDescription: (result: VerificationResult) =>
-            `Score: ${Math.round(result.compositeScore)}% — you can now access your dashboard.`,
+            isLoginDestination
+                ? `Score: ${Math.round(result.compositeScore)}% — you can now log in with full access.`
+                : `Score: ${Math.round(result.compositeScore)}% — you can now access your dashboard.`,
     });
 }
