@@ -1,4 +1,11 @@
 import axios from 'axios';
+import {
+    getStoredAccessToken,
+    isIdentityVerificationError,
+    redirectToIdentityVerification,
+    refreshStoredSession,
+    upgradeStoredSession,
+} from '@/api/auth/session-recovery';
 
 // Dedicated client for api/signature (port 3002) — separate from api/auth (port 3000).
 // Inherits the Authorization header from the main client's request interceptor
@@ -14,21 +21,47 @@ const signatureClient = axios.create({
 
 // Forward the Bearer token to api/signature using the same store/sessionStorage approach.
 signatureClient.interceptors.request.use((config) => {
-    try {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { useAuthStore } = require('@/lib/store/auth.store');
-        const token: string | null = useAuthStore.getState().accessToken;
-        if (token) config.headers.Authorization = `Bearer ${token}`;
-    } catch {
-        if (typeof window !== 'undefined') {
-            try {
-                const token = sessionStorage.getItem('av_at');
-                if (token) config.headers.Authorization = `Bearer ${token}`;
-            } catch { /* ignore */ }
-        }
-    }
+    const token = getStoredAccessToken();
+    if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
 });
+
+signatureClient.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+        const original = error.config ?? {};
+
+        if (isIdentityVerificationError(error) && !original._identityRetry) {
+            original._identityRetry = true;
+
+            const upgradedAccessToken = await upgradeStoredSession();
+            if (upgradedAccessToken) {
+                original.headers = {
+                    ...original.headers,
+                    Authorization: `Bearer ${upgradedAccessToken}`,
+                };
+                return signatureClient(original);
+            }
+
+            redirectToIdentityVerification();
+        }
+
+        if (error.response?.status === 401 && !original._retry) {
+            original._retry = true;
+
+            const refreshedAccessToken = await refreshStoredSession();
+            if (refreshedAccessToken) {
+                original.headers = {
+                    ...original.headers,
+                    Authorization: `Bearer ${refreshedAccessToken}`,
+                };
+                return signatureClient(original);
+            }
+        }
+
+        return Promise.reject(error);
+    },
+);
 
 // ─── Signature Image ──────────────────────────────────────────────────────────
 
