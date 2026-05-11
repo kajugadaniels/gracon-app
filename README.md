@@ -38,6 +38,7 @@ This application handles account onboarding, login, email verification, password
 - `session_active` cookie as middleware signal, not as token container
 - Cross-app redirect handling for `app/documents` return flows
 - Limited-token vs full-token user journeys
+- Personal-account onboarding sends users from email verification directly into identity verification with a temporary limited session, then returns them to login after identity verification passes
 - Local verification component stack in `src/components/pages/verification/shared`
 - Silent refresh through Next.js route handlers
 
