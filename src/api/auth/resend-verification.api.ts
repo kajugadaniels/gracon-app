@@ -5,10 +5,14 @@ export interface ResendVerificationResponse {
     message: string;
 }
 
+export type ResendVerificationPayload =
+    | { email: string; userId?: never }
+    | { userId: string; email?: never };
+
 // Resends the email verification link
 // Response is always vague (anti-enumeration) — same message regardless
-export const resendVerificationApi = (email: string) =>
+export const resendVerificationApi = (payload: ResendVerificationPayload) =>
     apiClient.post<ResendVerificationResponse>(
         '/users/resend-verification',
-        { email },
+        payload,
     );
