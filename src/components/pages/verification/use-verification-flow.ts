@@ -23,8 +23,31 @@ import { useAuthStore } from '@/lib/store/auth.store';
 export function useVerificationFlow(options: {
     challengeMode: VerificationChallengeMode;
     getSuccessDescription: (result: VerificationResult) => string;
+    returnToLoginAfterPass?: boolean;
 }) {
-    const { user, setUser, setTokens } = useAuthStore();
+    const { user, setUser, setTokens, clearAuth } = useAuthStore();
+
+    async function returnVerifiedUserToLogin(result: VerificationResult) {
+        const tokens = result.upgradedTokens;
+
+        if (tokens) {
+            await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000/api/v1'}/auth/logout`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${tokens.accessToken}`,
+                    },
+                    body: JSON.stringify({ refreshToken: tokens.refreshToken }),
+                    keepalive: true,
+                },
+            ).catch(() => undefined);
+        }
+
+        clearAuth();
+        window.location.replace('/login');
+    }
 
     return useVerificationFlowController({
         challengeMode: options.challengeMode,
@@ -81,6 +104,11 @@ export function useVerificationFlow(options: {
                 : fallback;
         },
         onVerificationPassed: (result) => {
+            if (options.returnToLoginAfterPass) {
+                void returnVerifiedUserToLogin(result);
+                return;
+            }
+
             if (user) {
                 setUser({ ...user, isIdVerified: true });
             }
