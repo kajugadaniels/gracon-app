@@ -47,13 +47,24 @@ export function VerifyEmailView() {
     }, [userId, token]);
 
     const handleResend = async () => {
-        // We don't have the email here — direct user to login to trigger resend
-        // In a fuller implementation you'd store email in a temp session
         setResendLoading(true);
         try {
-            await resendVerificationApi('');
-        } catch { }
-        setResendLoading(false);
+            if (!userId) {
+                setMessage('This verification link is missing the account reference. Please register again or contact support.');
+                return;
+            }
+
+            await resendVerificationApi({ userId });
+        } catch (error: unknown) {
+            setMessage(
+                error instanceof Error
+                    ? error.message
+                    : 'Unable to resend the verification email right now.',
+            );
+        } finally {
+            setResendLoading(false);
+        }
+
         setResendDone(true);
     };
 
