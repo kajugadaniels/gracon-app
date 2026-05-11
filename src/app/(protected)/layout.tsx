@@ -30,8 +30,23 @@ export default function ProtectedLayout({
         if (!accessToken && !user && hasSessionCookie) return;
         if (!accessToken || !user) {
             router.replace('/login');
+            return;
         }
-    }, [isHydrated, isLoading, accessToken, user, hasSessionCookie, router]);
+
+        if (!user.isIdVerified && !FULL_SCREEN_ROUTES.has(pathname)) {
+            router.replace(
+                `/verify-identity?next=${encodeURIComponent(pathname)}`,
+            );
+        }
+    }, [
+        isHydrated,
+        isLoading,
+        accessToken,
+        user,
+        hasSessionCookie,
+        pathname,
+        router,
+    ]);
 
     if (!isHydrated || isLoading || (!accessToken && !user && hasSessionCookie)) {
         return (
