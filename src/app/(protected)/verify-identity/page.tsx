@@ -9,7 +9,7 @@ import { Suspense } from 'react';
 import { VerificationForm } from '@/components/pages/verification';
 
 export const metadata: Metadata = {
-    title: 'Verify Identity — Gracon',
+    title: 'Verify Identity',
     description: 'Complete your identity verification to access your account',
 };
 
