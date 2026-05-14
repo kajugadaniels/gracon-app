@@ -8,6 +8,7 @@ import { Button, Input, Card } from '@/components/ui';
 import { loginApi } from '@/api/auth/login.api';
 import { useApi } from '@/lib/hooks/useApi';
 import { useAuthStore } from '@/lib/store/auth.store';
+import { writeSessionHintCookie } from '@/lib/auth/session-cookie-policy';
 
 const schema = z.object({
     email: z
@@ -41,10 +42,7 @@ export function LoginForm() {
 
             setTokens(accessToken, refreshToken);
             setUser(user);
-
-            // Set session cookie
-            document.cookie =
-                `session_active=1; path=/; SameSite=Strict; max-age=${60 * 60 * 24 * 30}`;
+            writeSessionHintCookie();
 
             if (res.tokenType === 'limited') {
                 // User verified email but hasn't done ID verification yet
