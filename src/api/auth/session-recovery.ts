@@ -2,6 +2,112 @@ import axios, { AxiosError } from 'axios';
 
 const AUTH_BASE =
     process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000/api/v1';
+const DEFAULT_ACCESS_TOKEN_TTL = '15m';
+const DEFAULT_REFRESH_TOKEN_TTL = '1d';
+const ACCESS_COOKIE =
+    process.env.NEXT_PUBLIC_AUTH_ACCESS_COOKIE_NAME?.trim() || 'g360_at';
+const REFRESH_COOKIE =
+    process.env.NEXT_PUBLIC_AUTH_REFRESH_COOKIE_NAME?.trim() || 'g360_rt';
+const SESSION_HINT_COOKIE =
+    process.env.NEXT_PUBLIC_AUTH_SESSION_HINT_COOKIE_NAME?.trim() ||
+    'session_active';
+
+function parseDurationSeconds(value: string | undefined, fallback: string): number {
+    const source = value ?? fallback;
+    const match = /^(\d+)([smhd])$/.exec(source.trim().toLowerCase());
+
+    if (!match) return parseDurationSeconds(fallback, '1d');
+
+    const amount = Number(match[1]);
+    const unit = match[2];
+
+    if (unit === 's') return amount;
+    if (unit === 'm') return amount * 60;
+    if (unit === 'h') return amount * 60 * 60;
+    return amount * 60 * 60 * 24;
+}
+
+function shouldWriteReadableAuthCookies(): boolean {
+    const explicit = process.env.NEXT_PUBLIC_ALLOW_DEV_READABLE_AUTH_COOKIES;
+
+    if (explicit === 'true') return true;
+    if (explicit === 'false') return false;
+
+    return process.env.NODE_ENV !== 'production';
+}
+
+function serializeClientCookie(name: string, value: string, maxAge: number): string {
+    const parts = [
+        `${name}=${value}`,
+        'path=/',
+        `max-age=${maxAge}`,
+        `SameSite=${process.env.NEXT_PUBLIC_AUTH_COOKIE_SAME_SITE ?? 'Lax'}`,
+    ];
+    const domain = process.env.NEXT_PUBLIC_AUTH_COOKIE_DOMAIN?.trim();
+
+    if (domain) parts.push(`domain=${domain}`);
+    if (
+        process.env.NEXT_PUBLIC_AUTH_COOKIE_SECURE === 'true' ||
+        process.env.NODE_ENV === 'production'
+    ) {
+        parts.push('Secure');
+    }
+
+    return parts.join('; ');
+}
+
+function writeSessionHintCookie(): void {
+    if (typeof document === 'undefined') return;
+
+    // Non-sensitive hint only. The server still owns real session validation.
+    document.cookie = serializeClientCookie(
+        SESSION_HINT_COOKIE,
+        '1',
+        parseDurationSeconds(
+            process.env.NEXT_PUBLIC_AUTH_REFRESH_TOKEN_TTL,
+            DEFAULT_REFRESH_TOKEN_TTL,
+        ),
+    );
+}
+
+function writeReadableAuthTokenCookies(
+    accessToken: string,
+    refreshToken: string,
+): void {
+    if (typeof document === 'undefined') return;
+    if (!shouldWriteReadableAuthCookies()) {
+        writeSessionHintCookie();
+        return;
+    }
+
+    // Development compatibility only. Production must use HttpOnly cookies set
+    // by the auth service or a same-origin route handler.
+    document.cookie = serializeClientCookie(
+        ACCESS_COOKIE,
+        accessToken,
+        parseDurationSeconds(
+            process.env.NEXT_PUBLIC_AUTH_ACCESS_TOKEN_TTL,
+            DEFAULT_ACCESS_TOKEN_TTL,
+        ),
+    );
+    document.cookie = serializeClientCookie(
+        REFRESH_COOKIE,
+        refreshToken,
+        parseDurationSeconds(
+            process.env.NEXT_PUBLIC_AUTH_REFRESH_TOKEN_TTL,
+            DEFAULT_REFRESH_TOKEN_TTL,
+        ),
+    );
+    writeSessionHintCookie();
+}
+
+function clearClientAuthCookies(): void {
+    if (typeof document === 'undefined') return;
+
+    document.cookie = serializeClientCookie(ACCESS_COOKIE, '', 0);
+    document.cookie = serializeClientCookie(REFRESH_COOKIE, '', 0);
+    document.cookie = serializeClientCookie(SESSION_HINT_COOKIE, '', 0);
+}
 
 interface TokenResponse {
     accessToken?: string;
@@ -35,12 +141,7 @@ function writeSessionValue(key: string, value: string): void {
 }
 
 function applySessionCookies(accessToken: string, refreshToken: string): void {
-    if (typeof document === 'undefined') return;
-
-    const maxAge = 60 * 60 * 24 * 30;
-    document.cookie = `g360_at=${accessToken}; path=/; max-age=${maxAge}; SameSite=Lax`;
-    document.cookie = `g360_rt=${refreshToken}; path=/; max-age=${maxAge}; SameSite=Lax`;
-    document.cookie = `session_active=1; path=/; max-age=${maxAge}; SameSite=Strict`;
+    writeReadableAuthTokenCookies(accessToken, refreshToken);
 }
 
 function persistTokens(accessToken: string, refreshToken: string): void {
@@ -169,10 +270,7 @@ export function clearAuthAndRedirect(): void {
         // Ignore storage failures during logout cleanup.
     }
 
-    document.cookie =
-        'session_active=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-    document.cookie = 'g360_at=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-    document.cookie = 'g360_rt=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    clearClientAuthCookies();
 
     window.location.href = '/login';
 }
