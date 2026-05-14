@@ -48,7 +48,7 @@ This application handles account onboarding, login, email verification, password
 - Shared `AppLoadingState` keeps auth/session, profile, logout, and digital-signature loading states visually consistent while `PremiumLoader` remains for small button-level spinners
 - Root metadata owns the `"%s | Gracon 360"` title template; client-only protected pages use `usePageTitle`
 - Digital-signature setup loads key-pair, certificate, request status, sanction status, and signature image together; pending or newly approved certificate state refreshes in the background
-- High-risk route styling is moving out of `globals.css` and inline objects into scoped CSS modules; protected layout, auth layout, profile page, digital-signature page, and identity-verification page now own their page-level styles locally
+- High-risk route styling is moving out of `globals.css` and inline objects into scoped CSS modules; protected layout, auth layout, profile page, digital-signature page, identity-verification page, public signature verification, and shared sidebar/navbar chrome now own their styles locally
 
 ## Main Areas
 
