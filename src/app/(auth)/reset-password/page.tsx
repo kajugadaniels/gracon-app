@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { ResetPasswordForm } from '@/components/pages/auth/reset-password';
 
 export const metadata: Metadata = {
-    title: 'Reset Password — ID Verify',
+    title: 'Reset Password',
     description: 'Set a new password for your account',
 };
 
