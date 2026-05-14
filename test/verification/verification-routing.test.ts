@@ -34,4 +34,18 @@ test('rejects invalid or foreign next urls', () => {
         resolveMainAppVerificationRedirect('not-a-url', 'http://localhost:4002'),
         { kind: 'internal', destination: '/dashboard' },
     );
+    assert.deepEqual(
+        resolveMainAppVerificationRedirect(
+            'javascript:alert(document.cookie)',
+            'http://localhost:4002',
+        ),
+        { kind: 'internal', destination: '/dashboard' },
+    );
+    assert.deepEqual(
+        resolveMainAppVerificationRedirect(
+            'http://localhost:4002.evil.example/invitations/abc',
+            'http://localhost:4002',
+        ),
+        { kind: 'internal', destination: '/dashboard' },
+    );
 });
