@@ -48,7 +48,7 @@ This application handles account onboarding, login, email verification, password
 - Shared `AppLoadingState` keeps auth/session, profile, logout, and digital-signature loading states visually consistent while `PremiumLoader` remains for small button-level spinners
 - Root metadata owns the `"%s | Gracon 360"` title template; client-only protected pages use `usePageTitle`
 - Digital-signature setup loads key-pair, certificate, request status, sanction status, and signature image together; pending or newly approved certificate state refreshes in the background
-- Route and component styling is still mostly inline/global; new route-specific work should move high-risk surfaces into scoped CSS modules before changing broad `globals.css` behavior
+- High-risk route styling is moving out of `globals.css` and inline objects into scoped CSS modules; protected layout, auth layout, profile page, digital-signature page, and identity-verification page now own their page-level styles locally
 
 ## Main Areas
 
@@ -131,6 +131,7 @@ NEXT_PUBLIC_DOCS_URL=http://localhost:4002
 - Keep verification redirects constrained. Only the configured `NEXT_PUBLIC_DOCS_URL` origin should be allowed for external return URLs.
 - Keep digital-signature setup state explicit. Certificate request, active certificate, sanction status, and signature image should remain separate UI states.
 - Prefer scoped CSS modules for new layout/page refactors. `globals.css` should stay limited to tokens, shared primitives, animations, and truly global shell behavior.
+- Keep route-level layout styles beside their routes in `.module.css` files. Avoid adding new page-shell, header, banner, or loading wrapper styles to `globals.css`.
 
 ## Contribution Checklist
 
