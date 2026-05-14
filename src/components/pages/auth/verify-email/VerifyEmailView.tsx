@@ -7,6 +7,7 @@ import { PremiumLoader } from '@/components/ui/Loader';
 import { verifyEmailApi } from '@/api/auth/verify-email.api';
 import { resendVerificationApi } from '@/api/auth/resend-verification.api';
 import { useAuthStore } from '@/lib/store/auth.store';
+import { writeSessionHintCookie } from '@/lib/auth/session-cookie-policy';
 
 type VerifyState = 'loading' | 'success' | 'error' | 'already_verified';
 
@@ -37,8 +38,7 @@ export function VerifyEmailView() {
                 if (res.data.tokenType === 'limited' && session) {
                     setTokens(session.accessToken, session.refreshToken);
                     setUser(session.user);
-                    document.cookie =
-                        `session_active=1; path=/; SameSite=Strict; max-age=${60 * 60 * 24 * 30}`;
+                    writeSessionHintCookie();
                     window.location.replace('/verify-identity?source=onboarding&next=/login');
                     return;
                 }
