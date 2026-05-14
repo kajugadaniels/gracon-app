@@ -1,4 +1,5 @@
 import { VerifyForm } from '@/components/pages/verify';
+import styles from './verify-page.module.css';
 
 export const metadata = {
     title: 'Verify Signature',
@@ -7,49 +8,25 @@ export const metadata = {
 
 export default function VerifyPage() {
     return (
-        <div
-            style={{
-                minHeight: '100dvh',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '32px 24px',
-            }}
-        >
+        <div className={styles.page}>
             {/* Minimal header — no nav required, this page is public */}
-            <div style={{ textAlign: 'center', marginBottom: 40 }}>
-                <div
-                    style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 10,
-                        marginBottom: 12,
-                    }}
-                >
-                    <div
-                        style={{
-                            width: 36, height: 36, borderRadius: 8,
-                            background: 'var(--primary-glass)',
-                            border: '1px solid var(--primary-border)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: 18,
-                        }}
-                    >
+            <div className={styles.header}>
+                <div className={styles.brand}>
+                    <div className={styles.brandMark}>
                         G
                     </div>
-                    <span style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)' }}>
+                    <span className={styles.brandName}>
                         Gracon 360
                     </span>
                 </div>
-                <p style={{ margin: 0, fontSize: 13, color: 'var(--text-muted)' }}>
+                <p className={styles.tagline}>
                     Digital Trust Infrastructure Platform
                 </p>
             </div>
 
             <VerifyForm />
 
-            <p style={{ marginTop: 32, fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', maxWidth: 400, lineHeight: 1.6 }}>
+            <p className={styles.assurance}>
                 This verification is performed mathematically — no trust in any person or institution is required. The result is either valid or it is not.
             </p>
         </div>
