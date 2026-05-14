@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { authCookiePolicy } from '@/lib/auth/session-cookie-policy';
 
 const AUTH_ROUTES = [
     '/login',
@@ -10,11 +11,9 @@ const AUTH_ROUTES = [
     '/reset-password',
 ];
 
-const SESSION_COOKIE = 'session_active';
-
 export function proxy(req: NextRequest) {
     const { pathname } = req.nextUrl;
-    const hasSession = req.cookies.has(SESSION_COOKIE);
+    const hasSession = req.cookies.has(authCookiePolicy.sessionHintCookieName);
 
     const isAuthRoute = AUTH_ROUTES.some(
         (route) => pathname === route || pathname.startsWith(`${route}/`),
