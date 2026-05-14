@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/auth.store';
 import { AppSidebar } from '@/components/shared/AppSidebar';
-import { PremiumLoader } from '@/components/ui/Loader';
+import { AppLoadingState } from '@/components/ui/AppLoadingState';
 
 // Routes that render full-screen with no sidebar or layout chrome.
 const FULL_SCREEN_ROUTES = new Set(['/verify-identity']);
@@ -50,29 +50,21 @@ export default function ProtectedLayout({
 
     if (!isHydrated || isLoading || (!accessToken && !user && hasSessionCookie)) {
         return (
-            <div
-                style={{
-                    minHeight: '100dvh', display: 'flex',
-                    alignItems: 'center', justifyContent: 'center',
-                }}
-            >
-                <PremiumLoader size={40} color="primary" />
-            </div>
+            <AppLoadingState
+                variant="fullscreen"
+                message="Opening your account..."
+                detail="Restoring your secure Gracon session"
+            />
         );
     }
 
     if (!accessToken || !user) {
         return (
-            <div
-                style={{
-                    minHeight: '100dvh',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                }}
-            >
-                <PremiumLoader size={40} color="primary" />
-            </div>
+            <AppLoadingState
+                variant="fullscreen"
+                message="Redirecting to sign in..."
+                detail="Your session needs to be refreshed"
+            />
         );
     }
 
