@@ -1,0 +1,104 @@
+.shell {
+    min-height: var(--route-recovery-min-height, 100dvh);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 20px;
+}
+
+.card {
+    width: min(100%, 480px);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.92);
+    padding: 30px;
+    text-align: center;
+}
+
+.badge {
+    width: 44px;
+    height: 44px;
+    margin: 0 auto 18px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-primary-subtle);
+    border: 1px solid var(--color-border-primary);
+    color: var(--color-primary);
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.error .badge {
+    background: var(--color-error-subtle);
+    border-color: var(--color-error-border);
+    color: var(--color-error);
+}
+
+.notFound .badge {
+    background: var(--color-primary-subtle);
+    border-color: var(--color-border-primary);
+}
+
+.eyebrow {
+    margin: 0 0 8px;
+    color: var(--color-text-muted);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.title {
+    margin: 0;
+    color: var(--color-text-primary);
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.message {
+    margin: 12px auto 0;
+    max-width: 360px;
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+.actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 24px;
+}
+
+.details {
+    margin-top: 18px;
+    border-top: 1px solid var(--color-border);
+    padding-top: 14px;
+    color: var(--color-text-muted);
+    font-family: monospace;
+    font-size: 11px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+    text-align: left;
+}
+
+@media (max-width: 520px) {
+    .card {
+        padding: 26px 20px;
+    }
+
+    .actions {
+        flex-direction: column;
+    }
+
+    .actions button {
+        width: 100%;
+    }
+}
