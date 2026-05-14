@@ -1,0 +1,205 @@
+.card {
+    background: var(--glass-card);
+    backdrop-filter: blur(var(--glass-card-blur));
+    border: 1px solid var(--glass-card-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--glass-card-shadow);
+    padding: 36px;
+    width: 100%;
+    max-width: 560px;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+}
+
+.title {
+    margin: 0 0 8px;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.description {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.field {
+    margin-bottom: 16px;
+}
+
+.label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: var(--radius-md);
+    background: var(--glass-interactive);
+    border: 1px solid var(--glass-interactive-border);
+    color: var(--text-primary);
+    font-size: 13px;
+    font-family: var(--font-sans);
+    outline: none;
+}
+
+.input:focus {
+    border-color: var(--primary-border);
+}
+
+.mono {
+    font-family: monospace;
+}
+
+.error {
+    background: var(--error-glass);
+    border: 1px solid var(--error-border);
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--error-text);
+    margin-bottom: 16px;
+}
+
+.result {
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.resultValid {
+    background: var(--success-glass);
+    border: 1px solid var(--success-border);
+}
+
+.resultInvalid {
+    background: var(--error-glass);
+    border: 1px solid var(--error-border);
+}
+
+.resultHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.resultHeaderSpaced {
+    margin-bottom: 16px;
+}
+
+.resultIcon {
+    font-size: 28px;
+}
+
+.resultTitle {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.validText {
+    color: var(--success-text);
+}
+
+.invalidText {
+    color: var(--error-text);
+}
+
+.reason {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: var(--error-text);
+    opacity: 0.8;
+}
+
+.signerDetails {
+    border-top: 1px solid var(--success-border);
+    padding-top: 16px;
+}
+
+.signerRow {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(52, 211, 153, 0.15);
+}
+
+.signerLabel {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.signerValue {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--success-text);
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+.confirmation {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: rgba(52, 211, 153, 0.08);
+    border-radius: 8px;
+}
+
+.confirmationText {
+    margin: 0;
+    font-size: 12px;
+    color: var(--success-text);
+    line-height: 1.5;
+}
+
+.secondaryButton {
+    width: 100%;
+    background: var(--glass-interactive);
+    border: 1px solid var(--glass-interactive-border);
+    border-radius: var(--radius-md);
+    padding: 11px 0;
+    font-size: 14px;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.submit {
+    width: 100%;
+}
+
+.loadingLabel {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+}
+
+@media (max-width: 560px) {
+    .card {
+        padding: 28px 22px;
+    }
+
+    .signerRow {
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .signerValue {
+        text-align: left;
+    }
+}
