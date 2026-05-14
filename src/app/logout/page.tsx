@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useAuthStore } from '@/lib/store/auth.store';
 import { logoutApi } from '@/api/auth/logout.api';
+import { AppLoadingState } from '@/components/ui/AppLoadingState';
 
 // This page handles logout triggered by app/documents or any other sub-app.
 // It clears the app/app auth store, clears cookies, and redirects to login.
@@ -35,8 +36,10 @@ export default function LogoutPage() {
     }, [clearAuth, refreshToken]);
 
     return (
-        <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ width: 32, height: 32, borderRadius: '50%', border: '3px solid rgba(91,35,255,0.2)', borderTopColor: 'var(--color-primary)', animation: 'btn-spin 0.7s linear infinite' }} />
-        </div>
+        <AppLoadingState
+            variant="fullscreen"
+            message="Signing you out..."
+            detail="Closing your secure session"
+        />
     );
 }
