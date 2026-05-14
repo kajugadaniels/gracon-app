@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { authCookiePolicy } from '@/lib/auth/session-cookie-policy';
 
 const AUTH_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000/api/v1';
 
 export async function POST(req: NextRequest) {
-    const refreshToken = req.cookies.get('g360_rt')?.value;
+    const refreshToken = req.cookies.get(authCookiePolicy.refreshCookieName)?.value;
 
     if (!refreshToken) {
         return NextResponse.json({ error: 'No refresh token' }, { status: 401 });
@@ -19,8 +20,8 @@ export async function POST(req: NextRequest) {
 
         if (!res.ok) {
             const response = NextResponse.json({ error: 'Refresh failed' }, { status: 401 });
-            response.cookies.set('g360_at', '', { maxAge: 0, path: '/' });
-            response.cookies.set('g360_rt', '', { maxAge: 0, path: '/' });
+            response.cookies.set(authCookiePolicy.accessCookieName, '', { maxAge: 0, path: '/' });
+            response.cookies.set(authCookiePolicy.refreshCookieName, '', { maxAge: 0, path: '/' });
             return response;
         }
 
@@ -28,9 +29,27 @@ export async function POST(req: NextRequest) {
         const { accessToken, refreshToken: newRefreshToken } = data?.data ?? data;
 
         const response = NextResponse.json({ accessToken });
-        const maxAge = 60 * 60 * 24 * 30;
-        response.cookies.set('g360_at', accessToken, { maxAge, path: '/', sameSite: 'lax' });
-        response.cookies.set('g360_rt', newRefreshToken, { maxAge, path: '/', sameSite: 'lax' });
+        const sameSite = authCookiePolicy.cookieSameSite.toLowerCase() as
+            | 'strict'
+            | 'lax'
+            | 'none';
+
+        response.cookies.set(authCookiePolicy.accessCookieName, accessToken, {
+            maxAge: authCookiePolicy.accessTokenMaxAgeSeconds,
+            path: '/',
+            sameSite,
+            secure: authCookiePolicy.cookieSecure,
+            httpOnly: true,
+            domain: authCookiePolicy.cookieDomain,
+        });
+        response.cookies.set(authCookiePolicy.refreshCookieName, newRefreshToken, {
+            maxAge: authCookiePolicy.refreshTokenMaxAgeSeconds,
+            path: '/',
+            sameSite,
+            secure: authCookiePolicy.cookieSecure,
+            httpOnly: true,
+            domain: authCookiePolicy.cookieDomain,
+        });
         return response;
     } catch {
         return NextResponse.json({ error: 'Auth service unavailable' }, { status: 503 });
