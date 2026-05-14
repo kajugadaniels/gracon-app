@@ -7,11 +7,13 @@ import { EditProfileModal } from '@/components/pages/profile/EditProfileModal';
 import { ChangePasswordModal } from '@/components/pages/profile/ChangePasswordModal';
 import { AppLoadingState, Button } from '@/components/ui';
 import { useApi } from '@/lib/hooks/useApi';
+import { usePageTitle } from '@/lib/hooks/usePageTitle';
 import { normalizeImageUrl } from '@/lib/normalize-image-url';
 import { getProfileApi, UserProfileResponse } from '@/api/users/get-profile.api';
 
 export default function ProfilePage() {
     const { user, setUser } = useAuthStore();
+    usePageTitle('Profile');
 
     const [profile, setProfile] = useState<UserProfileResponse | null>(null);
     const [editOpen, setEditOpen] = useState(false);
