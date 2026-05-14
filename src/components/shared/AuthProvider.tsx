@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { useAuthStore } from '@/lib/store/auth.store';
+import { hasSessionHintCookie } from '@/lib/auth/session-cookie-policy';
 
 interface AuthProviderProps {
     children: React.ReactNode;
@@ -38,8 +39,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         if (restoredFromCookies.current) return;
         if (!isHydrated) return;
         if (accessToken && user) return;
-        if (typeof document === 'undefined') return;
-        if (!document.cookie.includes('session_active=')) return;
+        if (!hasSessionHintCookie()) return;
 
         restoredFromCookies.current = true;
         setLoading(true);
