@@ -1,7 +1,7 @@
 import { VerifyForm } from '@/components/pages/verify';
 
 export const metadata = {
-    title: 'Verify Signature — Gracon 360',
+    title: 'Verify Signature',
     description: 'Verify the authenticity of a digitally signed document. No account required.',
 };
 
