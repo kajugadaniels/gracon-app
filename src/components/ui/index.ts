@@ -5,5 +5,6 @@ export { Input }       from './Input';
 export { Card }        from './Card';
 export { StatusBadge } from './StatusBadge';
 export { AppLoadingState } from './AppLoadingState';
+export { RouteRecoveryState } from './RouteRecoveryState';
 export { AppToaster, toast } from './Toast';
 export { PremiumLoader }    from './Loader';
