@@ -11,6 +11,7 @@ import { KeyPairCard } from '@/components/pages/signature';
 import { CertificateCard } from '@/components/pages/signature';
 import { SignatureImageCard } from '@/components/pages/signature';
 import { AppLoadingState } from '@/components/ui/AppLoadingState';
+import { usePageTitle } from '@/lib/hooks/usePageTitle';
 import type {
     KeyPairResponse,
     CertificateResponse,
@@ -383,6 +384,8 @@ const certificateAccessDateStyle = {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function SignaturePage() {
+    usePageTitle('Digital Signature');
+
     const [keyPair, setKeyPair]         = useState<KeyPairResponse | null>(null);
     const [certificate, setCertificate] = useState<CertificateResponse | null>(null);
     const [certificateRequest, setCertificateRequest] = useState<CertificateRequestResponse | null>(null);
