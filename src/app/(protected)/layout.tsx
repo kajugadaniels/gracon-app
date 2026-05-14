@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/auth.store';
 import { AppSidebar } from '@/components/shared/AppSidebar';
 import { AppLoadingState } from '@/components/ui/AppLoadingState';
+import { hasSessionHintCookie } from '@/lib/auth/session-cookie-policy';
 import styles from './layout.module.css';
 
 // Routes that render full-screen with no sidebar or layout chrome.
@@ -22,8 +23,7 @@ export default function ProtectedLayout({
     const { isHydrated, isLoading, accessToken, user } = useAuthStore();
     const router = useRouter();
     const pathname = usePathname();
-    const hasSessionCookie =
-        typeof document !== 'undefined' && document.cookie.includes('session_active=');
+    const hasSessionCookie = hasSessionHintCookie();
 
     useEffect(() => {
         if (!isHydrated) return;
