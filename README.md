@@ -39,6 +39,8 @@ This application handles account onboarding, login, email verification, password
 - `session_active` cookie as middleware signal, not as token container
 - AuthProvider restores active cookie-backed sessions through local `/api/me` before protected routes redirect to login
 - Axios auth recovery uses one retry for expired access tokens and can upgrade limited sessions through `/auth/session/upgrade` when identity verification is required
+- Cross-app auth is moving to a server-owned cookie contract. Production must rely on `HttpOnly`, `Secure`, parent-domain cookies for real credentials; JavaScript-readable `g360_at`/`g360_rt` cookies are development compatibility only and are blocked in production unless explicitly enabled.
+- `session_active` remains a non-sensitive session hint only. It must never be treated as proof of authentication without server validation.
 - Cross-app redirect handling for `app/documents` return flows
 - Limited-token vs full-token user journeys
 - Personal-account onboarding sends users from email verification directly into identity verification with a temporary limited session, then returns them to login after identity verification passes
@@ -113,7 +115,18 @@ Key variables:
 NEXT_PUBLIC_API_URL=http://localhost:3000/api/v1
 NEXT_PUBLIC_SIGNATURE_API_URL=http://localhost:3002/api/v1
 NEXT_PUBLIC_DOCS_URL=http://localhost:4002
+NEXT_PUBLIC_AUTH_COOKIE_DOMAIN=
+NEXT_PUBLIC_AUTH_COOKIE_SECURE=false
+NEXT_PUBLIC_AUTH_COOKIE_SAME_SITE=lax
+NEXT_PUBLIC_AUTH_ACCESS_TOKEN_TTL=15m
+NEXT_PUBLIC_AUTH_REFRESH_TOKEN_TTL=1d
+NEXT_PUBLIC_ALLOW_DEV_READABLE_AUTH_COOKIES=true
 ```
+
+For production, use a parent domain such as `.gracon360.com`, set
+`NEXT_PUBLIC_AUTH_COOKIE_SECURE=true`, and leave
+`NEXT_PUBLIC_ALLOW_DEV_READABLE_AUTH_COOKIES=false`. Access tokens should stay
+short-lived; use the refresh/session lifetime for daily re-authentication.
 
 ## Integration Boundaries
 
@@ -124,6 +137,7 @@ NEXT_PUBLIC_DOCS_URL=http://localhost:4002
 ## Important Rules
 
 - Keep tokens out of `localStorage`
+- Production must not write refresh tokens to JavaScript-readable storage or cookies. During the migration, `sessionStorage` remains for the current API client, but cross-app authentication must move toward `HttpOnly` server-managed cookies.
 - Do not add new auth persistence paths without checking `AuthProvider`, `auth.store.ts`, and `api/auth/session-recovery.ts` together.
 - Use hard navigation for cross-origin jumps back to `app/documents`
 - Preserve the distinction between full-token and limited-token experiences
