@@ -1,4 +1,8 @@
 import { create } from 'zustand';
+import {
+    clearClientAuthCookies,
+    writeReadableAuthTokenCookies,
+} from '../auth/session-cookie-policy';
 
 export interface UserProfile {
     userId: string;
@@ -67,12 +71,7 @@ const storage = {
 };
 
 function clearSessionCookies(): void {
-    if (typeof document === 'undefined') return;
-
-    const expired = 'expires=Thu, 01 Jan 1970 00:00:00 GMT';
-    document.cookie = `g360_at=; path=/; ${expired}; max-age=0; SameSite=Lax`;
-    document.cookie = `g360_rt=; path=/; ${expired}; max-age=0; SameSite=Lax`;
-    document.cookie = `session_active=; path=/; ${expired}; max-age=0; SameSite=Strict`;
+    clearClientAuthCookies();
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -84,19 +83,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     // Saves tokens to store AND sessionStorage
     setTokens: (accessToken, refreshToken) => {
-        // Existing sessionStorage writes — keep these
+        // Keep sessionStorage during the migration to server-owned sessions so
+        // current API clients continue working. Production must not rely on
+        // JavaScript-readable refresh-token cookies for cross-app auth.
         storage.set(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
         storage.set(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
-
-        // NEW — write access token to a cookie shared across all Gracon 360 apps
-        // SameSite=Lax allows the cookie to be sent on cross-origin navigations
-        // No HttpOnly — the token needs to be readable by JavaScript in app/documents
-        // In production replace 'localhost' with your actual domain e.g. .gracon360.com
-        if (typeof document !== 'undefined') {
-            const maxAge = 60 * 60 * 24 * 30; // 30 days — same as refresh token lifetime
-            document.cookie = `g360_at=${accessToken}; path=/; max-age=${maxAge}; SameSite=Lax`;
-            document.cookie = `g360_rt=${refreshToken}; path=/; max-age=${maxAge}; SameSite=Lax`;
-        }
+        writeReadableAuthTokenCookies(accessToken, refreshToken);
 
         set({ accessToken, refreshToken });
     },
