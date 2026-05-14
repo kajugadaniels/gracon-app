@@ -47,6 +47,7 @@ This application handles account onboarding, login, email verification, password
 - Silent refresh through Next.js route handlers
 - Shared `AppLoadingState` keeps auth/session, profile, logout, and digital-signature loading states visually consistent while `PremiumLoader` remains for small button-level spinners
 - Route-level loading, error, and not-found recovery screens are defined for root, auth, protected workspace, digital-signature setup, identity verification, and public signature verification surfaces
+- Regression tests cover verification routing, auth session recovery, identity-verification redirects, and token cleanup helpers
 - Root metadata owns the `"%s | Gracon 360"` title template; client-only protected pages use `usePageTitle`
 - Digital-signature setup loads key-pair, certificate, request status, sanction status, and signature image together; pending or newly approved certificate state refreshes in the background
 - High-risk route styling is moving out of `globals.css` and inline objects into scoped CSS modules; protected layout, auth layout, profile page, digital-signature page, identity-verification page, public signature verification, and shared sidebar/navbar chrome now own their styles locally
@@ -140,6 +141,7 @@ NEXT_PUBLIC_DOCS_URL=http://localhost:4002
 - Update middleware when adding new public routes
 - Keep auth recovery and redirect behavior explicit
 - Test verification, login, and return-to-documents flows after auth changes
+- Run the auth/session regression tests after touching `session-recovery.ts`, redirect handling, token storage keys, or identity-verification routing.
 - Test limited-token upgrade and identity-verification return flows after session changes
 - Test certificate pending, approved, rejected, cancelled, revoked, and restricted states after signature changes
 - Keep `README.md` updated when changing auth/session recovery, loading UI, verification routing, or signature setup behavior
