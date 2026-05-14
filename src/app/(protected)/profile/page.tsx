@@ -5,7 +5,7 @@ import { useAuthStore } from '@/lib/store/auth.store';
 import { ProfileCard, PlatformIdCard, VerificationStatus } from '@/components/pages/profile';
 import { EditProfileModal } from '@/components/pages/profile/EditProfileModal';
 import { ChangePasswordModal } from '@/components/pages/profile/ChangePasswordModal';
-import { Button, PremiumLoader } from '@/components/ui';
+import { AppLoadingState, Button } from '@/components/ui';
 import { useApi } from '@/lib/hooks/useApi';
 import { normalizeImageUrl } from '@/lib/normalize-image-url';
 import { getProfileApi, UserProfileResponse } from '@/api/users/get-profile.api';
@@ -56,14 +56,12 @@ export default function ProfilePage() {
 
     if (profileLoading || !profile) {
         return (
-            <div
-                style={{
-                    minHeight: '60vh', display: 'flex',
-                    alignItems: 'center', justifyContent: 'center',
-                }}
-            >
-                <PremiumLoader size={40} color="primary" />
-            </div>
+            <AppLoadingState
+                variant="panel"
+                minHeight="60vh"
+                message="Loading your profile..."
+                detail="Syncing identity and account settings"
+            />
         );
     }
 
