@@ -10,6 +10,7 @@ import { useApi } from '@/lib/hooks/useApi';
 import { usePageTitle } from '@/lib/hooks/usePageTitle';
 import { normalizeImageUrl } from '@/lib/normalize-image-url';
 import { getProfileApi, UserProfileResponse } from '@/api/users/get-profile.api';
+import styles from './profile-page.module.css';
 
 export default function ProfilePage() {
     const { user, setUser } = useAuthStore();
@@ -68,42 +69,19 @@ export default function ProfilePage() {
     }
 
     return (
-        <div
-            style={{
-                maxWidth: 760,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 24,
-            }}
-        >
+        <div className={styles.page}>
             {/* ── Page header ── */}
-            <div
-                style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    justifyContent: 'space-between',
-                    gap: 16,
-                    flexWrap: 'wrap',
-                }}
-            >
+            <div className={styles.header}>
                 <div>
-                    <h1
-                        style={{
-                            fontSize: 28,
-                            fontWeight: 700,
-                            color: 'var(--color-text-primary)',
-                            marginBottom: 6,
-                            letterSpacing: '-0.02em',
-                        }}
-                    >
+                    <h1 className={styles.title}>
                         {profile.citizenIdentity?.postNames ?? 'My Account'}
                     </h1>
-                    <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', margin: 0 }}>
+                    <p className={styles.subtitle}>
                         Manage your identity and security settings.
                     </p>
                 </div>
 
-                <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                <div className={styles.actions}>
                     <Button variant="ghost" size="sm" onClick={() => setPasswordOpen(true)}>
                         Change password
                     </Button>
@@ -114,7 +92,7 @@ export default function ProfilePage() {
             </div>
 
             {/* ── Content ── */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <div className={styles.content}>
                 <VerificationStatus />
 
                 <ProfileCard
