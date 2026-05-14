@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/auth.store';
 import { AppSidebar } from '@/components/shared/AppSidebar';
 import { AppLoadingState } from '@/components/ui/AppLoadingState';
+import styles from './layout.module.css';
 
 // Routes that render full-screen with no sidebar or layout chrome.
 const FULL_SCREEN_ROUTES = new Set(['/verify-identity']);
@@ -86,27 +87,9 @@ export default function ProtectedLayout({
       */}
             <div
                 id="protected-main"
-                style={{
-                    /*
-                      We can't read the Zustand store here (Server Component boundary risk),
-                      so we use a CSS var approach: the sidebar writes its width to a CSS var
-                      on <html>, and this element reads it.
-                      Fallback: start at SIDEBAR_EXPANDED width.
-                    */
-                    marginLeft: SIDEBAR_EXPANDED,
-                    minHeight: '100dvh',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    transition: 'margin-left 250ms cubic-bezier(0.4,0,0.2,1)',
-                }}
+                className={styles.protectedMain}
             >
-                <main
-                    style={{
-                        flex: 1,
-                        padding: '40px 32px',
-                        maxWidth: 960,
-                    }}
-                >
+                <main className={styles.content}>
                     {children}
                 </main>
             </div>
@@ -120,17 +103,6 @@ export default function ProtectedLayout({
                 collapsed={SIDEBAR_COLLAPSED}
             />
 
-            {/*
-        Responsive: on mobile the sidebar is hidden by default and
-        the content takes full width.
-      */}
-            <style>{`
-        @media (max-width: 767px) {
-          #protected-main {
-            margin-left: 0 !important;
-          }
-        }
-      `}</style>
         </>
     );
 }
