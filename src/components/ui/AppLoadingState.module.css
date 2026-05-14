@@ -1,0 +1,149 @@
+.state {
+    display: grid;
+    place-items: center;
+    color: var(--color-text-secondary);
+    isolation: isolate;
+}
+
+.fullscreen {
+    min-height: 100dvh;
+    padding: 32px 20px;
+}
+
+.panel {
+    min-height: var(--app-loading-min-height, 60vh);
+    padding: 24px 16px;
+}
+
+.content {
+    display: grid;
+    justify-items: center;
+    gap: 16px;
+    width: min(100%, 340px);
+    text-align: center;
+}
+
+.identityMark {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: calc(var(--app-loading-size, 44px) * 1.5);
+    height: calc(var(--app-loading-size, 44px) * 1.5);
+}
+
+.shield {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: var(--app-loading-size, 44px);
+    height: var(--app-loading-size, 44px);
+    border: 1px solid rgba(91, 35, 255, 0.18);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.84);
+    box-shadow:
+        0 18px 44px rgba(22, 16, 58, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.92);
+    color: var(--color-primary);
+    transform-origin: center;
+    animation: app-loading-float 1.8s ease-in-out infinite;
+}
+
+.shield::before {
+    content: "";
+    width: 48%;
+    height: 56%;
+    border: 2px solid currentColor;
+    border-radius: 12px 12px 16px 16px;
+    clip-path: polygon(50% 0, 100% 18%, 100% 58%, 50% 100%, 0 58%, 0 18%);
+}
+
+.pulse {
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba(91, 35, 255, 0.16);
+    border-radius: 22px;
+    animation: app-loading-pulse 1.7s ease-out infinite;
+}
+
+.textBlock {
+    display: grid;
+    gap: 5px;
+}
+
+.message {
+    margin: 0;
+    color: var(--color-text-primary);
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0;
+}
+
+.detail {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.45;
+}
+
+.progressTrack {
+    position: relative;
+    display: block;
+    width: min(100%, 190px);
+    height: 4px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(91, 35, 255, 0.12);
+}
+
+.progressBar {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 42%;
+    border-radius: inherit;
+    background: var(--color-primary);
+    animation: app-loading-progress 1.25s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+@keyframes app-loading-float {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-4px);
+    }
+}
+
+@keyframes app-loading-pulse {
+    0% {
+        opacity: 0.76;
+        transform: scale(0.72);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.28);
+    }
+}
+
+@keyframes app-loading-progress {
+    0% {
+        transform: translateX(-120%);
+    }
+    100% {
+        transform: translateX(260%);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .shield,
+    .pulse,
+    .progressBar {
+        animation: none;
+    }
+
+    .progressBar {
+        width: 100%;
+        opacity: 0.7;
+    }
+}
