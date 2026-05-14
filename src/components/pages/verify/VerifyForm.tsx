@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { verifySignature } from '@/api/signature/signature.api';
 import type { VerifyResponse } from '@/api/signature/signature.api';
+import styles from './VerifyForm.module.css';
 
 export function VerifyForm() {
     const [documentHash, setDocumentHash] = useState('');
@@ -55,24 +56,13 @@ export function VerifyForm() {
     }
 
     return (
-        <div
-            style={{
-                background: 'var(--glass-card)',
-                backdropFilter: 'blur(var(--glass-card-blur))',
-                border: '1px solid var(--glass-card-border)',
-                borderRadius: 'var(--radius-xl)',
-                boxShadow: 'var(--glass-card-shadow)',
-                padding: 36,
-                width: '100%',
-                maxWidth: 560,
-            }}
-        >
-            <div style={{ textAlign: 'center', marginBottom: 32 }}>
-                <div style={{ fontSize: 48, marginBottom: 12 }}>🔍</div>
-                <h2 style={{ margin: '0 0 8px', fontSize: 22, fontWeight: 700, color: 'var(--text-primary)' }}>
+        <div className={styles.card}>
+            <div className={styles.header}>
+                <div className={styles.icon}>🔍</div>
+                <h2 className={styles.title}>
                     Verify a Signature
                 </h2>
-                <p style={{ margin: 0, fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                <p className={styles.description}>
                     Paste the signature bytes, document hash, and signer ID to confirm authenticity. No account required.
                 </p>
             </div>
@@ -104,13 +94,10 @@ export function VerifyForm() {
                     mono: true,
                 },
             ].map(({ id, label, value, onChange, placeholder, mono }) => (
-                <div key={id} style={{ marginBottom: 16 }}>
+                <div key={id} className={styles.field}>
                     <label
                         htmlFor={id}
-                        style={{
-                            display: 'block', fontSize: 12, color: 'var(--text-muted)',
-                            marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.06em',
-                        }}
+                        className={styles.label}
                     >
                         {label}
                     </label>
@@ -119,28 +106,13 @@ export function VerifyForm() {
                         value={value}
                         onChange={e => onChange(e.target.value)}
                         placeholder={placeholder}
-                        style={{
-                            width: '100%', padding: '10px 12px', borderRadius: 'var(--radius-md)',
-                            background: 'var(--glass-interactive)',
-                            border: '1px solid var(--glass-interactive-border)',
-                            color: 'var(--text-primary)', fontSize: 13,
-                            fontFamily: mono ? 'monospace' : 'var(--font-sans)',
-                            outline: 'none',
-                        }}
-                        onFocus={e => (e.target.style.borderColor = 'var(--primary-border)')}
-                        onBlur={e => (e.target.style.borderColor = 'var(--glass-interactive-border)')}
+                        className={`${styles.input} ${mono ? styles.mono : ''}`}
                     />
                 </div>
             ))}
 
             {error && (
-                <div
-                    style={{
-                        background: 'var(--error-glass)', border: '1px solid var(--error-border)',
-                        borderRadius: 'var(--radius-md)', padding: '10px 14px',
-                        fontSize: 13, color: 'var(--error-text)', marginBottom: 16,
-                    }}
-                >
+                <div className={styles.error}>
                     {error}
                 </div>
             )}
@@ -148,25 +120,18 @@ export function VerifyForm() {
             {/* Result */}
             {result && (
                 <div
-                    style={{
-                        background: result.valid ? 'var(--success-glass)' : 'var(--error-glass)',
-                        border: `1px solid ${result.valid ? 'var(--success-border)' : 'var(--error-border)'}`,
-                        borderRadius: 'var(--radius-lg)', padding: 20, marginBottom: 20,
-                    }}
+                    className={`${styles.result} ${result.valid ? styles.resultValid : styles.resultInvalid}`}
                 >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: result.valid ? 16 : 0 }}>
-                        <span style={{ fontSize: 28 }}>{result.valid ? '✅' : '❌'}</span>
+                    <div className={`${styles.resultHeader} ${result.valid ? styles.resultHeaderSpaced : ''}`}>
+                        <span className={styles.resultIcon}>{result.valid ? '✅' : '❌'}</span>
                         <div>
                             <p
-                                style={{
-                                    margin: 0, fontSize: 16, fontWeight: 700,
-                                    color: result.valid ? 'var(--success-text)' : 'var(--error-text)',
-                                }}
+                                className={`${styles.resultTitle} ${result.valid ? styles.validText : styles.invalidText}`}
                             >
                                 {result.valid ? 'Signature is Valid' : 'Signature is Invalid'}
                             </p>
                             {!result.valid && result.reason && (
-                                <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--error-text)', opacity: 0.8 }}>
+                                <p className={styles.reason}>
                                     {result.reason}
                                 </p>
                             )}
@@ -174,7 +139,7 @@ export function VerifyForm() {
                     </div>
 
                     {result.valid && result.signer && (
-                        <div style={{ borderTop: '1px solid var(--success-border)', paddingTop: 16 }}>
+                        <div className={styles.signerDetails}>
                             {[
                                 { label: 'Signed by', value: result.signer.subjectCN },
                                 { label: 'Certificate', value: result.signer.certificateId.slice(0, 16) + '…' },
@@ -182,20 +147,17 @@ export function VerifyForm() {
                             ].map(({ label, value }) => (
                                 <div
                                     key={label}
-                                    style={{
-                                        display: 'flex', justifyContent: 'space-between',
-                                        padding: '6px 0', borderBottom: '1px solid rgba(52,211,153,0.15)',
-                                    }}
+                                    className={styles.signerRow}
                                 >
-                                    <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{label}</span>
-                                    <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--success-text)' }}>
+                                    <span className={styles.signerLabel}>{label}</span>
+                                    <span className={styles.signerValue}>
                                         {value}
                                     </span>
                                 </div>
                             ))}
 
-                            <div style={{ marginTop: 12, padding: '10px 12px', background: 'rgba(52,211,153,0.08)', borderRadius: 8 }}>
-                                <p style={{ margin: 0, fontSize: 12, color: 'var(--success-text)', lineHeight: 1.5 }}>
+                            <div className={styles.confirmation}>
+                                <p className={styles.confirmationText}>
                                     This document has not been modified since it was signed. The document hash matches the signature exactly.
                                 </p>
                             </div>
@@ -207,12 +169,7 @@ export function VerifyForm() {
             {result ? (
                 <button
                     onClick={reset}
-                    style={{
-                        width: '100%', background: 'var(--glass-interactive)',
-                        border: '1px solid var(--glass-interactive-border)',
-                        borderRadius: 'var(--radius-md)', padding: '11px 0',
-                        fontSize: 14, color: 'var(--text-secondary)', cursor: 'pointer',
-                    }}
+                    className={styles.secondaryButton}
                 >
                     Verify Another Signature
                 </button>
@@ -220,11 +177,10 @@ export function VerifyForm() {
                 <button
                     onClick={handleVerify}
                     disabled={loading}
-                    className="btn-primary"
-                    style={{ width: '100%' }}
+                    className={`btn-primary ${styles.submit}`}
                 >
                     {loading ? (
-                        <span style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
+                        <span className={styles.loadingLabel}>
                             <span className="btn-spinner" /> Verifying…
                         </span>
                     ) : 'Verify Signature'}
