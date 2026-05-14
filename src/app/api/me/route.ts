@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { authCookiePolicy } from '@/lib/auth/session-cookie-policy';
 
 // This route is called by app/documents on load to bootstrap the session.
 // It reads the g360_at cookie and returns the user profile from api/auth/.
@@ -35,9 +36,9 @@ async function refreshSession(refreshToken: string) {
 }
 
 function clearSessionCookies(response: NextResponse) {
-    response.cookies.set('g360_at', '', { maxAge: 0, path: '/' });
-    response.cookies.set('g360_rt', '', { maxAge: 0, path: '/' });
-    response.cookies.set('session_active', '', { maxAge: 0, path: '/' });
+    response.cookies.set(authCookiePolicy.accessCookieName, '', { maxAge: 0, path: '/' });
+    response.cookies.set(authCookiePolicy.refreshCookieName, '', { maxAge: 0, path: '/' });
+    response.cookies.set(authCookiePolicy.sessionHintCookieName, '', { maxAge: 0, path: '/' });
     return response;
 }
 
@@ -46,30 +47,42 @@ function applySessionCookies(
     accessToken: string,
     refreshToken: string,
 ) {
-    const maxAge = 60 * 60 * 24 * 30;
+    const sameSite = authCookiePolicy.cookieSameSite.toLowerCase() as
+        | 'strict'
+        | 'lax'
+        | 'none';
 
-    response.cookies.set('g360_at', accessToken, {
-        maxAge,
+    response.cookies.set(authCookiePolicy.accessCookieName, accessToken, {
+        maxAge: authCookiePolicy.accessTokenMaxAgeSeconds,
         path: '/',
-        sameSite: 'lax',
+        sameSite,
+        secure: authCookiePolicy.cookieSecure,
+        httpOnly: true,
+        domain: authCookiePolicy.cookieDomain,
     });
-    response.cookies.set('g360_rt', refreshToken, {
-        maxAge,
+    response.cookies.set(authCookiePolicy.refreshCookieName, refreshToken, {
+        maxAge: authCookiePolicy.refreshTokenMaxAgeSeconds,
         path: '/',
-        sameSite: 'lax',
+        sameSite,
+        secure: authCookiePolicy.cookieSecure,
+        httpOnly: true,
+        domain: authCookiePolicy.cookieDomain,
     });
-    response.cookies.set('session_active', '1', {
-        maxAge,
+    response.cookies.set(authCookiePolicy.sessionHintCookieName, '1', {
+        maxAge: authCookiePolicy.refreshTokenMaxAgeSeconds,
         path: '/',
-        sameSite: 'strict',
+        sameSite,
+        secure: authCookiePolicy.cookieSecure,
+        domain: authCookiePolicy.cookieDomain,
     });
 
     return response;
 }
 
 export async function GET(req: NextRequest) {
-    let accessToken = req.cookies.get('g360_at')?.value ?? null;
-    const refreshToken = req.cookies.get('g360_rt')?.value ?? null;
+    let accessToken = req.cookies.get(authCookiePolicy.accessCookieName)?.value ?? null;
+    const refreshToken =
+        req.cookies.get(authCookiePolicy.refreshCookieName)?.value ?? null;
     let refreshedTokens:
         | {
               accessToken: string;
