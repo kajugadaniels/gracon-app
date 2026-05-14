@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { LoginForm } from '@/components/pages/auth/login';
 
 export const metadata: Metadata = {
-    title: 'Sign In — ID Verify',
+    title: 'Login',
     description: 'Sign in to your verified account',
 };
 
