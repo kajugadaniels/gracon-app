@@ -12,8 +12,11 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-    title: 'ID Verification Platform',
-    description: 'Secure identity verification powered by AI',
+    title: {
+        default: 'Gracon 360',
+        template: '%s | Gracon 360',
+    },
+    description: 'Secure identity and digital trust infrastructure for Gracon 360.',
 };
 
 export default function RootLayout({
