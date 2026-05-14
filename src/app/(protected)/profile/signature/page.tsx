@@ -10,6 +10,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { KeyPairCard } from '@/components/pages/signature';
 import { CertificateCard } from '@/components/pages/signature';
 import { SignatureImageCard } from '@/components/pages/signature';
+import { AppLoadingState } from '@/components/ui/AppLoadingState';
 import type {
     KeyPairResponse,
     CertificateResponse,
@@ -42,29 +43,6 @@ async function fetchSignatureState() {
         certificateStatus: certificateStatus.status === 'fulfilled' ? certificateStatus.value : null,
         image: image.status === 'fulfilled' ? image.value : null,
     };
-}
-
-// ─── Spinner ──────────────────────────────────────────────────────────────────
-
-function Spinner() {
-    return (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 400 }}>
-            <div style={{ textAlign: 'center' }}>
-                <div style={{
-                    width: 40, height: 40,
-                    border: '3px solid rgba(91,35,255,0.12)',
-                    borderTopColor: 'var(--color-primary)',
-                    borderRadius: '50%',
-                    animation: 'sig-spin 0.75s linear infinite',
-                    margin: '0 auto 16px',
-                }} />
-                <p style={{ fontSize: 13, color: 'var(--color-text-muted)', margin: 0 }}>
-                    Loading your signature data…
-                </p>
-            </div>
-            <style>{`@keyframes sig-spin { to { transform: rotate(360deg); } }`}</style>
-        </div>
-    );
 }
 
 // ─── Setup stepper ────────────────────────────────────────────────────────────
@@ -467,7 +445,16 @@ export default function SignaturePage() {
         return () => window.clearInterval(interval);
     }, [isReady, refreshInBackground, requestStatus]);
 
-    if (loading) return <Spinner />;
+    if (loading) {
+        return (
+            <AppLoadingState
+                variant="panel"
+                minHeight="400px"
+                message="Loading digital signature..."
+                detail="Checking keys, certificate status, and signature image"
+            />
+        );
+    }
 
     return (
         <div style={{ maxWidth: 760, margin: '0 auto', padding: '40px 24px 72px' }} className="animate-fade-up">
