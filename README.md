@@ -12,6 +12,7 @@ This application handles account onboarding, login, email verification, password
 - State: Zustand + sessionStorage
 - Forms: React Hook Form + Zod
 - Media capture: browser camera flow for identity verification
+- Browser titles: each route should use the `"{page name} | Gracon 360"` convention
 
 ## What This App Owns
 
@@ -41,6 +42,8 @@ This application handles account onboarding, login, email verification, password
 - Personal-account onboarding sends users from email verification directly into identity verification with a temporary limited session, then returns them to login after identity verification passes
 - Local verification component stack in `src/components/pages/verification/shared`
 - Silent refresh through Next.js route handlers
+- Shared `AppLoadingState` keeps auth/session, profile, logout, and digital-signature loading states visually consistent while `PremiumLoader` remains for small button-level spinners
+- Root metadata owns the `"%s | Gracon 360"` title template; client-only protected pages use `usePageTitle`
 
 ## Main Areas
 
@@ -58,7 +61,7 @@ components/
     verification/
     verify/
   shared/
-  ui/
+  ui/            shared primitives, including AppLoadingState for page/surface loading
 api/
   auth/
   users/
@@ -67,6 +70,7 @@ api/
 lib/
   store/
   hooks/
+    usePageTitle.ts title helper for client-only pages
 ```
 
 ## Folder Structure
@@ -116,6 +120,8 @@ NEXT_PUBLIC_DOCS_URL=http://localhost:4002
 - Use hard navigation for cross-origin jumps back to `app/documents`
 - Preserve the distinction between full-token and limited-token experiences
 - Keep verification logic local to this app now that the shared package has been rolled back
+- Use `AppLoadingState` for page and panel loading. Avoid adding new inline full-page spinner wrappers.
+- Keep browser titles consistent. Server routes should set metadata titles without the suffix; client-only routes should use `usePageTitle`.
 
 ## Contribution Checklist
 
