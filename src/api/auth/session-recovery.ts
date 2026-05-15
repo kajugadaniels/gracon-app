@@ -5,10 +5,13 @@ const AUTH_BASE =
 const DEFAULT_ACCESS_TOKEN_TTL = '15m';
 const DEFAULT_REFRESH_TOKEN_TTL = '1d';
 const ACCESS_COOKIE =
+    process.env.AUTH_ACCESS_COOKIE_NAME?.trim() ||
     process.env.NEXT_PUBLIC_AUTH_ACCESS_COOKIE_NAME?.trim() || 'g360_at';
 const REFRESH_COOKIE =
+    process.env.AUTH_REFRESH_COOKIE_NAME?.trim() ||
     process.env.NEXT_PUBLIC_AUTH_REFRESH_COOKIE_NAME?.trim() || 'g360_rt';
 const SESSION_HINT_COOKIE =
+    process.env.AUTH_SESSION_HINT_COOKIE_NAME?.trim() ||
     process.env.NEXT_PUBLIC_AUTH_SESSION_HINT_COOKIE_NAME?.trim() ||
     'session_active';
 
@@ -29,9 +32,10 @@ function parseDurationSeconds(value: string | undefined, fallback: string): numb
 
 function shouldWriteReadableAuthCookies(): boolean {
     const explicit = process.env.NEXT_PUBLIC_ALLOW_DEV_READABLE_AUTH_COOKIES;
+    const serverExplicit = process.env.ALLOW_DEV_READABLE_AUTH_COOKIES;
 
-    if (explicit === 'true') return true;
-    if (explicit === 'false') return false;
+    if (serverExplicit === 'true' || explicit === 'true') return true;
+    if (serverExplicit === 'false' || explicit === 'false') return false;
 
     return process.env.NODE_ENV !== 'production';
 }
@@ -41,12 +45,15 @@ function serializeClientCookie(name: string, value: string, maxAge: number): str
         `${name}=${value}`,
         'path=/',
         `max-age=${maxAge}`,
-        `SameSite=${process.env.NEXT_PUBLIC_AUTH_COOKIE_SAME_SITE ?? 'Lax'}`,
+        `SameSite=${process.env.AUTH_COOKIE_SAME_SITE ?? process.env.NEXT_PUBLIC_AUTH_COOKIE_SAME_SITE ?? 'Lax'}`,
     ];
-    const domain = process.env.NEXT_PUBLIC_AUTH_COOKIE_DOMAIN?.trim();
+    const domain =
+        process.env.AUTH_COOKIE_DOMAIN?.trim() ??
+        process.env.NEXT_PUBLIC_AUTH_COOKIE_DOMAIN?.trim();
 
     if (domain) parts.push(`domain=${domain}`);
     if (
+        process.env.AUTH_COOKIE_SECURE === 'true' ||
         process.env.NEXT_PUBLIC_AUTH_COOKIE_SECURE === 'true' ||
         process.env.NODE_ENV === 'production'
     ) {
@@ -64,7 +71,8 @@ function writeSessionHintCookie(): void {
         SESSION_HINT_COOKIE,
         '1',
         parseDurationSeconds(
-            process.env.NEXT_PUBLIC_AUTH_REFRESH_TOKEN_TTL,
+            process.env.AUTH_REFRESH_TOKEN_TTL ??
+                process.env.NEXT_PUBLIC_AUTH_REFRESH_TOKEN_TTL,
             DEFAULT_REFRESH_TOKEN_TTL,
         ),
     );
@@ -86,7 +94,8 @@ function writeReadableAuthTokenCookies(
         ACCESS_COOKIE,
         accessToken,
         parseDurationSeconds(
-            process.env.NEXT_PUBLIC_AUTH_ACCESS_TOKEN_TTL,
+            process.env.AUTH_ACCESS_TOKEN_TTL ??
+                process.env.NEXT_PUBLIC_AUTH_ACCESS_TOKEN_TTL,
             DEFAULT_ACCESS_TOKEN_TTL,
         ),
     );
@@ -94,7 +103,8 @@ function writeReadableAuthTokenCookies(
         REFRESH_COOKIE,
         refreshToken,
         parseDurationSeconds(
-            process.env.NEXT_PUBLIC_AUTH_REFRESH_TOKEN_TTL,
+            process.env.AUTH_REFRESH_TOKEN_TTL ??
+                process.env.NEXT_PUBLIC_AUTH_REFRESH_TOKEN_TTL,
             DEFAULT_REFRESH_TOKEN_TTL,
         ),
     );
