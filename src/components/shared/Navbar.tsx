@@ -168,7 +168,7 @@ function NavEntry({
     const Icon = item.Icon;
     const className = [
         mobile ? styles.mobileLink : styles.navLink,
-        active ? styles.navLinkActive : '',
+        active ? (mobile ? styles.mobileLinkActive : styles.navLinkActive) : '',
         item.comingSoon ? styles.navLinkMuted : '',
     ].filter(Boolean).join(' ');
 
