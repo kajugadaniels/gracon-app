@@ -9,6 +9,10 @@ import { loginApi } from '@/api/auth/login.api';
 import { useApi } from '@/lib/hooks/useApi';
 import { useAuthStore } from '@/lib/store/auth.store';
 import { writeSessionHintCookie } from '@/lib/auth/session-cookie-policy';
+import {
+    parseAllowedRedirectOrigins,
+    resolveSafeLoginRedirect,
+} from '@/lib/auth/redirect-safety';
 
 const schema = z.object({
     email: z
@@ -27,8 +31,6 @@ export function LoginForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { setTokens, setUser } = useAuthStore();
-
-    const nextPath = searchParams.get('next') ?? '/dashboard';
 
     const {
         register,
@@ -56,12 +58,18 @@ export function LoginForm() {
             // in-app next path (which may include ?challenge=invitation query params).
             const currentNext = new URLSearchParams(window.location.search).get('next');
             const docsBase = process.env.NEXT_PUBLIC_DOCS_URL ?? 'http://localhost:4002';
+            const redirect = resolveSafeLoginRedirect(
+                currentNext,
+                docsBase,
+                parseAllowedRedirectOrigins(
+                    process.env.NEXT_PUBLIC_AUTH_ALLOWED_REDIRECT_ORIGINS,
+                ),
+            );
 
-            if (currentNext && currentNext.startsWith(docsBase)) {
-                // Safe redirect back to app/documents — only allow our own docs URL
-                window.location.href = currentNext;
+            if (redirect.kind === 'external') {
+                window.location.href = redirect.destination;
             } else {
-                router.push(nextPath);
+                router.push(redirect.destination);
             }
         },
     });
