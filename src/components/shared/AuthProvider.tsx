@@ -2,7 +2,10 @@
 
 import { useEffect, useRef } from 'react';
 import { useAuthStore } from '@/lib/store/auth.store';
-import { hasSessionHintCookie } from '@/lib/auth/session-cookie-policy';
+import {
+    hasSessionHintCookie,
+    shouldAllowReadableAuthTokenCookies,
+} from '@/lib/auth/session-cookie-policy';
 
 interface AuthProviderProps {
     children: React.ReactNode;
@@ -62,12 +65,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 const restoredRefreshToken = payload?.refreshToken;
                 const restoredUser = payload?.user;
 
-                if (!restoredAccessToken || !restoredRefreshToken || !restoredUser) {
+                if (!restoredAccessToken || !restoredUser) {
                     clearAuth();
                     return;
                 }
 
-                setTokens(restoredAccessToken, restoredRefreshToken);
+                // Production keeps refresh credentials inside HttpOnly cookies.
+                // Development can still hydrate the old JS-readable refresh-token
+                // path while local cross-app auth is being used.
+                setTokens(
+                    restoredAccessToken,
+                    shouldAllowReadableAuthTokenCookies() && restoredRefreshToken
+                        ? restoredRefreshToken
+                        : '',
+                );
                 setUser(restoredUser);
             } catch {
                 clearAuth();
