@@ -11,6 +11,8 @@ import { CertificateCard } from '@/components/pages/signature';
 import { SignatureImageCard } from '@/components/pages/signature';
 import { AppLoadingState } from '@/components/ui/AppLoadingState';
 import { usePageTitle } from '@/lib/hooks/usePageTitle';
+import { SignatureIdentityPanel } from './SignatureIdentityPanel';
+import { SignatureHowItWorksPanel } from './SignatureHowItWorksPanel';
 import styles from './signature-page.module.css';
 import type {
     KeyPairResponse,
@@ -244,63 +246,6 @@ function formatLongDate(value: string | null) {
     });
 }
 
-function InfoTip({ text }: { text: string }) {
-    return (
-        <span className={styles.infoTip} tabIndex={0} data-tooltip={text}>
-            i
-        </span>
-    );
-}
-
-function StatusSummary({
-    hasKey,
-    hasCert,
-    hasImage,
-    requestStatus,
-}: {
-    hasKey: boolean;
-    hasCert: boolean;
-    hasImage: boolean;
-    requestStatus: CertificateRequestStatus | null;
-}) {
-    const items = [
-        {
-            label: 'Key pair',
-            value: hasKey ? 'Generated' : 'Not generated',
-            ready: hasKey,
-            help: 'Your private key stays with your account and is used to create cryptographic signatures.',
-        },
-        {
-            label: 'Certificate',
-            value: hasCert ? 'Active' : requestStatus ? getStepTwoLabel(requestStatus) : 'Not requested',
-            ready: hasCert,
-            help: 'The certificate links your verified identity to your signing key after approval.',
-        },
-        {
-            label: 'Signature image',
-            value: hasImage ? 'Uploaded' : 'Optional',
-            ready: hasImage,
-            help: 'This image is only visual. The certificate is what makes document signing verifiable.',
-        },
-    ];
-
-    return (
-        <div className={styles.statusGrid} aria-label="Digital signature setup status">
-            {items.map((item) => (
-                <div key={item.label} className={styles.statusCard}>
-                    <div className={styles.statusLabel}>
-                        {item.label}
-                        <InfoTip text={item.help} />
-                    </div>
-                    <div className={item.ready ? styles.statusReady : styles.statusPending}>
-                        {item.value}
-                    </div>
-                </div>
-            ))}
-        </div>
-    );
-}
-
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function SignaturePage() {
@@ -382,98 +327,49 @@ export default function SignaturePage() {
 
     return (
         <div className={`${styles.page} animate-fade-up`}>
+            <div className={styles.workspace}>
+                <SignatureIdentityPanel
+                    hasKey={!!keyPair}
+                    hasCert={hasCert}
+                    hasImage={hasImage}
+                    requestStatus={requestStatus}
+                />
 
-            {/* ── Page header ────────────────────────────────────── */}
-            <section className={styles.hero}>
-                <div className={styles.heroMain}>
-                    <div className={styles.header}>
-                        <div className={styles.headerIcon}>
-                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                                <polyline points="9 12 11 14 15 10" />
-                            </svg>
-                        </div>
-                        <div>
-                            <p className={styles.eyebrow}>Signing identity</p>
-                            <h1 className={styles.title}>
-                                Digital Signature
-                            </h1>
-                            <p className={styles.subtitle}>
-                                Set up the verified identity used when you sign Gracon 360 documents.
-                                Your key pair, approved certificate, and optional handwritten image work together,
-                                but each one has a different purpose.
-                            </p>
-                        </div>
+                <main className={styles.mainPanel} aria-label="Digital signature setup controls">
+                    <div className={styles.mainHeader}>
+                        <p className={styles.eyebrow}>Setup workspace</p>
+                        <h2 className={styles.mainTitle}>Complete your signing setup</h2>
+                        <p className={styles.mainSubtitle}>
+                            Work through the setup cards from top to bottom. Each card updates independently, and
+                            approved certificate state refreshes in the background while you wait.
+                        </p>
                     </div>
 
-                    <StatusSummary
-                        hasKey={!!keyPair}
-                        hasCert={hasCert}
-                        hasImage={hasImage}
-                        requestStatus={requestStatus}
-                    />
-                </div>
+                    {/* ── Setup stepper ──────────────────────────────────── */}
+                    <SetupStepper hasKey={!!keyPair} hasCert={hasCert} requestStatus={requestStatus} />
 
-                <aside className={styles.explainPanel} aria-label="How digital signing works">
-                    <p className={styles.panelTitle}>How this works</p>
-                    <div className={styles.explainList}>
-                        <div>
-                            <strong>1. Create signing keys</strong>
-                            <span>Generate the cryptographic key pair used for document signatures.</span>
+                    {/* ── Ready banner ───────────────────────────────────── */}
+                    {certificateStatus && <CertificateAccessBanner status={certificateStatus} />}
+                    {isReady && <ReadyBanner />}
+                    {!isReady && requestStatus && <RequestBanner status={requestStatus} />}
+
+                    {/* ── Cards ──────────────────────────────────────────── */}
+                    <div className={`${styles.cards} stagger`}>
+                        <div className="animate-fade-up"><KeyPairCard keyPair={keyPair} onRefresh={load} /></div>
+                        <div className="animate-fade-up">
+                            <CertificateCard
+                                certificate={certificate}
+                                certificateRequest={certificateRequest}
+                                certificateStatus={certificateStatus}
+                                hasKeyPair={!!keyPair}
+                                onRefresh={load}
+                            />
                         </div>
-                        <div>
-                            <strong>2. Request approval</strong>
-                            <span>An admin approves the certificate that links your key to your verified identity.</span>
-                        </div>
-                        <div>
-                            <strong>3. Sign documents</strong>
-                            <span>Approved certificates make signatures verifiable. The image is only for display.</span>
-                        </div>
+                        <div className="animate-fade-up"><SignatureImageCard image={image} onRefresh={load} /></div>
                     </div>
-                    <p className={styles.panelNote}>
-                        Need help? Hover the small info markers beside each status or section label.
-                    </p>
-                </aside>
-            </section>
+                </main>
 
-            <div className={styles.helperGrid}>
-                <div className={styles.helperCard}>
-                    <span className={styles.helperLabel}>
-                        Certificate
-                        <InfoTip text="A certificate proves that an approved Gracon identity owns the signing key." />
-                    </span>
-                    <p>Required before you can produce trusted digital signatures.</p>
-                </div>
-                <div className={styles.helperCard}>
-                    <span className={styles.helperLabel}>
-                        Signature image
-                        <InfoTip text="The image appears on documents, but it does not replace the cryptographic signature." />
-                    </span>
-                    <p>Optional visual signature for printed or previewed documents.</p>
-                </div>
-            </div>
-
-            {/* ── Setup stepper ──────────────────────────────────── */}
-            <SetupStepper hasKey={!!keyPair} hasCert={hasCert} requestStatus={requestStatus} />
-
-            {/* ── Ready banner ───────────────────────────────────── */}
-            {certificateStatus && <CertificateAccessBanner status={certificateStatus} />}
-            {isReady && <ReadyBanner />}
-            {!isReady && requestStatus && <RequestBanner status={requestStatus} />}
-
-            {/* ── Cards ──────────────────────────────────────────── */}
-            <div className={`${styles.cards} stagger`}>
-                <div className="animate-fade-up"><KeyPairCard keyPair={keyPair} onRefresh={load} /></div>
-                <div className="animate-fade-up">
-                    <CertificateCard
-                        certificate={certificate}
-                        certificateRequest={certificateRequest}
-                        certificateStatus={certificateStatus}
-                        hasKeyPair={!!keyPair}
-                        onRefresh={load}
-                    />
-                </div>
-                <div className="animate-fade-up"><SignatureImageCard image={image} onRefresh={load} /></div>
+                <SignatureHowItWorksPanel />
             </div>
         </div>
     );
