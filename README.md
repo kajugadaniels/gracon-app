@@ -54,7 +54,8 @@ This application handles account onboarding, login, email verification, password
 - Regression tests cover verification routing, auth session recovery, identity-verification redirects, and token cleanup helpers
 - Root metadata owns the `"%s | Gracon 360"` title template; client-only protected pages use `usePageTitle`
 - Digital-signature setup loads key-pair, certificate, request status, sanction status, and signature image together; pending or newly approved certificate state refreshes in the background
-- High-risk route styling is moving out of `globals.css` and inline objects into scoped CSS modules; protected layout, auth layout, profile page, digital-signature page, identity-verification page, public signature verification, and shared sidebar/navbar chrome now own their styles locally
+- Protected workspace navigation is a responsive topbar. Do not reintroduce the old sidebar shell; unavailable product modules should use non-blocking coming-soon feedback.
+- High-risk route styling is moving out of `globals.css` and inline objects into scoped CSS modules; protected layout, auth layout, profile page, digital-signature page, identity-verification page, public signature verification, and shared topbar chrome now own their styles locally
 
 ## Main Areas
 
@@ -147,6 +148,7 @@ but should rotate on every refresh and reject reuse server-side.
 - Keep the development auth path intact. Local development may use `NEXT_PUBLIC_ALLOW_DEV_READABLE_AUTH_COOKIES=true`; production must disable it and rely on the server-cookie route handlers.
 - Do not add new auth persistence paths without checking `AuthProvider`, `auth.store.ts`, and `api/auth/session-recovery.ts` together.
 - Use hard navigation for cross-origin jumps back to `app/documents`
+- Keep the protected app shell topbar-first across desktop, laptop, tablet, and phone. New product entries should go through `src/constants/nav.tsx`.
 - Validate cross-app `next` values with exact origins only. Lookalike domains such as `documents.gracon360.com.evil.test` must fall back to `/dashboard`.
 - Preserve the distinction between full-token and limited-token experiences
 - Keep verification logic local to this app now that the shared package has been rolled back
