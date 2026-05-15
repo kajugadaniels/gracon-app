@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { authCookiePolicy } from '@/lib/auth/session-cookie-policy';
+import {
+    authCookiePolicy,
+    shouldAllowReadableAuthTokenCookies,
+} from '@/lib/auth/session-cookie-policy';
 
 // This route is called by app/documents on load to bootstrap the session.
 // It reads the g360_at cookie and returns the user profile from api/auth/.
@@ -57,7 +60,7 @@ function applySessionCookies(
         path: '/',
         sameSite,
         secure: authCookiePolicy.cookieSecure,
-        httpOnly: true,
+        httpOnly: !shouldAllowReadableAuthTokenCookies(),
         domain: authCookiePolicy.cookieDomain,
     });
     response.cookies.set(authCookiePolicy.refreshCookieName, refreshToken, {
@@ -65,7 +68,7 @@ function applySessionCookies(
         path: '/',
         sameSite,
         secure: authCookiePolicy.cookieSecure,
-        httpOnly: true,
+        httpOnly: !shouldAllowReadableAuthTokenCookies(),
         domain: authCookiePolicy.cookieDomain,
     });
     response.cookies.set(authCookiePolicy.sessionHintCookieName, '1', {
@@ -135,7 +138,12 @@ export async function GET(req: NextRequest) {
 
         const response = NextResponse.json({
             accessToken,
-            refreshToken: effectiveRefreshToken,
+            // Development compatibility: the current client-side API layer can
+            // still hydrate from a refresh token locally. Production keeps the
+            // refresh token in HttpOnly cookies and never returns it to JS.
+            refreshToken: shouldAllowReadableAuthTokenCookies()
+                ? effectiveRefreshToken
+                : null,
             user: {
                 userId: profile?.id ?? '',
                 email: profile?.email ?? '',
