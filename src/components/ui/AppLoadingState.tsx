@@ -37,7 +37,9 @@ export function AppLoadingState({
             <div className={styles.content}>
                 <div className={styles.identityMark} aria-hidden="true">
                     <span className={styles.pulse} />
-                    <span className={styles.shield} />
+                    <span className={styles.brandTile}>
+                        <span className={styles.brandLetter}>G</span>
+                    </span>
                 </div>
                 <div className={styles.textBlock}>
                     <p className={styles.message}>{message}</p>
