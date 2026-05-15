@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react';
 import { useAuthStore } from '@/lib/store/auth.store';
-import { logoutApi } from '@/api/auth/logout.api';
 import { AppLoadingState } from '@/components/ui/AppLoadingState';
 import { usePageTitle } from '@/lib/hooks/usePageTitle';
 
@@ -18,9 +17,12 @@ export default function LogoutPage() {
 
         const runLogout = async () => {
             try {
-                if (refreshToken) {
-                    await logoutApi(refreshToken);
-                }
+                await fetch('/api/logout', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ refreshToken }),
+                });
             } catch {
                 // Local logout must still complete even if token revocation fails.
             } finally {
