@@ -182,7 +182,12 @@ function NavEntry({
 
     if (item.comingSoon) {
         return (
-            <button type="button" className={className} onClick={() => onComingSoon(item.label)}>
+            <button
+                type="button"
+                className={className}
+                data-tooltip={item.description}
+                onClick={() => onComingSoon(item.label)}
+            >
                 {content}
             </button>
         );
@@ -194,6 +199,7 @@ function NavEntry({
             className={className}
             target={item.external ? '_blank' : undefined}
             rel={item.external ? 'noopener noreferrer' : undefined}
+            data-tooltip={item.description}
             onClick={onNavigate}
         >
             {content}
