@@ -47,6 +47,7 @@ This application handles account onboarding, login, email verification, password
 - Verification routing only allows external returns to the configured documents origin; invalid or foreign `next` values fall back to `/dashboard`
 - Local verification component stack in `src/components/pages/verification/shared`
 - Silent refresh through Next.js route handlers
+- Local `/api/me`, `/api/refresh`, and `/api/logout` route handlers are the transition point toward server-owned sessions. In production they keep refresh credentials in `HttpOnly` cookies; development can still opt into the previous readable-cookie path.
 - Shared `AppLoadingState` keeps auth/session, profile, logout, and digital-signature loading states visually consistent while `PremiumLoader` remains for small button-level spinners
 - Route-level loading, error, and not-found recovery screens are defined for root, auth, protected workspace, digital-signature setup, identity verification, and public signature verification surfaces
 - Regression tests cover verification routing, auth session recovery, identity-verification redirects, and token cleanup helpers
@@ -138,6 +139,7 @@ short-lived; use the refresh/session lifetime for daily re-authentication.
 
 - Keep tokens out of `localStorage`
 - Production must not write refresh tokens to JavaScript-readable storage or cookies. During the migration, `sessionStorage` remains for the current API client, but cross-app authentication must move toward `HttpOnly` server-managed cookies.
+- Keep the development auth path intact. Local development may use `NEXT_PUBLIC_ALLOW_DEV_READABLE_AUTH_COOKIES=true`; production must disable it and rely on the server-cookie route handlers.
 - Do not add new auth persistence paths without checking `AuthProvider`, `auth.store.ts`, and `api/auth/session-recovery.ts` together.
 - Use hard navigation for cross-origin jumps back to `app/documents`
 - Preserve the distinction between full-token and limited-token experiences
