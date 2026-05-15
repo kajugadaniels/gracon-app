@@ -41,13 +41,14 @@ This application handles account onboarding, login, email verification, password
 - Axios auth recovery uses one retry for expired access tokens and can upgrade limited sessions through `/auth/session/upgrade` when identity verification is required
 - Cross-app auth is moving to a server-owned cookie contract. Production must rely on `HttpOnly`, `Secure`, parent-domain cookies for real credentials; JavaScript-readable `g360_at`/`g360_rt` cookies are development compatibility only and are blocked in production unless explicitly enabled.
 - `session_active` remains a non-sensitive session hint only. It must never be treated as proof of authentication without server validation.
-- Cross-app redirect handling for `app/documents` return flows
+- Cross-app redirect handling for `app/documents` return flows uses exact-origin allowlisting. Never use prefix checks for external return URLs.
 - Limited-token vs full-token user journeys
 - Personal-account onboarding sends users from email verification directly into identity verification with a temporary limited session, then returns them to login after identity verification passes
 - Verification routing only allows external returns to the configured documents origin; invalid or foreign `next` values fall back to `/dashboard`
 - Local verification component stack in `src/components/pages/verification/shared`
 - Silent refresh through Next.js route handlers
 - Local `/api/me`, `/api/refresh`, and `/api/logout` route handlers are the transition point toward server-owned sessions. In production they keep refresh credentials in `HttpOnly` cookies; development can still opt into the previous readable-cookie path.
+- Logout must flow through local `/api/logout` first so parent-domain session cookies are cleared for every Gracon subdomain before the user is returned to login.
 - Shared `AppLoadingState` keeps auth/session, profile, logout, and digital-signature loading states visually consistent while `PremiumLoader` remains for small button-level spinners
 - Route-level loading, error, and not-found recovery screens are defined for root, auth, protected workspace, digital-signature setup, identity verification, and public signature verification surfaces
 - Regression tests cover verification routing, auth session recovery, identity-verification redirects, and token cleanup helpers
@@ -116,18 +117,22 @@ Key variables:
 NEXT_PUBLIC_API_URL=http://localhost:3000/api/v1
 NEXT_PUBLIC_SIGNATURE_API_URL=http://localhost:3002/api/v1
 NEXT_PUBLIC_DOCS_URL=http://localhost:4002
-NEXT_PUBLIC_AUTH_COOKIE_DOMAIN=
-NEXT_PUBLIC_AUTH_COOKIE_SECURE=false
-NEXT_PUBLIC_AUTH_COOKIE_SAME_SITE=lax
-NEXT_PUBLIC_AUTH_ACCESS_TOKEN_TTL=15m
-NEXT_PUBLIC_AUTH_REFRESH_TOKEN_TTL=1d
-NEXT_PUBLIC_ALLOW_DEV_READABLE_AUTH_COOKIES=true
+NEXT_PUBLIC_AUTH_ALLOWED_REDIRECT_ORIGINS=http://localhost:4002
+AUTH_ALLOWED_REDIRECT_ORIGINS=http://localhost:4002
+AUTH_COOKIE_DOMAIN=
+AUTH_COOKIE_SECURE=false
+AUTH_COOKIE_SAME_SITE=lax
+AUTH_ACCESS_TOKEN_TTL=15m
+AUTH_REFRESH_TOKEN_TTL=1d
+AUTH_REFRESH_ROTATION=true
+AUTH_REUSE_DETECTION=true
+ALLOW_DEV_READABLE_AUTH_COOKIES=true
 ```
 
 For production, use a parent domain such as `.gracon360.com`, set
-`NEXT_PUBLIC_AUTH_COOKIE_SECURE=true`, and leave
-`NEXT_PUBLIC_ALLOW_DEV_READABLE_AUTH_COOKIES=false`. Access tokens should stay
-short-lived; use the refresh/session lifetime for daily re-authentication.
+`AUTH_COOKIE_SECURE=true`, and leave `ALLOW_DEV_READABLE_AUTH_COOKIES=false`.
+Access tokens should stay short-lived. Refresh tokens may use a one-day lifetime,
+but should rotate on every refresh and reject reuse server-side.
 
 ## Integration Boundaries
 
@@ -142,6 +147,7 @@ short-lived; use the refresh/session lifetime for daily re-authentication.
 - Keep the development auth path intact. Local development may use `NEXT_PUBLIC_ALLOW_DEV_READABLE_AUTH_COOKIES=true`; production must disable it and rely on the server-cookie route handlers.
 - Do not add new auth persistence paths without checking `AuthProvider`, `auth.store.ts`, and `api/auth/session-recovery.ts` together.
 - Use hard navigation for cross-origin jumps back to `app/documents`
+- Validate cross-app `next` values with exact origins only. Lookalike domains such as `documents.gracon360.com.evil.test` must fall back to `/dashboard`.
 - Preserve the distinction between full-token and limited-token experiences
 - Keep verification logic local to this app now that the shared package has been rolled back
 - Use `AppLoadingState` for page and panel loading. Avoid adding new inline full-page spinner wrappers.
