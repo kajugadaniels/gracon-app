@@ -1,7 +1,6 @@
 /**
- * Shared navigation constants for the sidebar and navbar.
- * NAV_ITEMS drives AppSidebar (SVG icon components, exact/external flags).
- * NAV_LINKS drives Navbar (emoji icons, simple href + label).
+ * Shared product navigation for the protected app shell.
+ * Items marked as `comingSoon` should never navigate; the topbar shows a toast.
  */
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -16,13 +15,8 @@ export interface NavItem {
     exact: boolean;
     /** When true, opens in a new tab and is never marked active. */
     external: boolean;
-}
-
-/** A single navbar navigation link (emoji icon variant). */
-export interface NavLink {
-    href: string;
-    label: string;
-    icon: string;
+    /** When true, show a non-blocking unavailable message instead of navigating. */
+    comingSoon?: boolean;
 }
 
 // ─── Sidebar icons ────────────────────────────────────────────────────────────
@@ -70,6 +64,47 @@ function IconDocument() {
     );
 }
 
+function IconSpreadsheet() {
+    return (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="4" width="18" height="16" rx="2" />
+            <path d="M3 10h18M9 4v16M15 4v16" />
+        </svg>
+    );
+}
+
+function IconLand() {
+    return (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 18 9 7l5 11 3-7 3 7" />
+            <path d="M3 18h18" />
+            <circle cx="9" cy="7" r="2" />
+        </svg>
+    );
+}
+
+function IconBanking() {
+    return (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 10h18L12 4 3 10Z" />
+            <path d="M5 10v8M9 10v8M15 10v8M19 10v8M4 18h16M3 21h18" />
+        </svg>
+    );
+}
+
+function IconTasks() {
+    return (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 6h11M9 12h11M9 18h11" />
+            <path d="m4 6 1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2" />
+        </svg>
+    );
+}
+
 // ─── NAV_ITEMS — sidebar ──────────────────────────────────────────────────────
 
 export const NAV_ITEMS: NavItem[] = [
@@ -83,12 +118,8 @@ export const NAV_ITEMS: NavItem[] = [
         exact: false,
         external: true,
     },
-];
-
-// ─── NAV_LINKS — navbar ───────────────────────────────────────────────────────
-
-export const NAV_LINKS: NavLink[] = [
-    { href: '/dashboard',         label: 'Dashboard',         icon: '🏠' },
-    { href: '/profile/signature', label: 'Digital Signature', icon: '📜' },
-    { href: '/profile',           label: 'Profile',           icon: '👤' },
+    { href: '/spreadsheet', label: 'Spreadsheet', Icon: IconSpreadsheet, exact: false, external: false, comingSoon: true },
+    { href: '/land', label: 'Land', Icon: IconLand, exact: false, external: false, comingSoon: true },
+    { href: '/banking', label: 'Banking', Icon: IconBanking, exact: false, external: false, comingSoon: true },
+    { href: '/tasks', label: 'Task Management', Icon: IconTasks, exact: false, external: false, comingSoon: true },
 ];
