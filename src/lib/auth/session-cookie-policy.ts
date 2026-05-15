@@ -6,7 +6,7 @@ const DEFAULT_REFRESH_TOKEN_COOKIE = 'g360_rt';
 
 type CookieSameSite = 'Strict' | 'Lax' | 'None';
 
-function getPublicEnv(name: string): string | undefined {
+function getEnv(name: string): string | undefined {
     return process.env[name]?.trim() || undefined;
 }
 
@@ -34,31 +34,46 @@ function normalizeSameSite(value: string | undefined): CookieSameSite {
 
 export const authCookiePolicy = {
     accessCookieName:
-        getPublicEnv('NEXT_PUBLIC_AUTH_ACCESS_COOKIE_NAME') ?? DEFAULT_ACCESS_TOKEN_COOKIE,
+        getEnv('AUTH_ACCESS_COOKIE_NAME') ??
+        getEnv('NEXT_PUBLIC_AUTH_ACCESS_COOKIE_NAME') ??
+        DEFAULT_ACCESS_TOKEN_COOKIE,
     refreshCookieName:
-        getPublicEnv('NEXT_PUBLIC_AUTH_REFRESH_COOKIE_NAME') ?? DEFAULT_REFRESH_TOKEN_COOKIE,
+        getEnv('AUTH_REFRESH_COOKIE_NAME') ??
+        getEnv('NEXT_PUBLIC_AUTH_REFRESH_COOKIE_NAME') ??
+        DEFAULT_REFRESH_TOKEN_COOKIE,
     sessionHintCookieName:
-        getPublicEnv('NEXT_PUBLIC_AUTH_SESSION_HINT_COOKIE_NAME') ??
+        getEnv('AUTH_SESSION_HINT_COOKIE_NAME') ??
+        getEnv('NEXT_PUBLIC_AUTH_SESSION_HINT_COOKIE_NAME') ??
         DEFAULT_SESSION_HINT_COOKIE,
-    cookieDomain: getPublicEnv('NEXT_PUBLIC_AUTH_COOKIE_DOMAIN'),
+    cookieDomain:
+        getEnv('AUTH_COOKIE_DOMAIN') ?? getEnv('NEXT_PUBLIC_AUTH_COOKIE_DOMAIN'),
     cookieSameSite: normalizeSameSite(
-        getPublicEnv('NEXT_PUBLIC_AUTH_COOKIE_SAME_SITE'),
+        getEnv('AUTH_COOKIE_SAME_SITE') ?? getEnv('NEXT_PUBLIC_AUTH_COOKIE_SAME_SITE'),
     ),
     cookieSecure:
-        getPublicEnv('NEXT_PUBLIC_AUTH_COOKIE_SECURE') === 'true' ||
+        getEnv('AUTH_COOKIE_SECURE') === 'true' ||
+        getEnv('NEXT_PUBLIC_AUTH_COOKIE_SECURE') === 'true' ||
         process.env.NODE_ENV === 'production',
     accessTokenMaxAgeSeconds: parseDurationSeconds(
-        getPublicEnv('NEXT_PUBLIC_AUTH_ACCESS_TOKEN_TTL'),
+        getEnv('AUTH_ACCESS_TOKEN_TTL') ?? getEnv('NEXT_PUBLIC_AUTH_ACCESS_TOKEN_TTL'),
         DEFAULT_ACCESS_TOKEN_TTL,
     ),
     refreshTokenMaxAgeSeconds: parseDurationSeconds(
-        getPublicEnv('NEXT_PUBLIC_AUTH_REFRESH_TOKEN_TTL'),
+        getEnv('AUTH_REFRESH_TOKEN_TTL') ?? getEnv('NEXT_PUBLIC_AUTH_REFRESH_TOKEN_TTL'),
         DEFAULT_REFRESH_TOKEN_TTL,
     ),
+    refreshRotationRequired:
+        (getEnv('AUTH_REFRESH_ROTATION') ??
+            getEnv('NEXT_PUBLIC_AUTH_REFRESH_ROTATION')) !== 'false',
+    refreshReuseDetectionRequired:
+        (getEnv('AUTH_REUSE_DETECTION') ??
+            getEnv('NEXT_PUBLIC_AUTH_REUSE_DETECTION')) !== 'false',
 };
 
 export function shouldAllowReadableAuthTokenCookies(): boolean {
-    const explicit = getPublicEnv('NEXT_PUBLIC_ALLOW_DEV_READABLE_AUTH_COOKIES');
+    const explicit =
+        getEnv('ALLOW_DEV_READABLE_AUTH_COOKIES') ??
+        getEnv('NEXT_PUBLIC_ALLOW_DEV_READABLE_AUTH_COOKIES');
 
     if (explicit === 'true') return true;
     if (explicit === 'false') return false;
