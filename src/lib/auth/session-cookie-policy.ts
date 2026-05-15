@@ -57,7 +57,7 @@ export const authCookiePolicy = {
     ),
 };
 
-function shouldAllowReadableAuthTokenCookies(): boolean {
+export function shouldAllowReadableAuthTokenCookies(): boolean {
     const explicit = getPublicEnv('NEXT_PUBLIC_ALLOW_DEV_READABLE_AUTH_COOKIES');
 
     if (explicit === 'true') return true;
