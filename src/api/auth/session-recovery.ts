@@ -146,7 +146,9 @@ function applySessionCookies(accessToken: string, refreshToken: string): void {
 
 function persistTokens(accessToken: string, refreshToken: string): void {
     writeSessionValue('av_at', accessToken);
-    writeSessionValue('av_rt', refreshToken);
+    if (refreshToken) {
+        writeSessionValue('av_rt', refreshToken);
+    }
     applySessionCookies(accessToken, refreshToken);
 
     try {
@@ -209,6 +211,26 @@ export function isIdentityVerificationError(error: AxiosError): boolean {
 
 export async function refreshStoredSession(): Promise<string | null> {
     const refreshToken = getStoredRefreshToken();
+    if (!refreshToken && typeof window !== 'undefined') {
+        try {
+            const response = await fetch('/api/refresh', {
+                method: 'POST',
+                credentials: 'include',
+                cache: 'no-store',
+            });
+
+            if (!response.ok) return null;
+
+            const tokens = extractTokenResponse(await response.json());
+            if (!tokens.accessToken) return null;
+
+            persistTokens(tokens.accessToken, tokens.refreshToken ?? '');
+            return tokens.accessToken;
+        } catch {
+            return null;
+        }
+    }
+
     if (!refreshToken) return null;
 
     try {
