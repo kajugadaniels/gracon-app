@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { authCookiePolicy } from '@/lib/auth/session-cookie-policy';
+import {
+    authCookiePolicy,
+    shouldAllowReadableAuthTokenCookies,
+} from '@/lib/auth/session-cookie-policy';
 
 const AUTH_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000/api/v1';
 
@@ -39,7 +42,7 @@ export async function POST(req: NextRequest) {
             path: '/',
             sameSite,
             secure: authCookiePolicy.cookieSecure,
-            httpOnly: true,
+            httpOnly: !shouldAllowReadableAuthTokenCookies(),
             domain: authCookiePolicy.cookieDomain,
         });
         response.cookies.set(authCookiePolicy.refreshCookieName, newRefreshToken, {
@@ -47,7 +50,7 @@ export async function POST(req: NextRequest) {
             path: '/',
             sameSite,
             secure: authCookiePolicy.cookieSecure,
-            httpOnly: true,
+            httpOnly: !shouldAllowReadableAuthTokenCookies(),
             domain: authCookiePolicy.cookieDomain,
         });
         return response;
