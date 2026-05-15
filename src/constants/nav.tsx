@@ -9,6 +9,7 @@
 export interface NavItem {
     href: string;
     label: string;
+    description: string;
     /** React component that renders the SVG icon. */
     Icon: () => React.ReactElement;
     /** When true, only highlight this item on an exact pathname match. */
@@ -29,16 +30,6 @@ function IconDashboard() {
             <rect x="14" y="3" width="7" height="7" rx="1.5" />
             <rect x="3" y="14" width="7" height="7" rx="1.5" />
             <rect x="14" y="14" width="7" height="7" rx="1.5" />
-        </svg>
-    );
-}
-
-function IconProfile() {
-    return (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="8" r="4" />
-            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
         </svg>
     );
 }
@@ -108,18 +99,64 @@ function IconTasks() {
 // ─── NAV_ITEMS — sidebar ──────────────────────────────────────────────────────
 
 export const NAV_ITEMS: NavItem[] = [
-    { href: '/dashboard',         label: 'Dashboard',         Icon: IconDashboard, exact: true,  external: false },
-    { href: '/profile',           label: 'Profile',           Icon: IconProfile,   exact: true,  external: false },
-    { href: '/profile/signature', label: 'Digital Signature', Icon: IconSignature, exact: false, external: false },
+    {
+        href: '/dashboard',
+        label: 'Dashboard',
+        description: 'Your Gracon 360 workspace overview.',
+        Icon: IconDashboard,
+        exact: true,
+        external: false,
+    },
+    {
+        href: '/signature',
+        label: 'Digital Signature',
+        description: 'Manage your signing keys, certificate, and visible signature image.',
+        Icon: IconSignature,
+        exact: false,
+        external: false,
+    },
     {
         href: process.env.NEXT_PUBLIC_DOCS_URL ?? 'http://localhost:4002/documents',
         label: 'Documents',
+        description: 'Open the documents workspace in the Gracon 360 document app.',
         Icon: IconDocument,
         exact: false,
         external: true,
     },
-    { href: '/spreadsheet', label: 'Spreadsheet', Icon: IconSpreadsheet, exact: false, external: false, comingSoon: true },
-    { href: '/land', label: 'Land', Icon: IconLand, exact: false, external: false, comingSoon: true },
-    { href: '/banking', label: 'Banking', Icon: IconBanking, exact: false, external: false, comingSoon: true },
-    { href: '/tasks', label: 'Task Management', Icon: IconTasks, exact: false, external: false, comingSoon: true },
+    {
+        href: '/spreadsheet',
+        label: 'Spreadsheet',
+        description: 'Structured spreadsheet workflows are coming soon.',
+        Icon: IconSpreadsheet,
+        exact: false,
+        external: false,
+        comingSoon: true,
+    },
+    {
+        href: '/land',
+        label: 'Land',
+        description: 'Land registry and property workflows are coming soon.',
+        Icon: IconLand,
+        exact: false,
+        external: false,
+        comingSoon: true,
+    },
+    {
+        href: '/banking',
+        label: 'Banking',
+        description: 'Banking and financial verification tools are coming soon.',
+        Icon: IconBanking,
+        exact: false,
+        external: false,
+        comingSoon: true,
+    },
+    {
+        href: '/tasks',
+        label: 'Task Management',
+        description: 'Task and approval workflow management is coming soon.',
+        Icon: IconTasks,
+        exact: false,
+        external: false,
+        comingSoon: true,
+    },
 ];
