@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/lib/store/auth.store';
-import { logoutApi } from '@/api/auth/logout.api';
 import { Button } from '@/components/ui';
 import { NAV_LINKS } from '@/constants/nav';
 import styles from './Navbar.module.css';
@@ -17,7 +16,12 @@ export function Navbar() {
 
   const handleLogout = async () => {
     try {
-      if (refreshToken) await logoutApi(refreshToken);
+      await fetch('/api/logout', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken }),
+      });
     } catch {
       // Logout always succeeds client-side even if the server call fails
     } finally {
