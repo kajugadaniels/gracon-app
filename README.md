@@ -158,6 +158,7 @@ but should rotate on every refresh and reject reuse server-side.
 - Keep browser titles consistent. Server routes should set metadata titles without the suffix; client-only routes should use `usePageTitle`.
 - Keep verification redirects constrained. Only the configured `NEXT_PUBLIC_DOCS_URL` origin should be allowed for external return URLs.
 - Keep digital-signature setup at `/signature` and keep its state explicit. Certificate request, active certificate, sanction status, and signature image should remain separate UI states.
+- Keep complex signature-page sections split into local components with their own `.module.css` files. The identity rail, setup workspace, and help rail should remain visually independent and easy to scan.
 - Prefer scoped CSS modules for new layout/page refactors. `globals.css` should stay limited to tokens, shared primitives, animations, and truly global shell behavior.
 - Keep route-level layout styles beside their routes in `.module.css` files. Avoid adding new page-shell, header, banner, or loading wrapper styles to `globals.css`.
 
