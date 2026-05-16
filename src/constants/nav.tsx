@@ -96,6 +96,17 @@ function IconTasks() {
     );
 }
 
+function IconMeetings() {
+    return (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="5" width="18" height="16" rx="2" />
+            <path d="M16 3v4M8 3v4M3 10h18" />
+            <path d="M8 14h3M8 17h6" />
+        </svg>
+    );
+}
+
 // ─── NAV_ITEMS — sidebar ──────────────────────────────────────────────────────
 
 export const NAV_ITEMS: NavItem[] = [
@@ -155,6 +166,15 @@ export const NAV_ITEMS: NavItem[] = [
         label: 'Task Management',
         description: 'Task and approval workflow management is coming soon.',
         Icon: IconTasks,
+        exact: false,
+        external: false,
+        comingSoon: true,
+    },
+    {
+        href: '/meetings',
+        label: 'Meetings',
+        description: 'Meeting scheduling, notes, and follow-up workflows are coming soon.',
+        Icon: IconMeetings,
         exact: false,
         external: false,
         comingSoon: true,
