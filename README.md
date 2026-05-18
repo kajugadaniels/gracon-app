@@ -49,6 +49,7 @@ This application handles account onboarding, login, email verification, password
 - Silent refresh through Next.js route handlers
 - Local `/api/me`, `/api/refresh`, and `/api/logout` route handlers are the transition point toward server-owned sessions. In production they keep refresh credentials in `HttpOnly` cookies; development can still opt into the previous readable-cookie path.
 - Logout must flow through local `/api/logout` first so parent-domain session cookies are cleared for every Gracon subdomain before the user is returned to login.
+- `/logout` is a public route in the identity-app proxy because document logout clears shared cookies before handing off to app/app. Never preserve `/logout` as a login `next` destination; login redirect safety must fall back to `/dashboard` for logout paths.
 - Shared `AppLoadingState` keeps auth/session, profile, logout, and digital-signature loading states visually consistent while `PremiumLoader` remains for small button-level spinners
 - Route-level loading, error, and not-found recovery screens are defined for root, auth, protected workspace, digital-signature setup, identity verification, and public signature verification surfaces
 - Regression tests cover verification routing, auth session recovery, identity-verification redirects, and token cleanup helpers
