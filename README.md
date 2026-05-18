@@ -23,7 +23,7 @@ This application handles account onboarding, login, email verification, password
 - Background certificate-state refresh while requests are pending or newly approved
 - Persistent certificate sanction banners showing revocation or access restriction reasons returned by `api/signature`
 - Public document verification page
-- Shared-login entry point for the documents app
+- Shared-login entry point for the documents and meetings apps
 
 ## Core Skills Needed
 
@@ -119,6 +119,7 @@ Key variables:
 NEXT_PUBLIC_API_URL=http://localhost:3000/api/v1
 NEXT_PUBLIC_SIGNATURE_API_URL=http://localhost:3002/api/v1
 NEXT_PUBLIC_DOCS_URL=http://localhost:4002
+NEXT_PUBLIC_MEETINGS_URL=http://localhost:4003/home
 NEXT_PUBLIC_AUTH_ALLOWED_REDIRECT_ORIGINS=http://localhost:4002
 AUTH_ALLOWED_REDIRECT_ORIGINS=http://localhost:4002
 AUTH_COOKIE_DOMAIN=
@@ -139,7 +140,7 @@ but should rotate on every refresh and reject reuse server-side.
 ## Integration Boundaries
 
 - Calls `api/auth` and `api/signature`
-- Acts as the login/verification destination for `app/documents`
+- Acts as the login/verification destination for `app/documents` and the shared login source for `app/meetings`
 - Must not absorb document-editor business logic
 
 ## Important Rules
@@ -148,7 +149,7 @@ but should rotate on every refresh and reject reuse server-side.
 - Production must not write refresh tokens to JavaScript-readable storage or cookies. During the migration, `sessionStorage` remains for the current API client, but cross-app authentication must move toward `HttpOnly` server-managed cookies.
 - Keep the development auth path intact. Local development may use `NEXT_PUBLIC_ALLOW_DEV_READABLE_AUTH_COOKIES=true`; production must disable it and rely on the server-cookie route handlers.
 - Do not add new auth persistence paths without checking `AuthProvider`, `auth.store.ts`, and `api/auth/session-recovery.ts` together.
-- Use hard navigation for cross-origin jumps back to `app/documents`
+- Use hard navigation for cross-origin jumps to `app/documents` and `app/meetings`
 - Keep the protected app shell topbar-first across desktop, laptop, tablet, and phone. New product entries should go through `src/constants/nav.tsx`.
 - Add short tooltips for navigation items and sensitive setup concepts. Tooltips should clarify purpose or consequence, not repeat the visible label.
 - Validate cross-app `next` values with exact origins only. Lookalike domains such as `documents.gracon360.com.evil.test` must fall back to `/dashboard`.
