@@ -1,3 +1,6 @@
+/**
+ * Regression coverage for login redirect allowlisting and blocked destinations.
+ */
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -38,6 +41,17 @@ test('login redirects reject unsafe and lookalike destinations', () => {
             { kind: 'internal', destination: '/dashboard' },
         );
     }
+});
+
+test('login redirects never return to logout after cross-app sign-out', () => {
+    assert.deepEqual(
+        resolveSafeLoginRedirect('/logout', 'http://localhost:4002'),
+        { kind: 'internal', destination: '/dashboard' },
+    );
+    assert.deepEqual(
+        resolveSafeLoginRedirect('/logout?next=/documents', 'http://localhost:4002'),
+        { kind: 'internal', destination: '/dashboard' },
+    );
 });
 
 test('login redirects allow configured extra origins only by exact origin', () => {
