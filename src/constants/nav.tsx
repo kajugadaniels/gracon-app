@@ -171,12 +171,11 @@ export const NAV_ITEMS: NavItem[] = [
         comingSoon: true,
     },
     {
-        href: '/meetings',
+        href: process.env.NEXT_PUBLIC_MEETINGS_URL ?? 'http://localhost:4003/home',
         label: 'Meetings',
-        description: 'Meeting scheduling, notes, and follow-up workflows are coming soon.',
+        description: 'Open the meetings workspace in the Gracon 360 meetings app.',
         Icon: IconMeetings,
         exact: false,
-        external: false,
-        comingSoon: true,
+        external: true,
     },
 ];
