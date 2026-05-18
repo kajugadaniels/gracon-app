@@ -1,3 +1,9 @@
+/**
+ * App-level route proxy for auth gating in the identity app.
+ *
+ * This file keeps public auth/session routes reachable without a session hint
+ * and redirects protected surfaces to login with a safe return destination.
+ */
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { authCookiePolicy } from '@/lib/auth/session-cookie-policy';
@@ -9,8 +15,13 @@ const AUTH_ROUTES = [
     '/verify',
     '/forgot-password',
     '/reset-password',
+    '/logout',
 ];
 
+/**
+ * Routes unauthenticated users away from protected pages while keeping logout
+ * public so cross-app sign-out cannot become a post-login redirect target.
+ */
 export function proxy(req: NextRequest) {
     const { pathname } = req.nextUrl;
     const hasSession = req.cookies.has(authCookiePolicy.sessionHintCookieName);
