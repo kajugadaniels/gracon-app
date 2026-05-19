@@ -12,16 +12,20 @@ export type VerificationRedirect =
 export function resolveMainAppVerificationRedirect(
     next: string | null,
     docsBase: string,
+    allowedOrigins: string[] = [],
 ): VerificationRedirect {
     if (!next) {
         return { kind: 'internal', destination: '/dashboard' };
     }
 
     try {
-        const docsUrl = new URL(docsBase);
+        const allowed = new Set([
+            new URL(docsBase).origin,
+            ...allowedOrigins.map((origin) => new URL(origin).origin),
+        ]);
         const targetUrl = new URL(next);
 
-        if (targetUrl.origin === docsUrl.origin) {
+        if (allowed.has(targetUrl.origin)) {
             return { kind: 'external', destination: targetUrl.toString() };
         }
     } catch {
