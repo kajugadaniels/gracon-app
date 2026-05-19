@@ -6,6 +6,17 @@ export type VerificationRedirect =
     | { kind: 'internal'; destination: '/dashboard' }
     | { kind: 'external'; destination: string };
 
+const BLOCKED_EXTERNAL_PATHS = new Set(['/logout']);
+
+/**
+ * Rejects cross-app routes that would immediately destroy the user's session
+ * after verification. This keeps `next` useful without letting a forged link
+ * turn a successful verification into a confusing logout loop.
+ */
+function isBlockedExternalDestination(url: URL): boolean {
+    return BLOCKED_EXTERNAL_PATHS.has(url.pathname);
+}
+
 /**
  * Resolves where the auth app should send the user after verification.
  */
@@ -25,7 +36,7 @@ export function resolveMainAppVerificationRedirect(
         ]);
         const targetUrl = new URL(next);
 
-        if (allowed.has(targetUrl.origin)) {
+        if (allowed.has(targetUrl.origin) && !isBlockedExternalDestination(targetUrl)) {
             return { kind: 'external', destination: targetUrl.toString() };
         }
     } catch {
