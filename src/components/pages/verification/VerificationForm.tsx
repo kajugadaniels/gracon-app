@@ -7,6 +7,7 @@ import { createVerificationFlowConfig } from './verification-flow-config';
 import { resolveMainAppVerificationRedirect } from './verification-routing';
 import { useVerificationFlow } from './use-verification-flow';
 import { toast } from '@/components/ui';
+import { parseAllowedRedirectOrigins } from '@/lib/auth/redirect-safety';
 import { useAuthStore } from '@/lib/store/auth.store';
 
 // ── Main component ────────────────────────────────────────────
@@ -49,6 +50,9 @@ export function VerificationForm() {
         const redirect = resolveMainAppVerificationRedirect(
             searchParams.get('next'),
             docsBase,
+            parseAllowedRedirectOrigins(
+                process.env.NEXT_PUBLIC_AUTH_ALLOWED_REDIRECT_ORIGINS,
+            ),
         );
 
         if (redirect.kind === 'external') {
