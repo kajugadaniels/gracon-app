@@ -47,12 +47,17 @@ export function VerificationForm() {
         }
 
         const docsBase = process.env.NEXT_PUBLIC_DOCS_URL ?? 'http://localhost:4002';
+        const meetingsBase =
+            process.env.NEXT_PUBLIC_MEETINGS_URL ?? 'http://localhost:4003/home';
         const redirect = resolveMainAppVerificationRedirect(
             searchParams.get('next'),
             docsBase,
-            parseAllowedRedirectOrigins(
-                process.env.NEXT_PUBLIC_AUTH_ALLOWED_REDIRECT_ORIGINS,
-            ),
+            [
+                meetingsBase,
+                ...parseAllowedRedirectOrigins(
+                    process.env.NEXT_PUBLIC_AUTH_ALLOWED_REDIRECT_ORIGINS,
+                ),
+            ],
         );
 
         if (redirect.kind === 'external') {
