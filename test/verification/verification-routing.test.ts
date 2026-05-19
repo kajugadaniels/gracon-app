@@ -22,6 +22,20 @@ test('allows redirects into the documents app only when origin matches docs base
     );
 });
 
+test('allows redirects into the meetings app when origin is configured', () => {
+    assert.deepEqual(
+        resolveMainAppVerificationRedirect(
+            'http://localhost:4003/home',
+            'http://localhost:4002',
+            ['http://localhost:4003/home'],
+        ),
+        {
+            kind: 'external',
+            destination: 'http://localhost:4003/home',
+        },
+    );
+});
+
 test('rejects invalid or foreign next urls', () => {
     assert.deepEqual(
         resolveMainAppVerificationRedirect(
@@ -45,6 +59,17 @@ test('rejects invalid or foreign next urls', () => {
         resolveMainAppVerificationRedirect(
             'http://localhost:4002.evil.example/invitations/abc',
             'http://localhost:4002',
+        ),
+        { kind: 'internal', destination: '/dashboard' },
+    );
+});
+
+test('rejects session-ending external return routes', () => {
+    assert.deepEqual(
+        resolveMainAppVerificationRedirect(
+            'http://localhost:4003/logout',
+            'http://localhost:4002',
+            ['http://localhost:4003/home'],
         ),
         { kind: 'internal', destination: '/dashboard' },
     );
