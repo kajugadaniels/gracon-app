@@ -20,6 +20,29 @@ type VerificationIdentityStepProps = {
     continueLabel?: string;
 };
 
+const NID_GROUP_LENGTHS = [1, 4, 1, 7, 1, 2] as const;
+const FORMATTED_NID_MAX_LENGTH = 21;
+
+/**
+ * Formats Rwanda's 16-digit National ID into readable fixed groups while
+ * keeping validation and submission backed by the original raw digits.
+ */
+function formatNationalId(value: string): string {
+    const digits = value.replace(/\D/g, '').slice(0, 16);
+    const groups: string[] = [];
+    let offset = 0;
+
+    for (const length of NID_GROUP_LENGTHS) {
+        const group = digits.slice(offset, offset + length);
+        if (!group) break;
+
+        groups.push(group);
+        offset += length;
+    }
+
+    return groups.join(' ');
+}
+
 const cardTitleStyle = {
     fontSize: 22,
     fontWeight: 700,
@@ -96,6 +119,8 @@ export function VerificationIdentityStep({
     hint = 'This must match the ID you used when registering',
     continueLabel = 'Continue',
 }: VerificationIdentityStepProps) {
+    const formattedValue = formatNationalId(value);
+
     function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
         onChange(event.target.value.replace(/\D/g, '').slice(0, 16));
     }
@@ -127,9 +152,9 @@ export function VerificationIdentityStep({
                     <label style={labelStyle}>{label}</label>
                     <input
                         type="text"
-                        value={value}
+                        value={formattedValue}
                         onChange={handleInputChange}
-                        maxLength={16}
+                        maxLength={FORMATTED_NID_MAX_LENGTH}
                         inputMode="numeric"
                         autoComplete="off"
                         required
