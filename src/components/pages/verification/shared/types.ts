@@ -7,6 +7,7 @@ export type VerificationChallengeMode = 'STANDARD' | 'INVITATION';
 export interface VerificationLockoutState {
     maxAttempts: number;
     attemptWindowHours: number;
+    attemptLimitEnabled?: boolean;
     retryAvailableAt: string | null;
     retryAfterSeconds: number | null;
 }
