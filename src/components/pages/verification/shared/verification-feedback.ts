@@ -51,6 +51,10 @@ export function getVerificationResultNotice(
         return null;
     }
 
+    if (result.lockout.attemptLimitEnabled === false) {
+        return null;
+    }
+
     if (result.attemptsRemaining > 0) {
         return {
             kind: 'attempts',
