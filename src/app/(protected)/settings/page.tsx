@@ -1,5 +1,5 @@
 /**
- * User settings page for cross-platform invitation defaults.
+ * Workspace settings page for cross-platform invitation defaults.
  */
 'use client';
 
@@ -18,6 +18,7 @@ import styles from './settings-page.module.css';
 const NO_VERIFICATION: UserInviteVerificationPreference = 'NO_VERIFICATION';
 const EMAIL_OTP: UserInviteVerificationPreference = 'EMAIL_OTP';
 const IDENTITY_VERIFICATION: UserInviteVerificationPreference = 'IDENTITY_VERIFICATION';
+
 const RECOMMENDED_DEFAULTS: UserPreferencesResponse = {
     defaultDocumentInviteVerifications: [NO_VERIFICATION],
     defaultMeetingInviteVerifications: [NO_VERIFICATION],
@@ -136,11 +137,11 @@ export default function SettingsPage() {
     }
 
     return (
-        <div className={styles.page}>
-            <section className={styles.hero}>
+        <section className={styles.sectionPanel} aria-label="Workspace settings">
+            <div className={styles.panelHero}>
                 <div>
                     <p className={styles.eyebrow}>Workspace settings</p>
-                    <h1>Choose the invitation defaults you want Gracon to remember.</h1>
+                    <h1>Choose the invitation defaults Gracon should remember.</h1>
                     <p>
                         These defaults preselect document and meeting invitation checks. Login is
                         always required, and each workspace still enforces its own access rules.
@@ -170,9 +171,9 @@ export default function SettingsPage() {
                         </Button>
                     </div>
                 </div>
-            </section>
+            </div>
 
-            <section className={styles.grid} aria-label="Invitation defaults">
+            <section className={styles.preferenceGrid} aria-label="Invitation defaults">
                 <PreferenceCard
                     title="Document invitations"
                     description="Used when you share a document from the document workspace."
@@ -195,7 +196,7 @@ export default function SettingsPage() {
                     off for that workspace.
                 </p>
             </aside>
-        </div>
+        </section>
     );
 }
 
