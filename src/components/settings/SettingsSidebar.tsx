@@ -12,11 +12,13 @@ const SETTINGS_LINKS = [
         href: '/settings/profile',
         label: 'Profile',
         description: 'Account, identity, and security details.',
+        Icon: IconProfile,
     },
     {
         href: '/settings',
         label: 'Workspace settings',
         description: 'Default checks for invitations.',
+        Icon: IconWorkspace,
     },
 ] as const;
 
@@ -29,13 +31,17 @@ export function SettingsSidebar() {
     return (
         <aside className={styles.sidebar} aria-label="Settings navigation">
             <div className={styles.header}>
-                <p>Settings</p>
-                <h1>Account controls</h1>
+                <span className={styles.headerMark}>S</span>
+                <div>
+                    <p>Settings</p>
+                    <h1>Account controls</h1>
+                </div>
             </div>
 
             <nav className={styles.nav} aria-label="Settings sections">
                 {SETTINGS_LINKS.map((link) => {
                     const active = pathname === link.href;
+                    const Icon = link.Icon;
                     return (
                         <Link
                             key={link.href}
@@ -46,12 +52,43 @@ export function SettingsSidebar() {
                             ].filter(Boolean).join(' ')}
                             aria-current={active ? 'page' : undefined}
                         >
-                            <span>{link.label}</span>
-                            <small>{link.description}</small>
+                            <span className={styles.itemIcon} aria-hidden="true">
+                                <Icon />
+                            </span>
+                            <span className={styles.itemCopy}>
+                                <strong>{link.label}</strong>
+                                <small>{link.description}</small>
+                            </span>
                         </Link>
                     );
                 })}
             </nav>
+
+            <div className={styles.footerNote}>
+                <span />
+                <p>Changes here become the default across connected Gracon workspaces.</p>
+            </div>
         </aside>
+    );
+}
+
+function IconProfile() {
+    return (
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20 21a8 8 0 0 0-16 0" />
+            <circle cx="12" cy="7" r="4" />
+        </svg>
+    );
+}
+
+function IconWorkspace() {
+    return (
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="4" width="18" height="16" rx="3" />
+            <path d="M8 9h8M8 13h5" />
+            <path d="M16 17h1" />
+        </svg>
     );
 }
