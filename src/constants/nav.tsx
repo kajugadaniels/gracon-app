@@ -107,16 +107,6 @@ function IconMeetings() {
     );
 }
 
-function IconSettings() {
-    return (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5Z" />
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 8.92 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.21.63.8 1 1.51 1H21a2 2 0 0 1 0 4h-.09c-.7 0-1.3.37-1.51 1Z" />
-        </svg>
-    );
-}
-
 // ─── NAV_ITEMS — sidebar ──────────────────────────────────────────────────────
 
 export const NAV_ITEMS: NavItem[] = [
@@ -187,13 +177,5 @@ export const NAV_ITEMS: NavItem[] = [
         Icon: IconMeetings,
         exact: false,
         external: true,
-    },
-    {
-        href: '/settings',
-        label: 'Settings',
-        description: 'Control your default document and meeting invitation checks.',
-        Icon: IconSettings,
-        exact: false,
-        external: false,
     },
 ];
