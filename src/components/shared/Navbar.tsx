@@ -1,8 +1,14 @@
+/**
+ * Responsive authenticated top navigation for app/app.
+ *
+ * The header keeps product navigation separate from the account dropdown so
+ * the signed-in user controls stay compact and consistent with sibling apps.
+ */
 'use client';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuthStore } from '@/lib/store/auth.store';
 import { normalizeImageUrl } from '@/lib/normalize-image-url';
 import { NAV_ITEMS, type NavItem } from '@/constants/nav';
@@ -43,14 +49,28 @@ function getInitials(postNames?: string, surName?: string) {
     return `${first}${second}`.toUpperCase() || 'G';
 }
 
+/** Renders the protected application navbar with avatar-only account controls. */
 export function Navbar() {
     const pathname = usePathname();
     const { user, refreshToken, clearAuth } = useAuthStore();
     const [menuOpen, setMenuOpen] = useState(false);
+    const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+    const accountMenuRef = useRef<HTMLDivElement>(null);
 
     const displayName = user ? `${user.postNames} ${user.surName}`.trim() : 'Account';
     const profileImageUrl = normalizeImageUrl(user?.imageUrl);
     const initials = getInitials(user?.postNames, user?.surName);
+
+    useEffect(() => {
+        const handlePointerDown = (event: MouseEvent) => {
+            if (!accountMenuRef.current?.contains(event.target as Node)) {
+                setAccountMenuOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handlePointerDown);
+        return () => document.removeEventListener('mousedown', handlePointerDown);
+    }, []);
 
     const handleLogout = async () => {
         try {
@@ -98,24 +118,55 @@ export function Navbar() {
                 </div>
 
                 <div className={styles.accountCluster}>
-                    <Link href="/profile" className={styles.userPill}>
-                        <span className={styles.avatar}>
-                            {profileImageUrl ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img src={profileImageUrl} alt={displayName} className={styles.avatarImage} />
-                            ) : (
-                                initials
-                            )}
-                        </span>
-                        <span className={styles.userText}>
-                            <span className={styles.userName}>{displayName}</span>
-                            <span className={styles.userEmail}>{user?.email ?? 'Signed in'}</span>
-                        </span>
-                    </Link>
+                    <div ref={accountMenuRef} className={styles.accountMenu}>
+                        <button
+                            className={styles.avatarButton}
+                            type="button"
+                            title={displayName}
+                            aria-label="Open account menu"
+                            aria-expanded={accountMenuOpen}
+                            aria-haspopup="menu"
+                            onClick={() => setAccountMenuOpen((open) => !open)}
+                        >
+                            <span className={styles.avatar}>
+                                {profileImageUrl ? (
+                                    // eslint-disable-next-line @next/next/no-img-element
+                                    <img src={profileImageUrl} alt={displayName} className={styles.avatarImage} />
+                                ) : (
+                                    initials
+                                )}
+                            </span>
+                        </button>
 
-                    <button className={styles.logoutButton} type="button" onClick={handleLogout} aria-label="Log out">
-                        <IconLogout />
-                    </button>
+                        {accountMenuOpen ? (
+                            <div className={styles.accountDropdown} role="menu">
+                                <div className={styles.accountProfile}>
+                                    <span className={styles.dropdownAvatar}>
+                                        {profileImageUrl ? (
+                                            // eslint-disable-next-line @next/next/no-img-element
+                                            <img src={profileImageUrl} alt="" className={styles.avatarImage} />
+                                        ) : (
+                                            initials
+                                        )}
+                                    </span>
+                                    <div className={styles.accountCopy}>
+                                        <p>{displayName}</p>
+                                        <span>{user?.email ?? 'Signed in'}</span>
+                                    </div>
+                                </div>
+
+                                <button
+                                    className={styles.accountItemDanger}
+                                    type="button"
+                                    role="menuitem"
+                                    onClick={handleLogout}
+                                >
+                                    <IconLogout />
+                                    <span>Sign out</span>
+                                </button>
+                            </div>
+                        ) : null}
+                    </div>
 
                     <button
                         className={styles.menuButton}
