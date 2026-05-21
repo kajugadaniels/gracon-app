@@ -57,7 +57,7 @@ This application handles account onboarding, login, email verification, password
 - Root metadata owns the `"%s | Gracon 360"` title template; client-only protected pages use `usePageTitle`
 - Digital-signature setup loads key-pair, certificate, request status, sanction status, and signature image together; pending or newly approved certificate state refreshes in the background
 - Protected workspace navigation is a responsive topbar. Do not reintroduce the old sidebar shell; unavailable product modules should use non-blocking coming-soon feedback.
-- Settings at `/settings` lets users choose their default invitation verification behavior for document and meeting shares. The default is `No extra verification`; choosing it disables email and identity checks until the user turns it off or selects a stricter gate.
+- Settings at `/settings` lives in the account avatar dropdown, not the primary product navigation. It lets users choose their default invitation verification behavior for document and meeting shares. The default is `No extra verification`; choosing it disables email and identity checks until the user turns it off or selects a stricter gate.
 - High-risk route styling is moving out of `globals.css` and inline objects into scoped CSS modules; protected layout, auth layout, profile page, digital-signature page, identity-verification page, public signature verification, and shared topbar chrome now own their styles locally
 
 ## Main Areas
