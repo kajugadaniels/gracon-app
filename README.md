@@ -24,6 +24,7 @@ This application handles account onboarding, login, email verification, password
 - Persistent certificate sanction banners showing revocation or access restriction reasons returned by `api/signature`
 - Public document verification page
 - Shared-login entry point for the documents and meetings apps
+- User-owned default invitation verification settings for documents and meetings
 
 ## Core Skills Needed
 
@@ -56,6 +57,7 @@ This application handles account onboarding, login, email verification, password
 - Root metadata owns the `"%s | Gracon 360"` title template; client-only protected pages use `usePageTitle`
 - Digital-signature setup loads key-pair, certificate, request status, sanction status, and signature image together; pending or newly approved certificate state refreshes in the background
 - Protected workspace navigation is a responsive topbar. Do not reintroduce the old sidebar shell; unavailable product modules should use non-blocking coming-soon feedback.
+- Settings at `/settings` lets users choose their default invitation verification behavior for document and meeting shares. The default is `No extra verification`; choosing it disables email and identity checks until the user turns it off or selects a stricter gate.
 - High-risk route styling is moving out of `globals.css` and inline objects into scoped CSS modules; protected layout, auth layout, profile page, digital-signature page, identity-verification page, public signature verification, and shared topbar chrome now own their styles locally
 
 ## Main Areas
@@ -63,7 +65,7 @@ This application handles account onboarding, login, email verification, password
 ```text
 src/app/
   (auth)/         login, register, verify-email, forgot/reset-password
-  (protected)/    dashboard, profile, signature, verify-identity
+  (protected)/    dashboard, profile, settings, signature, verify-identity
   api/            local refresh and current-user handlers
   verify/         public document-authenticity page
 components/
@@ -158,6 +160,7 @@ but should rotate on every refresh and reject reuse server-side.
 - Use `AppLoadingState` for page and panel loading. Avoid adding new inline full-page spinner wrappers.
 - Add or update route-level `loading.tsx`, `error.tsx`, and `not-found.tsx` when introducing high-risk route segments. Use `RouteRecoveryState` for lightweight retry and navigation recovery UI.
 - Keep browser titles consistent. Server routes should set metadata titles without the suffix; client-only routes should use `usePageTitle`.
+- Keep cross-platform defaults user-owned. Document and meeting apps may consume `/users/preferences` to preselect invitation gates, but final permission and verification enforcement stays in each domain backend.
 - Keep verification redirects constrained. Only `NEXT_PUBLIC_DOCS_URL`, `NEXT_PUBLIC_MEETINGS_URL`, and exact origins listed in `NEXT_PUBLIC_AUTH_ALLOWED_REDIRECT_ORIGINS` should be allowed for external return URLs.
 - Keep digital-signature setup at `/signature` and keep its state explicit. Certificate request, active certificate, sanction status, and signature image should remain separate UI states.
 - Keep complex signature-page sections split into local components with their own `.module.css` files. The identity rail, setup workspace, and help rail should remain visually independent and easy to scan.
