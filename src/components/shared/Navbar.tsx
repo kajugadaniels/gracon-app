@@ -43,6 +43,16 @@ function IconLogout() {
     );
 }
 
+function IconSettings() {
+    return (
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5Z" />
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 8.92 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.21.63.8 1 1.51 1H21a2 2 0 0 1 0 4h-.09c-.7 0-1.3.37-1.51 1Z" />
+        </svg>
+    );
+}
+
 function getInitials(postNames?: string, surName?: string) {
     const first = postNames?.trim().charAt(0) ?? '';
     const second = surName?.trim().charAt(0) ?? '';
@@ -169,6 +179,19 @@ export function Navbar() {
                                         <span>{user?.email ?? 'Signed in'}</span>
                                     </div>
                                 </div>
+
+                                <Link
+                                    className={styles.accountItem}
+                                    href="/settings"
+                                    role="menuitem"
+                                    onClick={() => {
+                                        setAccountMenuOpen(false);
+                                        setMenuOpen(false);
+                                    }}
+                                >
+                                    <IconSettings />
+                                    <span>Settings</span>
+                                </Link>
 
                                 <button
                                     className={styles.accountItemDanger}
