@@ -63,11 +63,6 @@ export function SettingsSidebar() {
                     );
                 })}
             </nav>
-
-            <div className={styles.footerNote}>
-                <span />
-                <p>Changes here become the default across connected Gracon workspaces.</p>
-            </div>
         </aside>
     );
 }
