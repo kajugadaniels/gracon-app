@@ -59,6 +59,7 @@ export function SettingsSidebar() {
                                 <strong>{link.label}</strong>
                                 <small>{link.description}</small>
                             </span>
+                            {active ? <span className={styles.itemStatus}>Current</span> : null}
                         </Link>
                     );
                 })}
