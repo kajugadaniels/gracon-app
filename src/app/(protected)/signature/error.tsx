@@ -18,7 +18,7 @@ export default function SignatureError({
             minHeight="520px"
             actions={[
                 { label: 'Try again', onClick: reset, variant: 'primary' },
-                { label: 'Back to profile', href: '/profile' },
+                { label: 'Back to profile', href: '/settings/profile' },
             ]}
         />
     );
