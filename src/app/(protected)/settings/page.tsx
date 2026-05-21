@@ -10,7 +10,7 @@ import {
     type UserInviteVerificationPreference,
     type UserPreferencesResponse,
 } from '@/api/users';
-import { AppLoadingState, Button, toast } from '@/components/ui';
+import { AppLoadingState, toast } from '@/components/ui';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePageTitle } from '@/lib/hooks/usePageTitle';
 import styles from './settings-page.module.css';
@@ -141,34 +141,33 @@ export default function SettingsPage() {
             <div className={styles.panelHero}>
                 <div>
                     <p className={styles.eyebrow}>Workspace settings</p>
-                    <h1>Choose the invitation defaults Gracon should remember.</h1>
+                    <h1>Invitation defaults</h1>
                     <p>
-                        These defaults preselect document and meeting invitation checks. Login is
-                        always required, and each workspace still enforces its own access rules.
+                        Choose the verification checks Gracon should preselect when you invite
+                        people to documents or meetings.
                     </p>
                 </div>
                 <div className={styles.savePanel}>
-                    <span>{hasChanges ? 'Unsaved changes' : 'Settings are current'}</span>
+                    <span className={hasChanges ? styles.saveDirty : styles.saveClean}>
+                        {hasChanges ? 'Unsaved changes' : 'Saved'}
+                    </span>
                     <div className={styles.saveActions}>
-                        <Button
+                        <button
+                            className={styles.secondaryAction}
                             type="button"
-                            variant="ghost"
-                            size="sm"
                             onClick={resetToRecommended}
                             disabled={savingPreferences}
                         >
                             Reset defaults
-                        </Button>
-                        <Button
+                        </button>
+                        <button
+                            className={styles.primaryAction}
                             type="button"
-                            size="sm"
-                            loading={savingPreferences}
-                            loadingText="Saving..."
                             disabled={!hasChanges || savingPreferences}
                             onClick={handleSave}
                         >
-                            Save settings
-                        </Button>
+                            {savingPreferences ? 'Saving...' : 'Save changes'}
+                        </button>
                     </div>
                 </div>
             </div>
@@ -243,10 +242,12 @@ function PreferenceCard({
                                 disabled={disabled}
                                 onChange={() => onToggle(option.value)}
                             />
-                            <span className={styles.optionControl} aria-hidden="true" />
-                            <span>
+                            <span className={styles.optionText}>
                                 <strong>{option.label}</strong>
                                 <small>{option.description}</small>
+                            </span>
+                            <span className={styles.switch} aria-hidden="true">
+                                <span />
                             </span>
                         </label>
                     );
