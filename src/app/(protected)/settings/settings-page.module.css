@@ -1,30 +1,27 @@
 /**
  * Workspace settings page styles.
  */
-.sectionPanel,
-.card,
-.note {
-    border: 1px solid var(--color-border);
-    background: rgba(255, 255, 255, 0.78);
-    box-shadow: 0 14px 36px rgba(22, 16, 58, 0.06);
-}
-
 .sectionPanel {
     display: grid;
-    gap: 18px;
-    border-radius: 24px;
-    padding: clamp(18px, 2.5vw, 28px);
+    gap: 16px;
+    border: 1px solid var(--color-border);
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow: 0 14px 36px rgba(22, 16, 58, 0.06);
+    padding: clamp(16px, 2.2vw, 24px);
 }
 
 .panelHero {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(240px, 360px);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
     gap: 18px;
-    align-items: start;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(91, 35, 255, 0.1);
 }
 
 .eyebrow {
-    margin: 0 0 8px;
+    margin: 0 0 7px;
     color: var(--color-primary);
     font-size: 11px;
     font-weight: 850;
@@ -34,43 +31,115 @@
 }
 
 .panelHero h1 {
-    max-width: 820px;
+    max-width: 680px;
     margin: 0;
     color: var(--color-text-primary);
-    font-size: clamp(27px, 3vw, 42px);
+    font-size: clamp(25px, 2.4vw, 34px);
     font-weight: 850;
-    letter-spacing: -0.035em;
-    line-height: 1.08;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
 }
 
 .panelHero p {
-    max-width: 800px;
-    margin: 12px 0 0;
+    max-width: 680px;
+    margin: 9px 0 0;
     color: var(--color-text-secondary);
-    font-size: 14px;
-    line-height: 1.65;
+    font-size: 13px;
+    line-height: 1.55;
 }
 
 .savePanel {
-    display: grid;
-    gap: 12px;
-    align-self: stretch;
-    border: 1px solid rgba(91, 35, 255, 0.12);
-    border-radius: 18px;
-    background: rgba(255, 255, 255, 0.6);
-    padding: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    flex: 0 0 auto;
+    min-width: 0;
 }
 
-.savePanel > span {
-    color: var(--color-text-muted);
-    font-size: 12px;
+.saveClean,
+.saveDirty {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    border-radius: 999px;
+    padding: 0 10px;
+    font-size: 11px;
     font-weight: 850;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.saveClean {
+    border: 1px solid rgba(16, 185, 129, 0.22);
+    background: rgba(16, 185, 129, 0.08);
+    color: var(--color-success);
+}
+
+.saveDirty {
+    border: 1px solid rgba(245, 158, 11, 0.24);
+    background: rgba(245, 158, 11, 0.09);
+    color: var(--color-warning);
 }
 
 .saveActions {
     display: flex;
-    flex-wrap: wrap;
+    align-items: center;
     gap: 8px;
+}
+
+.primaryAction,
+.secondaryAction {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 34px;
+    border-radius: 999px;
+    padding: 0 14px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    transition:
+        background 150ms ease,
+        border-color 150ms ease,
+        color 150ms ease,
+        transform 150ms ease,
+        opacity 150ms ease;
+}
+
+.primaryAction {
+    border: 1px solid var(--color-primary);
+    background: var(--color-primary);
+    color: white;
+    box-shadow: 0 4px 0 0 #3d16c0, 0 6px 16px rgba(91, 35, 255, 0.22);
+}
+
+.primaryAction:hover:not(:disabled) {
+    transform: translateY(-1px);
+}
+
+.primaryAction:active:not(:disabled) {
+    box-shadow: 0 1px 0 0 #3d16c0, 0 3px 10px rgba(91, 35, 255, 0.2);
+    transform: translateY(2px);
+}
+
+.secondaryAction {
+    border: 1px solid var(--color-border);
+    background: rgba(255, 255, 255, 0.72);
+    color: var(--color-text-secondary);
+}
+
+.secondaryAction:hover:not(:disabled) {
+    border-color: var(--color-border-hover);
+    background: rgba(91, 35, 255, 0.05);
+    color: var(--color-text-primary);
+}
+
+.primaryAction:disabled,
+.secondaryAction:disabled {
+    cursor: not-allowed;
+    opacity: 0.48;
 }
 
 .preferenceGrid {
@@ -79,16 +148,23 @@
     gap: 14px;
 }
 
+.card,
+.note {
+    border: 1px solid var(--color-border);
+    background: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 10px 26px rgba(22, 16, 58, 0.045);
+}
+
 .card {
     display: grid;
-    gap: 16px;
-    border-radius: 20px;
-    padding: clamp(16px, 2vw, 22px);
+    gap: 14px;
+    border-radius: 18px;
+    padding: 16px;
 }
 
 .cardHeader {
     display: flex;
-    gap: 14px;
+    gap: 12px;
     align-items: flex-start;
     justify-content: space-between;
 }
@@ -96,17 +172,17 @@
 .cardHeader h2 {
     margin: 0;
     color: var(--color-text-primary);
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 850;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.015em;
     line-height: 1.2;
 }
 
 .cardHeader p {
-    margin: 7px 0 0;
+    margin: 5px 0 0;
     color: var(--color-text-secondary);
-    font-size: 13px;
-    line-height: 1.55;
+    font-size: 12px;
+    line-height: 1.45;
 }
 
 .cardHeader > span {
@@ -114,12 +190,12 @@
     align-items: center;
     width: fit-content;
     flex: 0 0 auto;
-    border: 1px solid var(--color-border);
+    border: 1px solid rgba(91, 35, 255, 0.16);
     border-radius: 999px;
     background: rgba(91, 35, 255, 0.06);
     color: var(--color-primary);
-    padding: 7px 11px;
-    font-size: 11px;
+    padding: 6px 9px;
+    font-size: 10px;
     font-weight: 850;
     line-height: 1;
     white-space: nowrap;
@@ -127,21 +203,21 @@
 
 .optionList {
     display: grid;
-    gap: 10px;
+    gap: 8px;
 }
 
 .option {
     position: relative;
     display: grid;
-    grid-template-columns: 38px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 12px;
     align-items: center;
-    min-height: 78px;
+    min-height: 62px;
     border: 1px solid var(--color-border);
-    border-radius: 16px;
+    border-radius: 14px;
     background: rgba(255, 255, 255, 0.62);
     cursor: pointer;
-    padding: 13px;
+    padding: 11px 12px;
     transition:
         border-color 150ms ease,
         background 150ms ease,
@@ -160,68 +236,79 @@
     pointer-events: none;
 }
 
-.optionControl {
-    display: grid;
-    width: 34px;
-    height: 34px;
-    place-items: center;
-    border: 1px solid var(--color-border);
-    border-radius: 999px;
-    background: rgba(91, 35, 255, 0.06);
-}
-
-.optionControl::after {
-    width: 10px;
-    height: 10px;
-    border-radius: 999px;
-    background: transparent;
-    content: "";
-}
-
-.optionChecked {
-    border-color: var(--color-border-primary);
-    background: rgba(91, 35, 255, 0.07);
-}
-
-.optionChecked .optionControl {
-    border-color: var(--color-primary);
-    background: var(--color-primary);
-}
-
-.optionChecked .optionControl::after {
-    background: rgba(255, 255, 255, 0.95);
-}
-
-.optionDisabled {
-    cursor: not-allowed;
-    opacity: 0.5;
+.optionText {
+    min-width: 0;
 }
 
 .option strong {
     display: block;
     color: var(--color-text-primary);
     font-size: 13px;
-    font-weight: 850;
-    line-height: 1.3;
+    font-weight: 800;
+    line-height: 1.25;
 }
 
 .option small {
     display: block;
-    margin-top: 4px;
+    margin-top: 3px;
     color: var(--color-text-secondary);
     font-size: 12px;
-    line-height: 1.45;
+    line-height: 1.35;
+}
+
+.switch {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    width: 42px;
+    height: 24px;
+    border: 1px solid rgba(91, 35, 255, 0.16);
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.08);
+    padding: 2px;
+    transition:
+        background 150ms ease,
+        border-color 150ms ease;
+}
+
+.switch span {
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 2px 8px rgba(22, 16, 58, 0.16);
+    transform: translateX(0);
+    transition: transform 150ms ease;
+}
+
+.optionChecked {
+    border-color: rgba(91, 35, 255, 0.28);
+    background: rgba(91, 35, 255, 0.055);
+}
+
+.optionChecked .switch {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+}
+
+.optionChecked .switch span {
+    transform: translateX(18px);
+}
+
+.optionDisabled {
+    cursor: not-allowed;
+    opacity: 0.48;
 }
 
 .note {
-    max-width: 920px;
-    border-radius: 18px;
-    padding: 16px 18px;
+    max-width: 840px;
+    border-radius: 16px;
+    padding: 14px 16px;
 }
 
 .note strong {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
     color: var(--color-text-primary);
     font-size: 13px;
     font-weight: 850;
@@ -230,12 +317,22 @@
 .note p {
     margin: 0;
     color: var(--color-text-secondary);
-    font-size: 13px;
-    line-height: 1.6;
+    font-size: 12px;
+    line-height: 1.55;
+}
+
+@media (max-width: 1320px) {
+    .panelHero {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .savePanel {
+        justify-content: space-between;
+    }
 }
 
 @media (max-width: 1180px) {
-    .panelHero,
     .preferenceGrid {
         grid-template-columns: 1fr;
     }
@@ -252,12 +349,22 @@
         padding: 14px;
     }
 
-    .cardHeader {
+    .panelHero {
+        padding-bottom: 12px;
+    }
+
+    .savePanel,
+    .saveActions {
+        align-items: stretch;
         flex-direction: column;
     }
 
-    .saveActions {
-        align-items: stretch;
+    .primaryAction,
+    .secondaryAction {
+        width: 100%;
+    }
+
+    .cardHeader {
         flex-direction: column;
     }
 }
