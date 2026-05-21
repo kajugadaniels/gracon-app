@@ -358,6 +358,7 @@
     line-height: 1.25;
 }
 
+.accountItem,
 .accountItemDanger {
     display: flex;
     align-items: center;
@@ -371,10 +372,16 @@
     font-size: 13px;
     font-weight: 600;
     text-align: left;
+    text-decoration: none;
     cursor: pointer;
     transition:
         background 120ms ease,
         color 120ms ease;
+}
+
+.accountItem:hover {
+    background: rgba(15, 23, 42, 0.05);
+    color: var(--color-text-primary);
 }
 
 .accountItemDanger:hover {
