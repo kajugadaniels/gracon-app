@@ -9,8 +9,16 @@ export {
     getUserPreferencesApi,
     updateUserPreferencesApi,
 } from './preferences.api';
+export { getUserActivityApi } from './activity.api';
 export type {
     UpdateUserPreferencesPayload,
     UserInviteVerificationPreference,
     UserPreferencesResponse,
 } from './preferences.api';
+export type {
+    UserActivityCategory,
+    UserActivityItem,
+    UserActivityOrder,
+    UserActivityQuery,
+    UserActivityResponse,
+} from './activity.api';
