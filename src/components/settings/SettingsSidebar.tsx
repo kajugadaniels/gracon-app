@@ -20,6 +20,12 @@ const SETTINGS_LINKS = [
         description: 'Default checks for invitations.',
         Icon: IconWorkspace,
     },
+    {
+        href: '/settings/activity',
+        label: 'User activity',
+        description: 'Read-only account action history.',
+        Icon: IconActivity,
+    },
 ] as const;
 
 /**
@@ -74,6 +80,17 @@ function IconProfile() {
             stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
             <path d="M20 21a8 8 0 0 0-16 0" />
             <circle cx="12" cy="7" r="4" />
+        </svg>
+    );
+}
+
+function IconActivity() {
+    return (
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 3v18h18" />
+            <path d="m7 14 3-3 3 2 5-6" />
+            <path d="M17 7h1v1" />
         </svg>
     );
 }
