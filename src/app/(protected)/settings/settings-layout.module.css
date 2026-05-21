@@ -1,0 +1,20 @@
+/**
+ * Settings layout styles.
+ */
+.layout {
+    display: grid;
+    grid-template-columns: minmax(230px, 300px) minmax(0, 1fr);
+    gap: clamp(14px, 2vw, 22px);
+    width: 100%;
+    align-items: start;
+}
+
+.content {
+    min-width: 0;
+}
+
+@media (max-width: 1180px) {
+    .layout {
+        grid-template-columns: 1fr;
+    }
+}
