@@ -55,10 +55,12 @@ export function Navbar() {
     const { user, refreshToken, clearAuth } = useAuthStore();
     const [menuOpen, setMenuOpen] = useState(false);
     const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+    const [avatarLoaded, setAvatarLoaded] = useState(false);
+    const [avatarFailed, setAvatarFailed] = useState(false);
     const accountMenuRef = useRef<HTMLDivElement>(null);
 
     const displayName = user ? `${user.postNames} ${user.surName}`.trim() : 'Account';
-    const profileImageUrl = normalizeImageUrl(user?.imageUrl);
+    const profileImageUrl = avatarFailed ? null : normalizeImageUrl(user?.imageUrl);
     const initials = getInitials(user?.postNames, user?.surName);
 
     useEffect(() => {
@@ -71,6 +73,11 @@ export function Navbar() {
         document.addEventListener('mousedown', handlePointerDown);
         return () => document.removeEventListener('mousedown', handlePointerDown);
     }, []);
+
+    useEffect(() => {
+        setAvatarLoaded(false);
+        setAvatarFailed(false);
+    }, [user?.userId, user?.imageUrl]);
 
     const handleLogout = async () => {
         try {
@@ -128,27 +135,35 @@ export function Navbar() {
                             aria-haspopup="menu"
                             onClick={() => setAccountMenuOpen((open) => !open)}
                         >
-                            <span className={styles.avatar}>
-                                {profileImageUrl ? (
-                                    // eslint-disable-next-line @next/next/no-img-element
-                                    <img src={profileImageUrl} alt={displayName} className={styles.avatarImage} />
-                                ) : (
-                                    initials
-                                )}
-                            </span>
+                            <AccountAvatar
+                                source={profileImageUrl}
+                                displayName={displayName}
+                                initials={initials}
+                                loaded={avatarLoaded}
+                                size="md"
+                                onLoad={() => setAvatarLoaded(true)}
+                                onError={() => {
+                                    setAvatarFailed(true);
+                                    setAvatarLoaded(false);
+                                }}
+                            />
                         </button>
 
                         {accountMenuOpen ? (
                             <div className={styles.accountDropdown} role="menu">
                                 <div className={styles.accountProfile}>
-                                    <span className={styles.dropdownAvatar}>
-                                        {profileImageUrl ? (
-                                            // eslint-disable-next-line @next/next/no-img-element
-                                            <img src={profileImageUrl} alt="" className={styles.avatarImage} />
-                                        ) : (
-                                            initials
-                                        )}
-                                    </span>
+                                    <AccountAvatar
+                                        source={profileImageUrl}
+                                        displayName={displayName}
+                                        initials={initials}
+                                        loaded={avatarLoaded}
+                                        size="sm"
+                                        onLoad={() => setAvatarLoaded(true)}
+                                        onError={() => {
+                                            setAvatarFailed(true);
+                                            setAvatarLoaded(false);
+                                        }}
+                                    />
                                     <div className={styles.accountCopy}>
                                         <p>{displayName}</p>
                                         <span>{user?.email ?? 'Signed in'}</span>
@@ -197,6 +212,48 @@ export function Navbar() {
                 </div>
             ) : null}
         </header>
+    );
+}
+
+/**
+ * Displays a robust profile avatar with the same loading/fallback behavior as
+ * the documents workspace avatar.
+ */
+function AccountAvatar({
+    source,
+    displayName,
+    initials,
+    loaded,
+    size,
+    onLoad,
+    onError,
+}: {
+    source: string | null;
+    displayName: string;
+    initials: string;
+    loaded: boolean;
+    size: 'sm' | 'md';
+    onLoad: () => void;
+    onError: () => void;
+}) {
+    return (
+        <span className={`${styles.avatar} ${styles[size]}`} aria-label={displayName}>
+            {source && !loaded ? <span className={styles.avatarLoading} aria-hidden="true" /> : null}
+            {source ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                    src={source}
+                    alt={`${displayName} profile photo`}
+                    className={`${styles.avatarImage} ${loaded ? styles.avatarImageLoaded : ''}`}
+                    decoding="async"
+                    referrerPolicy="no-referrer"
+                    onLoad={onLoad}
+                    onError={onError}
+                />
+            ) : (
+                <span className={styles.avatarInitials}>{initials}</span>
+            )}
+        </span>
     );
 }
 
