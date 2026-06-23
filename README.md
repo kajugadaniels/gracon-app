@@ -114,8 +114,8 @@ Read that guide before changing auth/session recovery, identity verification rou
 ## Security Hardening
 
 Read [SECURITY.md](./SECURITY.md) before changing login, logout, refresh,
-identity verification routing, cross-app redirects, cookie policy, or token
-storage.
+identity verification routing, cross-app redirects, cookie policy, token
+storage, CSP headers, or app security workflow checks.
 
 ## Local Commands
 
