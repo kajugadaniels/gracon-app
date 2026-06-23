@@ -145,6 +145,42 @@ function checkGitignore() {
     }
 }
 
+function checkNextSecurityHeaders() {
+    const configPath = join(projectRoot, 'next.config.ts');
+    if (!existsSync(configPath)) {
+        errors.push('next.config.ts is required.');
+        return;
+    }
+
+    const config = readFileSync(configPath, 'utf8');
+    for (const marker of [
+        'Content-Security-Policy',
+        'Referrer-Policy',
+        'X-Content-Type-Options',
+        'X-Frame-Options',
+        'Permissions-Policy',
+        'frame-ancestors',
+        'camera=(self)',
+    ]) {
+        if (!config.includes(marker)) {
+            errors.push(`next.config.ts must configure ${marker}.`);
+        }
+    }
+}
+
+function checkWorkflowSecretScanning() {
+    const workflowPath = join(projectRoot, '.github/workflows/app-security.yml');
+    if (!existsSync(workflowPath)) {
+        errors.push('.github/workflows/app-security.yml is required.');
+        return;
+    }
+
+    const workflow = readFileSync(workflowPath, 'utf8');
+    if (!workflow.includes('gitleaks/gitleaks-action')) {
+        errors.push('app-security workflow must run Gitleaks secret scanning.');
+    }
+}
+
 function checkSourceBoundary() {
     const sensitiveStorage = /\b(localStorage|sessionStorage)\b.*(token|jwt|secret|password|private|nid|pid|passport)/i;
     for (const file of walk(join(projectRoot, 'src'))) {
@@ -192,6 +228,8 @@ function checkRedirectSafety() {
 checkEnvExample();
 checkDeployEnv();
 checkGitignore();
+checkNextSecurityHeaders();
+checkWorkflowSecretScanning();
 checkSourceBoundary();
 checkRedirectSafety();
 
