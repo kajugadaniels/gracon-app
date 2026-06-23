@@ -111,11 +111,18 @@ Project-local AI guidance lives in `agents/README.md`.
 
 Read that guide before changing auth/session recovery, identity verification routing, profile/settings surfaces, shared topbar behavior, user activity, digital-signature setup, cross-app redirects, or production cookie behavior. The guide is intentionally specific to this frontend so contributors preserve the identity-app boundary while keeping `app/documents` and `app/meetings` handoff flows secure and user-friendly.
 
+## Security Hardening
+
+Read [SECURITY.md](./SECURITY.md) before changing login, logout, refresh,
+identity verification routing, cross-app redirects, cookie policy, or token
+storage.
+
 ## Local Commands
 
 ```bash
 npm install
 npm run dev
+npm run check:security
 npm run build
 npm run lint
 npm run test
