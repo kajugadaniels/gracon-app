@@ -46,3 +46,10 @@ Run deployment env validation with real production env values before release:
 ```bash
 CHECK_DEPLOY_ENV=true npm run check:security
 ```
+
+## Browser Hardening
+
+- `next.config.ts` owns the app-wide CSP and security headers.
+- The app security workflow runs Gitleaks before install/build steps.
+- Browser storage checks prevent token-like values from being added to
+  `localStorage` and keep cookie access inside approved session helpers.
